@@ -1,117 +1,121 @@
 {
-	"geode": "4.9.0",
-	"gd": {
-		"win": "2.2074",
-		"android": "2.2074",
-		"mac": "2.2074",
-		"ios": "2.2074"
-	},
-	"id": "km7dev.cosmic_clones",
-	"name": "Cosmic Clones",
-	"version": "v1.0.0",
-	"developer": "km7dev",
-	"description": "Adds chasers to levels.",
-	"dependencies": {
-		"geode.node-ids": ">=v1.20.0"
-	},
-	"settings": {
-		"enabled": {
-			"name": "Enabled",
-			"description": "A soft toggle for the mod. Requires reentering any active level.",
-			"type": "bool",
-			"default": true
-		},
-		"spawn-delay": {
-			"name": "Initial Delay",
-			"description": "Delay between the player spawning and the clones spawning. <cy>This is recommended to be higher than the main delay.</c>",
-			"type": "float",
-			"default": 1.5,
-			"min": 0.25,
-			"max": 20,
-			"control": {
-				"slider": true,
-				"slider-step": 0.25,
-				"arrows": true,
-				"arrow-step": 0.25,
-				"big-arrows": true,
-				"big-arrow-step": 1
-			}
-		},
-		"delay": {
-			"name": "Delay",
-			"description": "Delay between cosmic clones spawn.",
-			"type": "float",
-			"default": 1,
-			"min": 0.25,
-			"max": 20,
-			"control": {
-				"slider": true,
-				"slider-step": 0.25,
-				"arrows": true,
-				"arrow-step": 0.25,
-				"big-arrows": true,
-				"big-arrow-step": 1
-			}
-		},
-		"clones": {
-            "name": "Clone Count",
-			"description": "How many clones can spawn.",
-            "type": "int",
-            "default": 3,
-            "min": 1,
-            "max": 20,
-            "control": {
-                "slider": true,
-				"slider-step": 1,
-				"arrows": true,
-				"arrow-step": 1
-            }
-		},
-		"style": {
-                        "type": "string",
-                        "name": "Clone Style",
-                        "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**",
-                        "default": "Cosmic Mario (SMG 1)",
-                        "one-of": [
-                                "Cosmic Mario (SMG 1)",
-                                "Cosmic Clone (SMG 2)",
-                                "Badeline Chaser (Celeste)",
-								"Custom"
-                        ]
-                },
-		"custom-col1": {
-			"name": "Color 1",
-			"description": "Color 1 to use for clones.",
-			"type": "color",
-			"default": "#4287f5",
-			"enable-if": "!style-custom"
-		},
-		"custom-col2": {
-			"name": "Color 2",
-			"description": "Color 2 to use for clones.",
-			"type": "color",
-			"default": "#8d00d9"
-		},
-		"custom-use-glow": {
-			"name": "Use Glow",
-			"description": "If clones should use glow",
-			"type": "bool",
-			"default": true
-		},
-		"custom-glow": {
-			"name": "Glow",
-			"description": "Glow color to use for clones.",
-			"type": "color",
-			"default": "#7300f7"
-		}
-	},
-	"resources": {
-		"files": [
-			"resources/audio/*/*",
-			"resources/shaders/*"
-		],
-		"sprites": [
-			"resources/sprites/*.png"
-		]
-	}
+  "geode": "4.9.0",
+  "gd": {
+    "win": "2.2074",
+    "android": "2.2074",
+    "mac": "2.2074",
+    "ios": "2.2074"
+  },
+  "id": "km7dev.cosmic_clones",
+  "name": "Cosmic Clones",
+  "version": "v1.0.1",
+  "developer": "km7dev",
+  "description": "Adds chasers to levels.",
+  "dependencies": {
+    "geode.node-ids": ">=v1.20.0"
+  },
+  "tags": [
+    "gameplay",
+    "modtober25"
+  ],
+  "settings": {
+    "enabled": {
+      "name": "Enabled",
+      "description": "A soft toggle for the mod. Requires reentering any active level.",
+      "type": "bool",
+      "default": true
+    },
+    "spawn-delay": {
+      "name": "Initial Delay",
+      "description": "Delay between the player spawning and the clones spawning. <cy>This is recommended to be higher than the main delay.</c>",
+      "type": "float",
+      "default": 1.5,
+      "min": 0.25,
+      "max": 20,
+      "control": {
+        "slider": true,
+        "slider-step": 0.25,
+        "arrows": true,
+        "arrow-step": 0.25,
+        "big-arrows": true,
+        "big-arrow-step": 1
+      }
+    },
+    "delay": {
+      "name": "Delay",
+      "description": "Delay between cosmic clones spawn.",
+      "type": "float",
+      "default": 1,
+      "min": 0.25,
+      "max": 20,
+      "control": {
+        "slider": true,
+        "slider-step": 0.25,
+        "arrows": true,
+        "arrow-step": 0.25,
+        "big-arrows": true,
+        "big-arrow-step": 1
+      }
+    },
+    "clones": {
+      "name": "Clone Count",
+      "description": "How many clones can spawn.",
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 20,
+      "control": {
+        "slider": true,
+        "slider-step": 1,
+        "arrows": true,
+        "arrow-step": 1
+      }
+    },
+    "style": {
+      "type": "string",
+      "name": "Clone Style",
+      "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**",
+      "default": "Cosmic Mario (SMG 1)",
+      "one-of": [
+        "Cosmic Mario (SMG 1)",
+        "Cosmic Clone (SMG 2)",
+        "Badeline Chaser (Celeste)",
+        "Custom"
+      ]
+    },
+    "custom-col1": {
+      "name": "Color 1",
+      "description": "Color 1 to use for clones.",
+      "type": "color",
+      "default": "#4287f5",
+      "enable-if": "!style-custom"
+    },
+    "custom-col2": {
+      "name": "Color 2",
+      "description": "Color 2 to use for clones.",
+      "type": "color",
+      "default": "#8d00d9"
+    },
+    "custom-use-glow": {
+      "name": "Use Glow",
+      "description": "If clones should use glow",
+      "type": "bool",
+      "default": true
+    },
+    "custom-glow": {
+      "name": "Glow",
+      "description": "Glow color to use for clones.",
+      "type": "color",
+      "default": "#7300f7"
+    }
+  },
+  "resources": {
+    "files": [
+      "resources/audio/*/*",
+      "resources/shaders/*"
+    ],
+    "sprites": [
+      "resources/sprites/*.png"
+    ]
+  }
 }

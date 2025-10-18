@@ -23,7 +23,7 @@ int getFrame(const IconType type) {
 void CosmicClone::init(const int delay) {
     m_delay = delay;
     const auto pl = PlayLayer::get();
-    PlayerObject *plr = pl->m_player1;
+    PlayerObject* plr = pl->m_player1;
 
     auto gm = GameManager::sharedState();
     m_p1 = CosmicPlayerObject::createCosmic(gm->getPlayerFrame(), 1, pl, pl, true);
@@ -46,11 +46,11 @@ std::shared_ptr<CosmicClone> CosmicClone::create(const int delay) {
     return ret;
 }
 
-CosmicPlayerObject *CosmicClone::getP1() const {
+CosmicPlayerObject* CosmicClone::getP1() const {
     return m_p1;
 }
 
-CosmicPlayerObject *CosmicClone::getP2() const {
+CosmicPlayerObject* CosmicClone::getP2() const {
     return m_p2;
 }
 
@@ -137,7 +137,7 @@ void CosmicClone::setType(const IconType type, const int player) {
                 break;
             case IconType::Ship:
                 m_p2->toggleFlyMode(true, true);
-                if (m_p2->m_isPlatformer){
+                if (m_p2->m_isPlatformer) {
                     m_p2->updatePlayerJetpackFrame(sdi ? sdi->getSavedValue<int>("jetpack", gm->getPlayerJetpack()) : gm->getPlayerJetpack());
                 } else {
                     m_p2->updatePlayerShipFrame(sdi ? sdi->getSavedValue<int>("ship", gm->getPlayerShip()) : gm->getPlayerShip());
@@ -271,9 +271,9 @@ IconType CosmicClone::getType(const int player) const {
     return player == 2 ? m_p2type : m_p1type;
 }
 
-CosmicPlayerObject *CosmicPlayerObject::createCosmic(int player, int ship, GJBaseGameLayer *gameLayer, CCLayer *layer,
+CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBaseGameLayer* gameLayer, CCLayer* layer,
                                                      bool playLayer) {
-    auto ret = reinterpret_cast<CosmicPlayerObject *>(PlayerObject::create(player, ship, gameLayer, layer, playLayer));
+    auto ret = reinterpret_cast<CosmicPlayerObject*>(PlayerObject::create(player, ship, gameLayer, layer, playLayer));
     ret->m_fields->m_isCosmic = true;
     return ret;
 }
@@ -324,27 +324,27 @@ void CosmicClone::updateStyle(std::string style) {
 
 int CosmicClone::playSFX(CosmicCloneSFXType type) {
     switch (type) {
-    case CosmicCloneSFXType::Spawn:
-        if (m_style == "Badeline Chaser (Celeste)") {
-            return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
-        }
-        return -1;
-    case CosmicCloneSFXType::FirstSpawn:
-        if (m_style == "Cosmic Clone (SMG 2)" || m_style == "Cosmic Mario (SMG 1)") {
-            return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
-        }
-        if (m_style == "Badeline Chaser (Celeste)") {
-            return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
-        }
-        return -1;
-    case CosmicCloneSFXType::Die:
-        if (m_style == "Cosmic Clone (SMG 2)" || m_style == "Cosmic Mario (SMG 1)") {
-            return FMODAudioEngine::get()->playEffect("defeat.wav"_spr);
-        }
-        if (m_style == "Badeline Chaser (Celeste)") {
-            return FMODAudioEngine::get()->playEffect("disappear.wav"_spr);
-        }
-        return -1;
+        case CosmicCloneSFXType::Spawn:
+            if (m_style == "Badeline Chaser (Celeste)") {
+                return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
+            }
+            return -1;
+        case CosmicCloneSFXType::FirstSpawn:
+            if (m_style == "Cosmic Clone (SMG 2)" || m_style == "Cosmic Mario (SMG 1)") {
+                return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
+            }
+            if (m_style == "Badeline Chaser (Celeste)") {
+                return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
+            }
+            return -1;
+        case CosmicCloneSFXType::Die:
+            if (m_style == "Cosmic Clone (SMG 2)" || m_style == "Cosmic Mario (SMG 1)") {
+                return FMODAudioEngine::get()->playEffect("defeat.wav"_spr);
+            }
+            if (m_style == "Badeline Chaser (Celeste)") {
+                return FMODAudioEngine::get()->playEffect("disappear.wav"_spr);
+            }
+            return -1;
     }
     return -1;
 }

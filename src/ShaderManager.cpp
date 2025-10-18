@@ -4,6 +4,7 @@
 
 #include "Utils.hpp"
 #include "hooks/GJBaseGameLayer.hpp"
+#include "Shaders.hpp"
 
 using namespace geode::prelude;
 
@@ -16,22 +17,8 @@ CCGLProgram* ShaderManager::getCosmicShader() {
     auto cache = CCShaderCache::sharedShaderCache();
     auto shader = cache->programForKey("cosmic"_spr);
     if (shader) return shader;
-    auto vsh = Mod::get()->getResourcesDir() / "cosmic.vsh";
-    auto fsh = Mod::get()->getResourcesDir() / "cosmic.fsh";
-
-    if (!std::filesystem::exists(vsh)) {
-        log::error("Vertex shader doesn't exist.");
-        return nullptr;
-    }
-
-    if (!std::filesystem::exists(fsh)) {
-        log::error("Fragment shader doesn't exist.");
-        return nullptr;
-    }
-
     shader = new CCGLProgram;
-
-    if (!shader->initWithVertexShaderFilename(string::pathToString(vsh.c_str()).c_str(), string::pathToString(fsh.c_str()).c_str())) {
+    if (!shader->initWithVertexShaderByteArray(g_cosmicVsh, g_cosmicFsh)) {
         log::error("Shader failed to load!");
         log::error("{}", shader->fragmentShaderLog()); // probably going to crash anyway
         delete shader;
@@ -85,7 +72,7 @@ void CosmicSprite::updateStyle(std::string style) {
 }
 
 $on_mod(Loaded) {
-    listenForSettingChanges("style", [](std::string style){
+    listenForSettingChanges("style", [](std::string style) {
         if (auto pl = reinterpret_cast<CosmicClonesGJBGL*>(PlayLayer::get())) {
             auto fields = pl->m_fields.self();
             fields->m_sprite->updateStyle(style);

@@ -1,10 +1,9 @@
 #pragma once
 
 class ShaderManager {
-    public:
-        static ShaderManager& get();
-        cocos2d::CCGLProgram* getCosmicShader();
-
+public:
+    static ShaderManager& get();
+    cocos2d::CCGLProgram* getCosmicShader();
 };
 
 class CosmicSprite : public cocos2d::CCSprite {
@@ -20,6 +19,7 @@ protected:
     std::string m_style;
 
     float m_time = 0;
+
 public:
     static CosmicSprite* create(cocos2d::CCTexture2D* base);
 

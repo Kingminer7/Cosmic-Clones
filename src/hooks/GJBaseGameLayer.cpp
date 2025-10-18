@@ -5,7 +5,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     auto fields = m_fields.self();
     if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processCommands(dt);
     int tick = m_gameState.m_currentProgress - fields->m_offset;
-    for (auto clone: fields->m_clones) {
+    for (auto clone : fields->m_clones) {
         auto del = tick - clone->getDelay();
         if (fields->m_snapshots.contains(del)) {
             auto snap = fields->m_snapshots.at(del);
@@ -95,9 +95,9 @@ void CosmicClonesGJBGL::processCommands(float dt) {
         snap.pos2 = m_player2->getPosition();
         snap.rotation2 = m_player2->getRotation();
         snap.scale2 = m_player2->getScale();
-        snap.left2 = m_player2->m_isGoingLeft,
-                snap.side2 = m_player2->m_isSideways,
-                snap.flip2 = m_player2->m_isUpsideDown;
+        snap.left2 = m_player2->m_isGoingLeft;
+        snap.side2 = m_player2->m_isSideways;
+        snap.flip2 = m_player2->m_isUpsideDown;
         snap.visible2 = m_player2->isVisible();
         if (m_player2->m_isShip) {
             snap.type2 = IconType::Ship;
@@ -123,14 +123,14 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     if (!fields->m_p1Frozen && fields->m_p1Immunity > 0) {
         fields->m_p1Immunity--;
     } else if (!fields->m_p1Frozen) {
-        for (auto const &clone: fields->m_clones) {
+        for (auto const& clone : fields->m_clones) {
             if (clone->getDelay() <= tick) clone->checkCollision(m_player1);
         }
     }
     if (!fields->m_p2Frozen && fields->m_p2Immunity > 0) {
         fields->m_p2Immunity--;
-    } else if (!fields->m_p2Frozen && m_gameState.m_isDualMode && m_player2 != nullptr){
-        for (auto const &clone: fields->m_clones) {
+    } else if (!fields->m_p2Frozen && m_gameState.m_isDualMode && m_player2 != nullptr) {
+        for (auto const& clone : fields->m_clones) {
             if (clone->getDelay() <= tick) clone->checkCollision(m_player2);
         }
     }

@@ -4,7 +4,7 @@
 #include "../Utils.hpp"
 
 void CosmicClonesPlayLayer::resetLevel() {
-    auto fields = reinterpret_cast<CosmicClonesGJBGL *>(this)->m_fields.self();
+    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
     if (!fields->m_enabled) return PlayLayer::resetLevel();
     auto tick = m_gameState.m_currentProgress - fields->m_offset;
     fields->m_stopped = false;
@@ -16,7 +16,7 @@ void CosmicClonesPlayLayer::resetLevel() {
         PlayLayer::resetLevel();
         fields->m_p1Immunity = 240; // 1s immunity (except for stinky tps bypass)
         fields->m_p2Immunity = 240;
-        std::vector<std::shared_ptr<CosmicClone> > toRem;
+        std::vector<std::shared_ptr<CosmicClone>> toRem;
         for (auto clone = fields->m_clones.begin(); clone != fields->m_clones.end();) {
             if (clone->get()->getDelay() > tick) {
                 auto p1 = clone->get()->getP1();
@@ -35,7 +35,7 @@ void CosmicClonesPlayLayer::resetLevel() {
             return time.first > tick;
         });
     } else {
-        for (auto clone: fields->m_clones) {
+        for (auto clone : fields->m_clones) {
             auto p1 = clone->getP1();
             p1->toggleGhostEffect(GhostType::Disabled);
             p1->removeFromParent();
@@ -54,17 +54,16 @@ void CosmicClonesPlayLayer::resetLevel() {
         fields->m_initialDelay = getSettingFast<"spawn-delay", float>();
         fields->m_sfxIds.erase(
             std::remove_if(fields->m_sfxIds.begin(), fields->m_sfxIds.end(), [](int channel) {
-                return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->
-                       m_stoppedChannels.end();
+                return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
             }), fields->m_sfxIds.end());
-        for (auto channel: fields->m_sfxIds) {
+        for (auto channel : fields->m_sfxIds) {
             FMODAudioEngine::get()->stopChannel(channel);
         }
     }
 }
 
 void CosmicClonesPlayLayer::setupHasCompleted() {
-    auto fields = reinterpret_cast<CosmicClonesGJBGL *>(this)->m_fields.self();
+    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
     if (!fields->m_enabled) return PlayLayer::setupHasCompleted();
     fields->m_count = getSettingFast<"clones", int>();
     fields->m_delay = getSettingFast<"delay", float>();
@@ -90,11 +89,11 @@ void CosmicClonesPlayLayer::setupHasCompleted() {
 }
 
 void CosmicClonesPlayLayer::levelComplete() {
-    auto fields = reinterpret_cast<CosmicClonesGJBGL *>(this)->m_fields.self();
+    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
     PlayLayer::levelComplete();
     if (!fields->m_enabled) return;
     bool hasSfxed = false;
-    for (const auto& clone: fields->m_clones) {
+    for (const auto& clone : fields->m_clones) {
         if (!hasSfxed) {
             hasSfxed = true;
             clone->playSFX(CosmicCloneSFXType::Die);

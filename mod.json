@@ -8,7 +8,7 @@
   },
   "id": "km7dev.cosmic_clones",
   "name": "Cosmic Clones",
-  "version": "v1.0.1",
+  "version": "v1.0.2",
   "developer": "km7dev",
   "description": "Adds chasers to levels.",
   "dependencies": {
@@ -18,6 +18,9 @@
     "gameplay",
     "modtober25"
   ],
+  "links": {
+    "source": "https://github.com/kingminer7/cosmic-clones"
+  },
   "settings": {
     "enabled": {
       "name": "Enabled",
@@ -111,8 +114,7 @@
   },
   "resources": {
     "files": [
-      "resources/audio/*/*",
-      "resources/shaders/*"
+      "resources/audio/*/*"
     ],
     "sprites": [
       "resources/sprites/*.png"

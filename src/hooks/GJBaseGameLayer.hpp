@@ -22,7 +22,7 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
         bool m_p2Jump = false;
         bool m_p1Frozen = false;
         bool m_p2Frozen = false;
-	bool m_enabled = geode::Mod::get()->getSettingValue<bool>("enabled");
+        bool m_enabled = geode::Mod::get()->getSettingValue<bool>("enabled");
 
         cocos2d::CCRenderTexture* m_renderTex;
         cocos2d::CCLayer* m_renderLayer;

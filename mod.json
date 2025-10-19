@@ -8,7 +8,7 @@
   },
   "id": "km7dev.cosmic_clones",
   "name": "Cosmic Clones",
-  "version": "v1.0.2",
+  "version": "v1.0.3",
   "developer": "km7dev",
   "description": "Adds chasers to levels.",
   "dependencies": {
@@ -60,6 +60,18 @@
         "big-arrow-step": 1
       }
     },
+    "normal-mode": {
+      "name": "Enable in Normal Mode",
+      "description": "If clones should spawn in normal mode.",
+      "type": "bool",
+      "default": false
+    },
+    "friendly": {
+      "name": "No Damage",
+      "description": "Prevents clones from damaging you.\nSuggested by DragosDobrican.",
+      "type": "bool",
+      "default": false
+    },
     "clones": {
       "name": "Clone Count",
       "description": "How many clones can spawn.",
@@ -73,6 +85,10 @@
         "arrows": true,
         "arrow-step": 1
       }
+    },
+    "style-header": {
+      "type": "title",
+      "name": "Style Options"
     },
     "style": {
       "type": "string",

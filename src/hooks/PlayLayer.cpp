@@ -64,6 +64,7 @@ void CosmicClonesPlayLayer::resetLevel() {
 
 void CosmicClonesPlayLayer::setupHasCompleted() {
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
+    if (!m_isPlatformer && !getSettingFast<"normal-mode", bool>()) fields->m_enabled = false;
     if (!fields->m_enabled) return PlayLayer::setupHasCompleted();
     fields->m_count = getSettingFast<"clones", int>();
     fields->m_delay = getSettingFast<"delay", float>();

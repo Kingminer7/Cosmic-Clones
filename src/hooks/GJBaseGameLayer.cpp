@@ -1,5 +1,7 @@
 #include "GJBaseGameLayer.hpp"
 
+#include "../Utils.hpp"
+
 void CosmicClonesGJBGL::processCommands(float dt) {
     if (!PlayLayer::get()) return GJBaseGameLayer::processCommands(dt);
     auto fields = m_fields.self();
@@ -120,6 +122,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     fields->m_snapshots[tick] = std::move(snap);
 
     GJBaseGameLayer::processCommands(dt);
+    if (getSettingFast<"friendly", bool>()) return;
     if (!fields->m_p1Frozen && fields->m_p1Immunity > 0) {
         fields->m_p1Immunity--;
     } else if (!fields->m_p1Frozen) {

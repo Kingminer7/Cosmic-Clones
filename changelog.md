@@ -1,3 +1,7 @@
+# 1.0.4
+- <cy>Fix incorrect icons showing up in dual</c>
+- <cy>Fix clones having jetpack in normal mode</c>
+- <cy>Fix clones disappearing after mirror portals</c>
 # 1.0.3
 - <cg>Add an option to disable clone damage</c>
 - <cy>Make normal mode clones toggleable</c>

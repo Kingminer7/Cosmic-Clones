@@ -64,9 +64,9 @@ protected:
     Animation m_p1anim = Animation::None;
     Animation m_p2anim = Animation::None;
 
-    void init(int delay);
+    void init(int delay, bool plat);
 public:
-    static std::shared_ptr<CosmicClone> create(int delay);
+    static std::shared_ptr<CosmicClone> create(int delay, bool plat);
     CosmicPlayerObject* getP1() const;
     CosmicPlayerObject* getP2() const;
     int getDelay() const;

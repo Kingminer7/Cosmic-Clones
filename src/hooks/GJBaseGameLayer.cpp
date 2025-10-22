@@ -41,7 +41,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     for (int i = 1; i <= fields->m_count; i++) {
         auto del = ((i - 1) * fields->m_delay + fields->m_initialDelay) * 240;
         if (tick == del) {
-            auto clone = CosmicClone::create(del);
+            auto clone = CosmicClone::create(del, m_isPlatformer);
             fields->m_renderLayer->addChild(clone->getP1());
             fields->m_renderLayer->addChild(clone->getP2());
             fields->m_clones.push_back(clone);
@@ -141,14 +141,39 @@ void CosmicClonesGJBGL::processCommands(float dt) {
 
 void CosmicClonesGJBGL::visit() {
     if (this != static_cast<GJBaseGameLayer*>(PlayLayer::get())) return GJBaseGameLayer::visit();
+
     auto fields = m_fields.self();
     if (!fields->m_enabled) return GJBaseGameLayer::visit();
-    fields->m_renderLayer->setPosition(m_objectLayer->getPosition());
-    fields->m_sprite->setScale(1 / m_objectLayer->getScale());
-    fields->m_renderLayer->setScale(m_objectLayer->getScale());
+
+    float dirX = (m_objectLayer->getScaleX() > 0) ? 1.f : -1.f;
+    float dirY = (m_objectLayer->getScaleY() > 0) ? 1.f : -1.f;
+    
+    float offsetX = (m_objectLayer->getScaleX() > 0) ? 0.f : fields->m_sprite->getContentWidth();
+    float offsetY = (m_objectLayer->getScaleY() > 0) ? 0.f : fields->m_sprite->getContentHeight();
+
+    fields->m_renderLayer->setPosition(
+        m_objectLayer->getPosition() * cocos2d::CCPoint{dirX, dirY} +
+        cocos2d::CCPoint{offsetX, offsetY}
+    );
+
+    fields->m_sprite->setScaleX(std::abs(1 / m_objectLayer->getScaleX()));
+    fields->m_sprite->setScaleY(std::abs(1 / m_objectLayer->getScaleY()));
+    fields->m_renderLayer->setScale(
+        std::abs(m_objectLayer->getScaleX()),
+        std::abs(m_objectLayer->getScaleY())
+    );
+
     fields->m_renderTex->beginWithClear(0, 0, 0, 0);
     fields->m_renderLayer->visit();
     fields->m_renderTex->end();
-    fields->m_sprite->setPosition(fields->m_sprite->getScaledContentSize() / 2 - m_objectLayer->getPosition() / m_objectLayer->getScale());
+
+    fields->m_sprite->setPosition(
+        (fields->m_sprite->getScaledContentSize() * cocos2d::CCPoint{dirX, dirY} / 2) -
+        (m_objectLayer->getPosition() / cocos2d::CCPoint{
+            m_objectLayer->getScaleX(),
+            m_objectLayer->getScaleY()
+        })
+    );
+
     GJBaseGameLayer::visit();
 }

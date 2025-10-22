@@ -20,7 +20,7 @@ int getFrame(const IconType type) {
     }
 }
 
-void CosmicClone::init(const int delay) {
+void CosmicClone::init(const int delay, bool plat) {
     m_delay = delay;
     const auto pl = PlayLayer::get();
     PlayerObject* plr = pl->m_player1;
@@ -29,20 +29,20 @@ void CosmicClone::init(const int delay) {
     m_p1 = CosmicPlayerObject::createCosmic(gm->getPlayerFrame(), 1, pl, pl, true);
     m_p1->m_fields->m_clone = this;
     m_p1->setID(fmt::format("cosmic-clone-{}"_spr, delay));
-    m_p1->togglePlatformerMode(true);
+    m_p1->togglePlatformerMode(plat);
 
     auto sdi = Loader::get()->getLoadedMod("weebify.separate_dual_icons");
     m_p2 = CosmicPlayerObject::createCosmic(sdi ? sdi->getSavedValue<int>("cube", gm->getPlayerFrame()) : gm->getPlayerFrame(), 1, pl, pl, true);
     m_p2->m_fields->m_clone = this;
     m_p2->setID(fmt::format("cosmic-clone-dual-{}"_spr, delay));
-    m_p2->togglePlatformerMode(true);
+    m_p2->togglePlatformerMode(plat);
 
     updateStyle(getSettingFast<"style", std::string>());
 }
 
-std::shared_ptr<CosmicClone> CosmicClone::create(const int delay) {
+std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat) {
     auto ret = std::make_shared<CosmicClone>();
-    ret->init(delay);
+    ret->init(delay, plat);
     return ret;
 }
 
@@ -145,27 +145,27 @@ void CosmicClone::setType(const IconType type, const int player) {
                 break;
             case IconType::Ball:
                 m_p2->toggleRollMode(true, true);
-                m_p2->updatePlayerFrame(sdi ? sdi->getSavedValue<int>("roll", gm->getPlayerBall()) : gm->getPlayerBall());
+                m_p2->updatePlayerRollFrame(sdi ? sdi->getSavedValue<int>("roll", gm->getPlayerBall()) : gm->getPlayerBall());
                 break;
             case IconType::Ufo:
                 m_p2->toggleBirdMode(true, true);
-                m_p2->updatePlayerFrame(sdi ? sdi->getSavedValue<int>("bird", gm->getPlayerBird()) : gm->getPlayerBird());
+                m_p2->updatePlayerBirdFrame(sdi ? sdi->getSavedValue<int>("bird", gm->getPlayerBird()) : gm->getPlayerBird());
                 break;
             case IconType::Wave:
                 m_p2->toggleDartMode(true, true);
-                m_p2->updatePlayerFrame(sdi ? sdi->getSavedValue<int>("dart", gm->getPlayerDart()) : gm->getPlayerDart());
+                m_p2->updatePlayerDartFrame(sdi ? sdi->getSavedValue<int>("dart", gm->getPlayerDart()) : gm->getPlayerDart());
                 break;
             case IconType::Robot:
                 m_p2->toggleRobotMode(true, true);
-                m_p2->updatePlayerFrame(sdi ? sdi->getSavedValue<int>("robot", gm->getPlayerRobot()) : gm->getPlayerRobot());
+                m_p2->updatePlayerRobotFrame(sdi ? sdi->getSavedValue<int>("robot", gm->getPlayerRobot()) : gm->getPlayerRobot());
                 break;
             case IconType::Spider:
                 m_p2->toggleSpiderMode(true, true);
-                m_p2->updatePlayerFrame(sdi ? sdi->getSavedValue<int>("spider", gm->getPlayerSpider()) : gm->getPlayerSpider());
+                m_p2->updatePlayerSpiderFrame(sdi ? sdi->getSavedValue<int>("spider", gm->getPlayerSpider()) : gm->getPlayerSpider());
                 break;
             case IconType::Swing:
                 m_p2->toggleSwingMode(true, true);
-                m_p2->updatePlayerFrame(sdi ? sdi->getSavedValue<int>("swing", gm->getPlayerSwing()) : gm->getPlayerSwing());
+                m_p2->updatePlayerSwingFrame(sdi ? sdi->getSavedValue<int>("swing", gm->getPlayerSwing()) : gm->getPlayerSwing());
                 break;
             default: break;
         }

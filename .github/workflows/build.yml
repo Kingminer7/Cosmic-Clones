@@ -60,7 +60,7 @@
             bindings: kingminer7/bindings
             bindings-ref: patch-4
             combine: true
-            build-config: ${{ github.event.inputs.build_type != 'release' && (matrix.arget == 'Win64' && 'RelWithDebInfo' || 'Debug') || 'Release' }}
+            build-config: ${{ github.event.inputs.build_type != 'release' && (matrix.target == 'Win64' && 'RelWithDebInfo' || 'Debug') || 'Release' }}
             export-pdb: true
             export-symbols: true
             target: ${{ matrix.config.target }}

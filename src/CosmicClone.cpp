@@ -196,7 +196,7 @@ void CosmicClone::updateAnimation(const int player) const {
             case ::Animation::None: break;
             case ::Animation::Jump: {
                 if (m_p1type == IconType::Cube) {
-                    m_p1->animatePlatformerJump(1.f);
+                    if (m_p1->m_isPlatformer) m_p1->animatePlatformerJump(1.f);
                 } else if (m_p1type == IconType::Robot) {
                     m_p1->m_robotSprite->tweenToAnimation("jump_loop", 0.1f);
                 } else if (m_p1type == IconType::Spider) {
@@ -234,7 +234,7 @@ void CosmicClone::updateAnimation(const int player) const {
             case ::Animation::None: break;
             case ::Animation::Jump: {
                 if (m_p2type == IconType::Cube) {
-                    m_p2->animatePlatformerJump(1.f);
+                    if (m_p2->m_isPlatformer) m_p2->animatePlatformerJump(1.f);
                 } else if (m_p2type == IconType::Robot) {
                     m_p2->m_robotSprite->tweenToAnimation("jump_loop", 0.1f);
                 } else if (m_p2type == IconType::Spider) {

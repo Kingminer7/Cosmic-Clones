@@ -90,6 +90,11 @@
       "type": "title",
       "name": "Style Options"
     },
+    "styles": {
+      "name": "Clone Style",
+      "type": "custom:clone-style",
+      "default": ["Cosmic Mario (SMG 1)"]
+    },
     "style": {
       "type": "string",
       "name": "Clone Style",

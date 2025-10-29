@@ -9,8 +9,8 @@ public:
 class CosmicSprite : public cocos2d::CCSprite {
 protected:
     bool init(cocos2d::CCTexture2D* base);
-    void draw();
-    void update(float dt);
+    void draw() override;
+    void update(float dt) override;
 
     GLuint m_cosmicTex = 0;;
     GLuint m_normalTex = 0;

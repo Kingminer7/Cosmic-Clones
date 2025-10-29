@@ -63,7 +63,8 @@ void CosmicClonesPlayLayer::resetLevel() {
 }
 
 void CosmicClonesPlayLayer::setupHasCompleted() {
-    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
     if (!m_isPlatformer && !getSettingFast<"normal-mode", bool>()) fields->m_enabled = false;
     if (!fields->m_enabled) return PlayLayer::setupHasCompleted();
     fields->m_count = getSettingFast<"clones", int>();
@@ -72,21 +73,7 @@ void CosmicClonesPlayLayer::setupHasCompleted() {
     PlayLayer::setupHasCompleted();
     fields->m_offset = m_gameState.m_currentProgress;
     fields->m_initialDelay = getSettingFast<"spawn-delay", float>();
-    auto ws = cocos2d::CCDirector::get()->getWinSize();
-    fields->m_renderTex = cocos2d::CCRenderTexture::create(ws.width, ws.height);
-    fields->m_renderTex->setPosition(ws / 2);
-    fields->m_renderLayer = CCLayer::create();
-    fields->m_renderLayer->setContentSize({0, 0});
-    fields->m_renderLayer->setScale(m_objectLayer->getScale());
-    fields->m_renderLayer->setPosition(m_objectLayer->getPosition());
-    fields->m_renderTex->addChild(fields->m_renderLayer);
-    fields->m_renderTex->setVisible(false);
-    fields->m_sprite = CosmicSprite::create(fields->m_renderTex->m_pTexture);
-    fields->m_sprite->setFlipY(true);
-    fields->m_sprite->setScale(1 / m_objectLayer->getScale());
-    fields->m_sprite->addChild(fields->m_renderTex);
-    m_objectLayer->addChild(fields->m_sprite, m_player1->getZOrder());
-    fields->m_sprite->setPosition(fields->m_sprite->getContentSize() / 2 - m_objectLayer->getPosition() / m_objectLayer->getScale());
+    bgl->setupRenderTexture();
 }
 
 void CosmicClonesPlayLayer::levelComplete() {

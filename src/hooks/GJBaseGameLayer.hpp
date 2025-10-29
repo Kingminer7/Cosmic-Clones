@@ -32,4 +32,6 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
 
     void processCommands(float dt);
     void visit();
+
+    void setupRenderTexture();
 };

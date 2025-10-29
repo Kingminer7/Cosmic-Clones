@@ -177,3 +177,39 @@ void CosmicClonesGJBGL::visit() {
 
     GJBaseGameLayer::visit();
 }
+
+void CosmicClonesGJBGL::setupRenderTexture() {
+    auto fields = m_fields.self();
+    auto ws = cocos2d::CCDirector::get()->getWinSize();
+    if (!fields->m_renderLayer) {
+        fields->m_renderLayer = CCLayer::create();
+        fields->m_renderLayer->setContentSize({0, 0});
+        fields->m_renderLayer->setScale(m_objectLayer->getScale());
+        fields->m_renderLayer->setPosition(m_objectLayer->getPosition());
+        fields->m_renderLayer->retain();
+    } else {
+        geode::log::info("{}", fields->m_renderLayer->getParent() == nullptr);
+        fields->m_renderLayer->retain();
+        fields->m_renderLayer->removeFromParent();
+        geode::log::info("{}", fields->m_renderLayer->getParent() == nullptr);
+    }
+    if (fields->m_renderTex) {
+        fields->m_renderTex->removeFromParent();
+        fields->m_renderTex = nullptr;
+    }
+    fields->m_renderTex = cocos2d::CCRenderTexture::create(ws.width, ws.height);
+    fields->m_renderTex->setPosition(ws / 2);
+    fields->m_renderTex->addChild(fields->m_renderLayer);
+    fields->m_renderLayer->release();
+    fields->m_renderTex->setVisible(false);
+    if (!fields->m_sprite) {
+        fields->m_sprite = CosmicSprite::create(fields->m_renderTex->m_pTexture);
+        fields->m_sprite->setFlipY(true);
+        fields->m_sprite->setScale(1 / m_objectLayer->getScale());
+        fields->m_sprite->setPosition(fields->m_sprite->getContentSize() / 2 - m_objectLayer->getPosition() / m_objectLayer->getScale());
+        m_objectLayer->addChild(fields->m_sprite, m_player1->getZOrder());
+    } else {
+        fields->m_sprite->setTexture(fields->m_renderTex->m_pTexture);
+    }
+    fields->m_sprite->addChild(fields->m_renderTex);
+}

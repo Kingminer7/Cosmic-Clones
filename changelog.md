@@ -1,3 +1,5 @@
+# 1.0.5
+- <cy>Fix clones visually freezing when turning your device off</c>
 # 1.0.4
 - <cy>Fix incorrect icons showing up in dual</c>
 - <cy>Fix clones having jetpack in normal mode</c>

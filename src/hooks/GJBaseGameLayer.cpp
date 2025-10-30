@@ -188,10 +188,8 @@ void CosmicClonesGJBGL::setupRenderTexture() {
         fields->m_renderLayer->setPosition(m_objectLayer->getPosition());
         fields->m_renderLayer->retain();
     } else {
-        geode::log::info("{}", fields->m_renderLayer->getParent() == nullptr);
         fields->m_renderLayer->retain();
         fields->m_renderLayer->removeFromParent();
-        geode::log::info("{}", fields->m_renderLayer->getParent() == nullptr);
     }
     if (fields->m_renderTex) {
         fields->m_renderTex->removeFromParent();

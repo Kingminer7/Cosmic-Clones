@@ -120,6 +120,7 @@ void CosmicClone::setType(const IconType type, const int player) {
                 break;
             default: break;
         }
+        m_p1->updateGlowColor();
     } else if (player == 2) {
         if (type == m_p2type) return;
         m_p2type = type;
@@ -169,6 +170,7 @@ void CosmicClone::setType(const IconType type, const int player) {
                 break;
             default: break;
         }
+        m_p1->updateGlowColor();
     }
     updateAnimation(player);
 }
@@ -286,7 +288,7 @@ void CosmicClone::updateStyle(std::string style) {
             // This won't really be seen normally but just in case
             plr->setColor(ccColor3B{12, 11, 56});
             plr->setSecondColor(ccColor3B{11, 27, 56});
-            plr->setGlowColor(ccColor3B{13, 23, 64});
+            plr->enableCustomGlowColor(ccColor3B{13, 23, 64});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Disabled);

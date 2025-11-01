@@ -45,8 +45,10 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             fields->m_renderLayer->addChild(clone->getP1());
             fields->m_renderLayer->addChild(clone->getP2());
             fields->m_clones.push_back(clone);
-            auto id = clone->playSFX(i > 1 ? CosmicCloneSFXType::Spawn : CosmicCloneSFXType::FirstSpawn);
-            if (id > -1) fields->m_sfxIds.push_back(id);
+            if (getSettingFast<"sfx", bool>()) {
+                auto id = clone->playSFX(i > 1 ? CosmicCloneSFXType::Spawn : CosmicCloneSFXType::FirstSpawn);
+                if (id > -1) fields->m_sfxIds.push_back(id);
+            }
         }
     }
     int max = tick - ((fields->m_count - 1) * fields->m_delay + fields->m_initialDelay) * 240;

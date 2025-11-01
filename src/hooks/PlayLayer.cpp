@@ -84,7 +84,7 @@ void CosmicClonesPlayLayer::levelComplete() {
     for (const auto& clone : fields->m_clones) {
         if (!hasSfxed) {
             hasSfxed = true;
-            clone->playSFX(CosmicCloneSFXType::Die);
+            if (getSettingFast<"sfx", bool>()) clone->playSFX(CosmicCloneSFXType::Die);
         }
         clone->getP1()->playerDestroyed(false);
         clone->getP2()->playerDestroyed(false);

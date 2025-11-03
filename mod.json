@@ -95,7 +95,9 @@
       "name": "Clone Style",
       "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**\nSelecting multiple styles suggested by NonCloud9.",
       "default": [
-        "Cosmic Mario\n(SMG 1)"
+        {
+          "type": "Cosmic Mario\n(SMG 1)"
+        }
       ]
     },
     "sfx": {
@@ -103,30 +105,6 @@
       "description": "If clones should play sound effects (if the selected style has any)\nToggle suggested by Crafty-Jumper.",
       "type": "bool",
       "default": true
-    },
-    "custom-col1": {
-      "name": "Color 1",
-      "description": "Color 1 to use for clones.",
-      "type": "color",
-      "default": "#4287f5"
-    },
-    "custom-col2": {
-      "name": "Color 2",
-      "description": "Color 2 to use for clones.",
-      "type": "color",
-      "default": "#8d00d9"
-    },
-    "custom-use-glow": {
-      "name": "Use Glow",
-      "description": "If clones should use glow",
-      "type": "bool",
-      "default": true
-    },
-    "custom-glow": {
-      "name": "Glow",
-      "description": "Glow color to use for clones.",
-      "type": "color",
-      "default": "#7300f7"
     }
   },
   "resources": {

@@ -71,9 +71,9 @@ bool CosmicSprite::init() {
     return true;
 }
 
-void CosmicSprite::updateStyle(std::string style) {
+void CosmicSprite::updateStyle(Style style) {
     m_style = std::move(style);
-    if (m_style == "Cosmic Mario\n(SMG 1)") setShaderProgram(ShaderManager::get().getCosmicShader());
+    if (m_style.type == "Cosmic Mario\n(SMG 1)") setShaderProgram(ShaderManager::get().getCosmicShader());
     else setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
 }
 
@@ -105,7 +105,7 @@ CCRenderTexture* CosmicSprite::getRenderTexture() {
 }
 
 $on_mod(Loaded) {
-    listenForSettingChanges("styles", [](std::vector<std::string> style) {
+    listenForSettingChanges("styles", [](std::vector<Style> style) {
         if (auto pl = reinterpret_cast<CosmicClonesGJBGL*>(PlayLayer::get())) {
             auto fields = pl->m_fields.self();
             int i = 0;
@@ -148,7 +148,7 @@ void CosmicSprite::visit() {
 
 
 void CosmicSprite::draw() {
-    if (m_style != "Cosmic Mario\n(SMG 1)") return CCSprite::draw();
+    if (m_style.type != "Cosmic Mario\n(SMG 1)") return CCSprite::draw();
     CC_NODE_DRAW_SETUP();
 
     cocos2d::ccGLBlendFunc(m_sBlendFunc.src, m_sBlendFunc.dst);

@@ -1,7 +1,5 @@
 #include "CosmicClone.hpp"
 
-#include "Utils.hpp"
-
 using namespace geode::prelude;
 
 int getFrame(const IconType type) {
@@ -296,13 +294,13 @@ CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBas
     return ret;
 }
 
-void CosmicClone::updateStyle(std::string style) {
+void CosmicClone::updateStyle(Style style) {
     m_style = std::move(style);
     m_p1spr->updateStyle(m_style);
     m_p2spr->updateStyle(m_style);
 
     for (auto plr : {m_p1, m_p2}) {
-        if (m_style == "Cosmic Mario\n(SMG 1)") {
+        if (m_style.type == "Cosmic Mario\n(SMG 1)") {
             // This won't really be seen normally but just in case
             plr->setColor(ccColor3B{12, 11, 56});
             plr->setSecondColor(ccColor3B{11, 27, 56});
@@ -310,14 +308,14 @@ void CosmicClone::updateStyle(std::string style) {
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Disabled);
-        } else if (m_style == "Cosmic Clone\n(SMG 2)") {
+        } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
             plr->setColor(ccColor3B{60, 20, 21});
             plr->setSecondColor(ccColor3B{243, 235, 87});
             plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Disabled);
-        } else if (m_style == "Badeline Chaser\n(Celeste)") {
+        } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
             plr->setColor(ccColor3B{155, 63, 181});
             plr->setSecondColor(ccColor3B{191, 29, 51});
             plr->disableCustomGlowColor();
@@ -327,10 +325,10 @@ void CosmicClone::updateStyle(std::string style) {
             plr->m_ghostTrail->m_color = ccColor3B{255, 0, 0};
             plr->m_ghostTrail->m_fadeInterval = .4f;
         } else {
-            plr->setColor(getSettingFast<"custom-col1", ccColor3B>());
-            plr->setSecondColor(getSettingFast<"custom-col2", ccColor3B>());
-            if (getSettingFast<"custom-use-glow", bool>()) {
-                plr->enableCustomGlowColor(getSettingFast<"custom-glow", ccColor3B>());
+            plr->setColor(style.col1);
+            plr->setSecondColor(style.col2);
+            if (style.useGlow) {
+                plr->enableCustomGlowColor(style.glow);
                 plr->m_hasGlow = true;
             } else {
                 plr->disableCustomGlowColor();
@@ -345,23 +343,23 @@ void CosmicClone::updateStyle(std::string style) {
 int CosmicClone::playSFX(CosmicCloneSFXType type) {
     switch (type) {
         case CosmicCloneSFXType::Spawn:
-            if (m_style == "Badeline Chaser\n(Celeste)") {
+            if (m_style.type == "Badeline Chaser\n(Celeste)") {
                 return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
             }
             return -1;
         case CosmicCloneSFXType::FirstSpawn:
-            if (m_style == "Cosmic Clone\n(SMG 2)" || m_style == "Cosmic Mario\n(SMG 1)") {
+            if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)") {
                 return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
             }
-            if (m_style == "Badeline Chaser\n(Celeste)") {
+            if (m_style.type == "Badeline Chaser\n(Celeste)") {
                 return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
             }
             return -1;
         case CosmicCloneSFXType::Die:
-            if (m_style == "Cosmic Clone\n(SMG 2)" || m_style == "Cosmic Mario\n(SMG 1)") {
+            if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)") {
                 return FMODAudioEngine::get()->playEffect("defeat.wav"_spr);
             }
-            if (m_style == "Badeline Chaser\n(Celeste)") {
+            if (m_style.type == "Badeline Chaser\n(Celeste)") {
                 return FMODAudioEngine::get()->playEffect("disappear.wav"_spr);
             }
             return -1;

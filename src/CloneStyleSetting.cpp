@@ -1,13 +1,15 @@
 #include "CloneStyleSetting.hpp"
 
-std::vector<std::string> StyleNode::m_styles = {
-    "Cosmic Mario\n(SMG 1)",
-    "Cosmic Clone\n(SMG 2)",
-    "Badeline Chaser\n(Celeste)",
-    "Custom"
+using namespace geode::prelude;
+
+std::vector<Style> StyleNode::m_styles = {
+    {"Cosmic Mario\n(SMG 1)"},
+    {"Cosmic Clone\n(SMG 2)"},
+    {"Badeline Chaser\n(Celeste)"},
+    {"Custom"}
 };
 
-Result<std::shared_ptr<SettingV3> > CloneStyleSetting::parse(std::string const &key, std::string const &modID, matjson::Value const &json) {
+Result<std::shared_ptr<SettingV3>> CloneStyleSetting::parse(std::string const &key, std::string const &modID, matjson::Value const &json) {
     auto res = std::make_shared<CloneStyleSetting>();
     auto root = checkJson(json, "CloneStyleSetting");
     res->parseBaseProperties(key, modID, root);
@@ -48,7 +50,10 @@ void CloneStyleSettingNode::updateState(CCNode *invoker) {
 
     m_addBtn->setVisible(val.size() < 20);
 
-    auto h = m_nodes.size() * 30.f + 30.f;
+    auto h = 30.f;
+    for (auto node : m_nodes) {
+        h += node->getContentHeight();
+    }
     bm->setContentHeight(h);
     setContentHeight(h);
     bm->updateLayout();
@@ -61,7 +66,7 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
     auto bm = getButtonMenu();
     m_addBtn = CCMenuItemExt::createSpriteExtraWithFrameName("edit_addCBtn_001.png", .5f, [this](auto btn) {
         auto val = getValue();
-        val.push_back("Cosmic Mario\n(SMG 1)");
+        val.push_back(Style{"Cosmic Mario\n(SMG 1)"});
         setValue(val, btn);
     });
     m_addBtn->setContentSize({30.f, 30.f});
@@ -82,9 +87,6 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
 
     m_addBtn->setVisible(val.size() < 20);
 
-    auto h = m_nodes.size() * 30.f + 30.f;
-    bm->setContentHeight(h);
-    setContentHeight(h);
     bm->setContentWidth(100);
     bm->setLayout(ColumnLayout::create()->setAxisReverse(true)->setGap(0.f));
 
@@ -93,7 +95,7 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
     return true;
 }
 
-void CloneStyleSettingNode::setNodeValue(StyleNode* node, std::string value) {
+void CloneStyleSettingNode::setNodeValue(StyleNode* node, Style value) {
     auto val = getValue();
     val[node->getTag()] = value;
     setValue(val, node);
@@ -118,19 +120,20 @@ CloneStyleSettingNode* CloneStyleSettingNode::create(std::shared_ptr<CloneStyleS
     return nullptr;
 }
 
-bool StyleNode::init(CloneStyleSettingNode* setting, std::string value) {
+bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     if (!CCMenu::init()) return false;
     setID("clone-style-node");
     m_setting = setting;
+    m_style = std::move(value);
     ignoreAnchorPointForPosition(false);
     setAnchorPoint({.5f, .5f});
-    setContentSize({120, 30});
-    m_label = CCLabelBMFont::create(value.c_str(), "bigFont.fnt");
+    setContentSize({120, m_style.type == "Custom" ? 120.f : 30.f});
+    m_label = CCLabelBMFont::create(value.type.c_str(), "bigFont.fnt");
     m_label->setScale(75.f / m_label->getContentWidth());
     m_label->setAlignment(kCCTextAlignmentCenter);
     m_label->setID("display-label");
-    auto lArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this, value](auto) {
-        auto it = std::find(m_styles.begin(), m_styles.end(), m_label->getString());
+    auto lArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this](auto) {
+        auto it = std::find(m_styles.begin(), m_styles.end(), m_style);
         if (it == m_styles.begin() || it == m_styles.end())
             it = m_styles.end() - 1;
         else
@@ -141,7 +144,7 @@ bool StyleNode::init(CloneStyleSettingNode* setting, std::string value) {
     static_cast<CCSprite*>(lArrow->getNormalImage())->setFlipX(true);
     lArrow->setID("left-arrow-button");
     auto rArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this, value](auto) {
-        auto it = std::find(m_styles.begin(), m_styles.end(), m_label->getString());
+        auto it = std::find(m_styles.begin(), m_styles.end(), m_style);
         if (it == m_styles.end() - 1 || it == m_styles.end())
             it = m_styles.begin();
         else
@@ -156,22 +159,38 @@ bool StyleNode::init(CloneStyleSettingNode* setting, std::string value) {
     });
     del->setID("delete-button");
 
-    addChildAtPosition(m_label, Anchor::Center, {-7.5f, 0.f});
-    addChildAtPosition(lArrow, Anchor::Left, {5.f, 0.f});
-    addChildAtPosition(rArrow, Anchor::Right, {-20.f, 0.f});
-    addChildAtPosition(del, Anchor::Right, {-5.f, 0.f});
+    addChildAtPosition(m_label, Anchor::Top, {-7.5f, -15.f});
+    addChildAtPosition(lArrow, Anchor::TopLeft, {5.f, -15.f});
+    addChildAtPosition(rArrow, Anchor::TopRight, {-20.f, -15.f});
+    addChildAtPosition(del, Anchor::TopRight, {-5.f, -15.f});
     return true;
 }
 
-void StyleNode::updateState(std::string value) {
-    m_label->setString(value.c_str());
+void StyleNode::updateColor(ccColor4B const& color) {
+    if (m_currentlyEditing == "col1") {
+        m_style.col1 = ccColor3B(color.r, color.g, color.b);
+    } else if (m_currentlyEditing == "col2") {
+        m_style.col2 = ccColor3B(color.r, color.g, color.b);
+    } else if (m_currentlyEditing == "glow") {
+        m_style.glow = ccColor3B(color.r, color.g, color.b);
+    } else {
+        return;
+    }
+    m_setting->setNodeValue(this, m_style);
+}
+
+void StyleNode::updateState(Style value) {
+    m_style = std::move(value);
+    m_label->setString(m_style.type.c_str());
     if (auto width = m_label->getContentWidth(); width > 0.001f)
         m_label->setScale(std::min(80.f / width, .45f));
     else
         m_label->setScale(.001f);
+    setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
+    updateLayout();
 }
 
-StyleNode* StyleNode::create(CloneStyleSettingNode* setting, std::string value) {
+StyleNode* StyleNode::create(CloneStyleSettingNode* setting, Style value) {
     auto ret = new StyleNode();
     if (ret->init(setting, value)) {
         ret->autorelease();

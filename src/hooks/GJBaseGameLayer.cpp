@@ -39,7 +39,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             }
         }
     }
-    auto styles = getSettingFast<"styles", std::vector<std::string>>();
+    auto styles = getSettingFast<"styles", std::vector<Style>>();
     for (int i = 1; i <= fields->m_count; i++) {
         auto del = ((i - 1) * fields->m_delay + fields->m_initialDelay) * 240;
         if (tick == del) {

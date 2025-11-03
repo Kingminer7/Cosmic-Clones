@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Geode/modify/PlayerObject.hpp>
+
+#include "CloneStyleSetting.hpp"
 #include "ShaderManager.hpp"
 
 enum class Animation {
@@ -59,7 +61,7 @@ protected:
     CosmicSprite* m_p1spr = nullptr;
     CosmicPlayerObject* m_p2 = nullptr;
     CosmicSprite* m_p2spr = nullptr;
-    std::string m_style;
+    Style m_style;
 
     bool m_dual = false;
     IconType m_p1type = IconType::Cube;
@@ -85,5 +87,5 @@ public:
 
     int playSFX(CosmicCloneSFXType type);
 
-    void updateStyle(std::string style);
+    void updateStyle(Style style);
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include "CloneStyleSetting.hpp"
 
 class ShaderManager {
 public:
@@ -16,13 +17,13 @@ protected:
     GLuint m_cosmicTex = 0;;
     GLuint m_normalTex = 0;
     GLuint m_overlayTex = 0;
-    std::string m_style;
+    Style m_style;
     float m_time = 0;
     cocos2d::CCRenderTexture* m_renderTexture = nullptr;
 public:
     static CosmicSprite* create();
 
-    void updateStyle(std::string style);
+    void updateStyle(Style style);
     void resetRenderTexture();
     cocos2d::CCRenderTexture* getRenderTexture();
 };

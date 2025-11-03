@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "Utils.hpp"
 #include "hooks/GJBaseGameLayer.hpp"
 #include "Shaders.hpp"
+#include "CloneStyleSetting.hpp"
 
 using namespace geode::prelude;
 
@@ -41,9 +41,9 @@ CCGLProgram* ShaderManager::getCosmicShader() {
     return shader;
 }
 
-CosmicSprite* CosmicSprite::create(CCTexture2D* base) {
+CosmicSprite* CosmicSprite::create() {
     auto ret = new CosmicSprite;
-    if (ret->init(base)) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
@@ -52,32 +52,67 @@ CosmicSprite* CosmicSprite::create(CCTexture2D* base) {
     return nullptr;
 }
 
-bool CosmicSprite::init(CCTexture2D* base) {
-    if (!CCSprite::initWithTexture(base)) return false;
+bool CosmicSprite::init() {
     m_cosmicTex = CCTextureCache::get()->addImage("cosmic.png"_spr, false)->getName();
     m_normalTex = CCTextureCache::get()->addImage("normal.png"_spr, false)->getName();
     m_overlayTex = CCTextureCache::get()->addImage("star.png"_spr, false)->getName();
 
-    updateStyle(getSettingFast<"style", std::string>());
+    m_renderTexture = CCRenderTexture::create(60, 60);
+    m_renderTexture->setContentSize({60, 60});
+    m_renderTexture->setVisible(false);
+    addChild(m_renderTexture);
+
+    if (!CCSprite::initWithTexture(m_renderTexture->m_pTexture)) return false;
 
     scheduleUpdate();
+
+    setScaleY(-1);
 
     return true;
 }
 
 void CosmicSprite::updateStyle(std::string style) {
     m_style = std::move(style);
-    if (m_style == "Cosmic Mario (SMG 1)") setShaderProgram(ShaderManager::get().getCosmicShader());
+    if (m_style == "Cosmic Mario\n(SMG 1)") setShaderProgram(ShaderManager::get().getCosmicShader());
     else setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
 }
 
+void CosmicSprite::resetRenderTexture() {
+    std::vector<CCNode*> nodes;
+    if (m_renderTexture) {
+        for (auto child : m_renderTexture->getChildrenExt<CCNode*>()) {
+            if (child == m_renderTexture->m_pSprite) continue;
+            nodes.push_back(child);
+            child->retain();
+            child->removeFromParent();
+        }
+        m_renderTexture->removeFromParent();
+        m_renderTexture = nullptr;
+    }
+    m_renderTexture = CCRenderTexture::create(60, 60);
+    m_renderTexture->setContentSize({60, 60});
+    m_renderTexture->setVisible(false);
+    addChild(m_renderTexture);
+    setTexture(m_renderTexture->m_pTexture);
+    for (auto child : nodes) {
+        m_renderTexture->addChild(child);
+        child->release();
+    }
+}
+
+CCRenderTexture* CosmicSprite::getRenderTexture() {
+    return m_renderTexture;
+}
+
 $on_mod(Loaded) {
-    listenForSettingChanges("style", [](std::string style) {
+    listenForSettingChanges("styles", [](std::vector<std::string> style) {
         if (auto pl = reinterpret_cast<CosmicClonesGJBGL*>(PlayLayer::get())) {
             auto fields = pl->m_fields.self();
-            fields->m_sprite->updateStyle(style);
+            int i = 0;
             for (auto clone : fields->m_clones) {
-                clone->updateStyle(style);
+                if (clone == nullptr) continue;
+                clone->updateStyle(style[i % style.size()]);
+                i++;
             }
         }
     });
@@ -102,9 +137,18 @@ void CosmicSprite::update(float dt) {
     m_time += dt;
 }
 
+void CosmicSprite::visit() {
+    m_renderTexture->beginWithClear(0, 0, 0, 0);
+    for (auto child : m_renderTexture->getChildrenExt<CCNode*>()) {
+        child->visit();
+    }
+    m_renderTexture->end();
+    CCSprite::visit();
+}
+
 
 void CosmicSprite::draw() {
-    if (m_style != "Cosmic Mario (SMG 1)") return CCSprite::draw();
+    if (m_style != "Cosmic Mario\n(SMG 1)") return CCSprite::draw();
     CC_NODE_DRAW_SETUP();
 
     cocos2d::ccGLBlendFunc(m_sBlendFunc.src, m_sBlendFunc.dst);

@@ -2,7 +2,7 @@
 
 std::vector<std::string> StyleNode::m_styles = {
     "Cosmic Mario\n(SMG 1)",
-    "Cosmic Clones\n(SMG 2)",
+    "Cosmic Clone\n(SMG 2)",
     "Badeline Chaser\n(Celeste)",
     "Custom"
 };
@@ -46,6 +46,8 @@ void CloneStyleSettingNode::updateState(CCNode *invoker) {
         }
     }
 
+    m_addBtn->setVisible(val.size() < 20);
+
     auto h = m_nodes.size() * 30.f + 30.f;
     bm->setContentHeight(h);
     setContentHeight(h);
@@ -57,18 +59,16 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
         return false;
 
     auto bm = getButtonMenu();
-    auto addBtn = CCMenuItemExt::createSpriteExtraWithFrameName("edit_addCBtn_001.png", .5f, [this](auto btn) {
+    m_addBtn = CCMenuItemExt::createSpriteExtraWithFrameName("edit_addCBtn_001.png", .5f, [this](auto btn) {
         auto val = getValue();
         val.push_back("Cosmic Mario\n(SMG 1)");
         setValue(val, btn);
     });
-    addBtn->setContentSize({30.f, 30.f});
-    auto img = addBtn->getNormalImage();
-    // img->retain();
+    m_addBtn->setContentSize({30.f, 30.f});
+    auto img = m_addBtn->getNormalImage();
     img->removeFromParent();
-    addBtn->addChildAtPosition(img, Anchor::Center);
-    // img->release();
-    bm->addChild(addBtn);
+    m_addBtn->addChildAtPosition(img, Anchor::Center);
+    bm->addChild(m_addBtn);
     int i = 0;
     auto val = getValue();
     for (auto value : val) {
@@ -79,6 +79,8 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
         bm->addChild(node);
         i++;
     }
+
+    m_addBtn->setVisible(val.size() < 20);
 
     auto h = m_nodes.size() * 30.f + 30.f;
     bm->setContentHeight(h);

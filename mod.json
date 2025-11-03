@@ -90,22 +90,10 @@
       "type": "title",
       "name": "Style Options"
     },
-    "style": {
-      "type": "string",
-      "name": "Clone Style",
-      "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**",
-      "default": "Cosmic Mario (SMG 1)",
-      "one-of": [
-        "Cosmic Mario (SMG 1)",
-        "Cosmic Clone (SMG 2)",
-        "Badeline Chaser (Celeste)",
-        "Custom"
-      ]
-    },
     "styles": {
       "type": "custom:clone-style",
       "name": "Clone Style",
-      "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**\nMultiple styles suggested by NonCloud9.",
+      "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**\nSelecting multiple styles suggested by NonCloud9.",
       "default": [
         "Cosmic Mario\n(SMG 1)"
       ]

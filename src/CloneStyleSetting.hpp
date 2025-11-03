@@ -25,6 +25,7 @@ protected:
     void updateState(CCNode* invoker) override;
 
     std::vector<StyleNode*> m_nodes;
+    CCMenuItemSpriteExtra* m_addBtn = nullptr;
 public:
     void setNodeValue(StyleNode* node, std::string value);
     void remove(int id);

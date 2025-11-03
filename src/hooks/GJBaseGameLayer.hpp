@@ -2,7 +2,6 @@
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include "../CosmicClone.hpp"
-#include "../ShaderManager.hpp"
 
 class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
     struct Fields {
@@ -23,15 +22,7 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
         bool m_p1Frozen = false;
         bool m_p2Frozen = false;
         bool m_enabled = geode::Mod::get()->getSettingValue<bool>("enabled");
-
-        cocos2d::CCRenderTexture* m_renderTex;
-        cocos2d::CCLayer* m_renderLayer;
-
-        CosmicSprite* m_sprite;
     };
 
     void processCommands(float dt);
-    void visit();
-
-    void setupRenderTexture();
 };

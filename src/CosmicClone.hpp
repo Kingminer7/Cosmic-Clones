@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Geode/modify/PlayerObject.hpp>
+#include "ShaderManager.hpp"
 
 enum class Animation {
     Jump,
@@ -55,7 +56,9 @@ class CosmicClone {
 protected:
     int m_delay = 0;
     CosmicPlayerObject* m_p1 = nullptr;
+    CosmicSprite* m_p1spr = nullptr;
     CosmicPlayerObject* m_p2 = nullptr;
+    CosmicSprite* m_p2spr = nullptr;
     std::string m_style;
 
     bool m_dual = false;
@@ -68,7 +71,9 @@ protected:
 public:
     static std::shared_ptr<CosmicClone> create(int delay, bool plat);
     CosmicPlayerObject* getP1() const;
+    CosmicSprite* getP1Sprite() const;
     CosmicPlayerObject* getP2() const;
+    CosmicSprite* getP2Sprite() const;
     int getDelay() const;
     void checkCollision(PlayerObject* player) const;
     void setDual(bool dual);

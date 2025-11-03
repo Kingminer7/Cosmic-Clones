@@ -6,5 +6,8 @@ void CosmicClonesGameManager::applicationWillEnterForeground() {
     GameManager::applicationWillEnterForeground();
     if (!PlayLayer::get()) return;
     auto bgl = reinterpret_cast<CosmicClonesGJBGL *>(PlayLayer::get());
-    bgl->setupRenderTexture();
+    for (auto clone : bgl->m_fields->m_clones) {
+        clone->getP1Sprite()->resetRenderTexture();
+        clone->getP2Sprite()->resetRenderTexture();
+    }
 }

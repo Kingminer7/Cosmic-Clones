@@ -1,6 +1,5 @@
 #include "CosmicClone.hpp"
 
-#include <utility>
 #include "Utils.hpp"
 
 using namespace geode::prelude;
@@ -23,21 +22,22 @@ int getFrame(const IconType type) {
 void CosmicClone::init(const int delay, bool plat) {
     m_delay = delay;
     const auto pl = PlayLayer::get();
-    PlayerObject* plr = pl->m_player1;
 
     auto gm = GameManager::sharedState();
     m_p1 = CosmicPlayerObject::createCosmic(gm->getPlayerFrame(), 1, pl, pl, true);
     m_p1->m_fields->m_clone = this;
     m_p1->setID(fmt::format("cosmic-clone-{}"_spr, delay));
     m_p1->togglePlatformerMode(plat);
+    m_p1spr = CosmicSprite::create();
+    m_p1spr->getRenderTexture()->addChildAtPosition(m_p1, Anchor::Center);
 
     auto sdi = Loader::get()->getLoadedMod("weebify.separate_dual_icons");
     m_p2 = CosmicPlayerObject::createCosmic(sdi ? sdi->getSavedValue<int>("cube", gm->getPlayerFrame()) : gm->getPlayerFrame(), 1, pl, pl, true);
     m_p2->m_fields->m_clone = this;
     m_p2->setID(fmt::format("cosmic-clone-dual-{}"_spr, delay));
     m_p2->togglePlatformerMode(plat);
-
-    updateStyle(getSettingFast<"style", std::string>());
+    m_p2spr = CosmicSprite::create();
+    m_p2spr->getRenderTexture()->addChildAtPosition(m_p2, Anchor::Center);
 }
 
 std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat) {
@@ -50,8 +50,16 @@ CosmicPlayerObject* CosmicClone::getP1() const {
     return m_p1;
 }
 
+CosmicSprite* CosmicClone::getP1Sprite() const {
+    return m_p1spr;
+}
+
 CosmicPlayerObject* CosmicClone::getP2() const {
     return m_p2;
+}
+
+CosmicSprite* CosmicClone::getP2Sprite() const {
+    return m_p2spr;
 }
 
 int CosmicClone::getDelay() const {
@@ -60,8 +68,16 @@ int CosmicClone::getDelay() const {
 
 void CosmicClone::checkCollision(PlayerObject* player) const {
     const auto pl = PlayLayer::get();
-    if (m_p1->getObjectRect().intersectsRect(player->getObjectRect()) || (m_dual && m_p2->getObjectRect().intersectsRect(player->getObjectRect()))) {
+    auto rect1 = m_p1->getObjectRect();
+    rect1.origin = m_p1spr->getPosition() - rect1.size / 2;
+    if (rect1.intersectsRect(player->getObjectRect())) {
         pl->destroyPlayer(player, nullptr);
+    } else if (m_dual) {
+        auto rect2 = m_p2->getObjectRect();
+        rect2.origin = m_p2spr->getPosition() - rect2.size / 2;
+        if (rect2.intersectsRect(player->getObjectRect())) {
+            pl->destroyPlayer(player, nullptr);
+        }
     }
 }
 
@@ -275,16 +291,18 @@ IconType CosmicClone::getType(const int player) const {
 
 CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBaseGameLayer* gameLayer, CCLayer* layer,
                                                      bool playLayer) {
-    auto ret = reinterpret_cast<CosmicPlayerObject*>(PlayerObject::create(player, ship, gameLayer, layer, playLayer));
+    auto ret = static_cast<CosmicPlayerObject*>(PlayerObject::create(player, ship, gameLayer, layer, playLayer));
     ret->m_fields->m_isCosmic = true;
     return ret;
 }
 
 void CosmicClone::updateStyle(std::string style) {
     m_style = std::move(style);
+    m_p1spr->updateStyle(m_style);
+    m_p2spr->updateStyle(m_style);
 
     for (auto plr : {m_p1, m_p2}) {
-        if (m_style == "Cosmic Mario (SMG 1)") {
+        if (m_style == "Cosmic Mario\n(SMG 1)") {
             // This won't really be seen normally but just in case
             plr->setColor(ccColor3B{12, 11, 56});
             plr->setSecondColor(ccColor3B{11, 27, 56});
@@ -292,14 +310,14 @@ void CosmicClone::updateStyle(std::string style) {
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Disabled);
-        } else if (m_style == "Cosmic Clone (SMG 2)") {
+        } else if (m_style == "Cosmic Clone\n(SMG 2)") {
             plr->setColor(ccColor3B{60, 20, 21});
             plr->setSecondColor(ccColor3B{243, 235, 87});
             plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Disabled);
-        } else if (m_style == "Badeline Chaser (Celeste)") {
+        } else if (m_style == "Badeline Chaser\n(Celeste)") {
             plr->setColor(ccColor3B{155, 63, 181});
             plr->setSecondColor(ccColor3B{191, 29, 51});
             plr->disableCustomGlowColor();
@@ -327,23 +345,23 @@ void CosmicClone::updateStyle(std::string style) {
 int CosmicClone::playSFX(CosmicCloneSFXType type) {
     switch (type) {
         case CosmicCloneSFXType::Spawn:
-            if (m_style == "Badeline Chaser (Celeste)") {
+            if (m_style == "Badeline Chaser\n(Celeste)") {
                 return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
             }
             return -1;
         case CosmicCloneSFXType::FirstSpawn:
-            if (m_style == "Cosmic Clone (SMG 2)" || m_style == "Cosmic Mario (SMG 1)") {
+            if (m_style == "Cosmic Clone\n(SMG 2)" || m_style == "Cosmic Mario\n(SMG 1)") {
                 return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
             }
-            if (m_style == "Badeline Chaser (Celeste)") {
+            if (m_style == "Badeline Chaser\n(Celeste)") {
                 return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
             }
             return -1;
         case CosmicCloneSFXType::Die:
-            if (m_style == "Cosmic Clone (SMG 2)" || m_style == "Cosmic Mario (SMG 1)") {
+            if (m_style == "Cosmic Clone\n(SMG 2)" || m_style == "Cosmic Mario\n(SMG 1)") {
                 return FMODAudioEngine::get()->playEffect("defeat.wav"_spr);
             }
-            if (m_style == "Badeline Chaser (Celeste)") {
+            if (m_style == "Badeline Chaser\n(Celeste)") {
                 return FMODAudioEngine::get()->playEffect("disappear.wav"_spr);
             }
             return -1;

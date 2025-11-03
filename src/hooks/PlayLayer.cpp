@@ -31,7 +31,7 @@ void CosmicClonesPlayLayer::resetLevel() {
                 ++clone;
             }
         }
-        erase_if(fields->m_snapshots, [this, tick](std::pair<const int, Snapshot> time) {
+        erase_if(fields->m_snapshots, [tick](std::pair<const int, Snapshot> time) {
             return time.first > tick;
         });
     } else {
@@ -41,8 +41,10 @@ void CosmicClonesPlayLayer::resetLevel() {
             p1->removeFromParent();
 
             auto p2 = clone->getP2();
-            p2->toggleGhostEffect(GhostType::Disabled);
-            p2->removeFromParent();
+            if (p2) {
+                p2->toggleGhostEffect(GhostType::Disabled);
+                p2->removeFromParent();
+            }
         }
         fields->m_clones.clear();
         fields->m_snapshots.clear();
@@ -73,7 +75,6 @@ void CosmicClonesPlayLayer::setupHasCompleted() {
     PlayLayer::setupHasCompleted();
     fields->m_offset = m_gameState.m_currentProgress;
     fields->m_initialDelay = getSettingFast<"spawn-delay", float>();
-    bgl->setupRenderTexture();
 }
 
 void CosmicClonesPlayLayer::levelComplete() {

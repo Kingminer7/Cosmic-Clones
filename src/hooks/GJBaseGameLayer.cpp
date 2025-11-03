@@ -1,6 +1,7 @@
 #include "GJBaseGameLayer.hpp"
 
 #include "../Utils.hpp"
+#include "../CloneStyleSetting.hpp"
 
 void CosmicClonesGJBGL::processCommands(float dt) {
     if (!PlayLayer::get()) return GJBaseGameLayer::processCommands(dt);
@@ -13,7 +14,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             auto snap = fields->m_snapshots.at(del);
             clone->setDual(snap.dualEnabled);
             auto p1 = clone->getP1();
-            p1->setPosition(snap.pos);
+            clone->getP1Sprite()->setPosition(snap.pos);
             p1->setScale(snap.scale);
             p1->setRotation(snap.rotation);
             p1->setVisible(snap.visible);
@@ -25,7 +26,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             clone->animate(snap.anim, 1);
             if (snap.dualEnabled) {
                 auto p2 = clone->getP2();
-                p2->setPosition(snap.pos2);
+                clone->getP2Sprite()->setPosition(snap.pos2);
                 p2->setScale(snap.scale2);
                 p2->setRotation(snap.rotation2);
                 p2->setVisible(snap.visible2);
@@ -38,12 +39,14 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             }
         }
     }
+    auto styles = getSettingFast<"styles", std::vector<std::string>>();
     for (int i = 1; i <= fields->m_count; i++) {
         auto del = ((i - 1) * fields->m_delay + fields->m_initialDelay) * 240;
         if (tick == del) {
             auto clone = CosmicClone::create(del, m_isPlatformer);
-            fields->m_renderLayer->addChild(clone->getP1());
-            fields->m_renderLayer->addChild(clone->getP2());
+            clone->updateStyle(styles[(i - 1) % styles.size()]);
+            m_objectLayer->addChild(clone->getP1Sprite());
+            m_objectLayer->addChild(clone->getP2Sprite());
             fields->m_clones.push_back(clone);
             if (getSettingFast<"sfx", bool>()) {
                 auto id = clone->playSFX(i > 1 ? CosmicCloneSFXType::Spawn : CosmicCloneSFXType::FirstSpawn);
@@ -139,77 +142,4 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             if (clone->getDelay() <= tick) clone->checkCollision(m_player2);
         }
     }
-}
-
-void CosmicClonesGJBGL::visit() {
-    if (this != static_cast<GJBaseGameLayer*>(PlayLayer::get())) return GJBaseGameLayer::visit();
-
-    auto fields = m_fields.self();
-    if (!fields->m_enabled) return GJBaseGameLayer::visit();
-
-    float dirX = (m_objectLayer->getScaleX() > 0) ? 1.f : -1.f;
-    float dirY = (m_objectLayer->getScaleY() > 0) ? 1.f : -1.f;
-    
-    float offsetX = (m_objectLayer->getScaleX() > 0) ? 0.f : fields->m_sprite->getContentWidth();
-    float offsetY = (m_objectLayer->getScaleY() > 0) ? 0.f : fields->m_sprite->getContentHeight();
-
-    fields->m_renderLayer->setPosition(
-        m_objectLayer->getPosition() * cocos2d::CCPoint{dirX, dirY} +
-        cocos2d::CCPoint{offsetX, offsetY}
-    );
-
-    fields->m_sprite->setScaleX(std::abs(1 / m_objectLayer->getScaleX()));
-    fields->m_sprite->setScaleY(std::abs(1 / m_objectLayer->getScaleY()));
-    fields->m_renderLayer->setScale(
-        std::abs(m_objectLayer->getScaleX()),
-        std::abs(m_objectLayer->getScaleY())
-    );
-
-    fields->m_renderTex->beginWithClear(0, 0, 0, 0);
-    fields->m_renderLayer->visit();
-    fields->m_renderTex->end();
-
-    fields->m_sprite->setPosition(
-        (fields->m_sprite->getScaledContentSize() * cocos2d::CCPoint{dirX, dirY} / 2) -
-        (m_objectLayer->getPosition() / cocos2d::CCPoint{
-            m_objectLayer->getScaleX(),
-            m_objectLayer->getScaleY()
-        })
-    );
-
-    GJBaseGameLayer::visit();
-}
-
-void CosmicClonesGJBGL::setupRenderTexture() {
-    auto fields = m_fields.self();
-    auto ws = cocos2d::CCDirector::get()->getWinSize();
-    if (!fields->m_renderLayer) {
-        fields->m_renderLayer = CCLayer::create();
-        fields->m_renderLayer->setContentSize({0, 0});
-        fields->m_renderLayer->setScale(m_objectLayer->getScale());
-        fields->m_renderLayer->setPosition(m_objectLayer->getPosition());
-        fields->m_renderLayer->retain();
-    } else {
-        fields->m_renderLayer->retain();
-        fields->m_renderLayer->removeFromParent();
-    }
-    if (fields->m_renderTex) {
-        fields->m_renderTex->removeFromParent();
-        fields->m_renderTex = nullptr;
-    }
-    fields->m_renderTex = cocos2d::CCRenderTexture::create(ws.width, ws.height);
-    fields->m_renderTex->setPosition(ws / 2);
-    fields->m_renderTex->addChild(fields->m_renderLayer);
-    fields->m_renderLayer->release();
-    fields->m_renderTex->setVisible(false);
-    if (!fields->m_sprite) {
-        fields->m_sprite = CosmicSprite::create(fields->m_renderTex->m_pTexture);
-        fields->m_sprite->setFlipY(true);
-        fields->m_sprite->setScale(1 / m_objectLayer->getScale());
-        fields->m_sprite->setPosition(fields->m_sprite->getContentSize() / 2 - m_objectLayer->getPosition() / m_objectLayer->getScale());
-        m_objectLayer->addChild(fields->m_sprite, m_player1->getZOrder());
-    } else {
-        fields->m_sprite->setTexture(fields->m_renderTex->m_pTexture);
-    }
-    fields->m_sprite->addChild(fields->m_renderTex);
 }

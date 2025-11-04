@@ -87,6 +87,7 @@ protected:
     Style m_style;
     cocos2d::CCLabelBMFont* m_label = nullptr;
     CloneStyleSettingNode* m_setting = nullptr;
+    CCMenu* m_customMenu = nullptr;
 
     std::string m_currentlyEditing = "none";
 

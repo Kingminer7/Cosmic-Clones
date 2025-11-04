@@ -26,6 +26,7 @@ void CloneStyleSettingNode::updateState(CCNode *invoker) {
     SettingValueNodeV3::updateState(invoker);
     auto val = getValue();
     auto bm = getButtonMenu();
+    typeinfo_cast<AnchorLayoutOptions*>(getNameMenu()->getLayoutOptions())->setOffset({10.f, getContentHeight() / 2 - 15.f});
     if (m_nodes.size() < val.size()) {
         for (size_t i = m_nodes.size(); i < val.size(); ++i) {
             auto node = StyleNode::create(this, val[i]);
@@ -163,6 +164,74 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     addChildAtPosition(lArrow, Anchor::TopLeft, {5.f, -15.f});
     addChildAtPosition(rArrow, Anchor::TopRight, {-20.f, -15.f});
     addChildAtPosition(del, Anchor::TopRight, {-5.f, -15.f});
+
+    m_customMenu = CCMenu::create();
+    m_customMenu->setAnchorPoint({.5f, .5f});
+    m_customMenu->ignoreAnchorPointForPosition(false);
+
+    auto col1Lab = CCLabelBMFont::create("Color 1", "bigFont.fnt");
+    col1Lab->setAnchorPoint({0.f, .5f});
+    col1Lab->setContentSize({120, 90.f});
+    col1Lab->setScale(.4f);
+    m_customMenu->addChildAtPosition(col1Lab, Anchor::Left, {19, 30});
+
+    auto col1Spr = ColorChannelSprite::create();
+    col1Spr->setColor(m_style.col1);
+    col1Spr->setScale(.7f);
+    auto col1Btn = CCMenuItemExt::createSpriteExtra(col1Spr, [this](auto) {
+        m_currentlyEditing = "col1";
+        auto popup = ColorPickPopup::create(m_style.col1);
+        popup->setDelegate(this);
+        popup->show();
+    });
+    col1Btn->setID("col1");
+    m_customMenu->addChildAtPosition(col1Btn, Anchor::Center, {50, 30});
+
+    auto col2Lab = CCLabelBMFont::create("Color 2", "bigFont.fnt");
+    col2Lab->setAnchorPoint({0.f, .5f});
+    col2Lab->setContentSize({120, 90.f});
+    col2Lab->setScale(.4f);
+    m_customMenu->addChildAtPosition(col2Lab, Anchor::Left, {19, 0});
+
+    auto col2Spr = ColorChannelSprite::create();
+    col2Spr->setColor(m_style.col2);
+    col2Spr->setScale(.7f);
+    auto col2Btn = CCMenuItemExt::createSpriteExtra(col2Spr, [this](auto) {
+        m_currentlyEditing = "col2";
+        auto popup = ColorPickPopup::create(m_style.col2);
+        popup->setDelegate(this);
+        popup->show();
+    });
+    col2Btn->setID("col2");
+    m_customMenu->addChildAtPosition(col2Btn, Anchor::Center, {50, 0});
+
+    auto glowLab = CCLabelBMFont::create("Glow", "bigFont.fnt");
+    glowLab->setAnchorPoint({0.f, .5f});
+    glowLab->setContentSize({120, 90.f});
+    glowLab->setScale(.4f);
+    m_customMenu->addChildAtPosition(glowLab, Anchor::Left, {19, -30});
+
+    auto glowSpr = ColorChannelSprite::create();
+    glowSpr->setColor(m_style.glow);
+    glowSpr->setScale(.7f);
+    auto glowBtn = CCMenuItemExt::createSpriteExtra(glowSpr, [this](auto) {
+        m_currentlyEditing = "glow";
+        auto popup = ColorPickPopup::create(m_style.glow);
+        popup->setDelegate(this);
+        popup->show();
+    });
+    glowBtn->setID("glow");
+    m_customMenu->addChildAtPosition(glowBtn, Anchor::Center, {50, -30});
+
+    auto toggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this, glowBtn](auto) {
+        m_style.useGlow = !m_style.useGlow;
+        m_setting->setNodeValue(this, m_style);
+    });
+    glowBtn->setEnabled(m_style.useGlow);
+    toggle->setID("glow-toggler");
+    m_customMenu->addChildAtPosition(toggle, Anchor::Center, {20, -30});
+
+    addChildAtPosition(m_customMenu, Anchor::Center, {0.f, -15.f});
     return true;
 }
 
@@ -187,6 +256,13 @@ void StyleNode::updateState(Style value) {
     else
         m_label->setScale(.001f);
     setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
+    m_customMenu->setVisible(m_style.type == "Custom");
+    m_customMenu->getChildByID("col1")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col1);
+    m_customMenu->getChildByID("col2")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col2);
+    auto glowBtn = m_customMenu->getChildByID("glow");
+    glowBtn->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.glow);
+    typeinfo_cast<CCMenuItemSpriteExtra*>(glowBtn)->setEnabled(m_style.useGlow);
+    typeinfo_cast<CCMenuItemToggler*>(m_customMenu->getChildByID("glow-toggler"))->toggle(m_style.useGlow);
     updateLayout();
 }
 

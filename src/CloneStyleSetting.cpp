@@ -224,8 +224,10 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     m_customMenu->addChildAtPosition(glowBtn, Anchor::Center, {50, -30});
 
     auto toggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this, glowBtn](auto) {
-        m_style.useGlow = !m_style.useGlow;
-        m_setting->setNodeValue(this, m_style);
+        queueInMainThread([this] {
+            m_style.useGlow = !m_style.useGlow;
+            m_setting->setNodeValue(this, m_style);
+        });
     });
     glowBtn->setEnabled(m_style.useGlow);
     toggle->setID("glow-toggler");

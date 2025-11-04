@@ -1,3 +1,7 @@
+# 1.1.0
+- <cg>Allow multiple clone types (this will reset your previously selected config, sorry!)</c>
+- <cg>Add a toggle for sound effects</c>
+- <cy>Fix robot glow</c>
 # 1.0.5
 - <cy>Fix clones visually freezing when turning your device off</c>
 # 1.0.4

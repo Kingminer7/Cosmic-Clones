@@ -59,7 +59,7 @@ jobs:
           bindings: kingminer7/bindings
           bindings-ref: patch-4
           combine: true
-          build-config: ${{ github.event.inputs.build_type != 'release' && (matrix.config.target == 'Win64' && 'RelWithDebInfo' || 'Debug') || 'Release' }}
+          build-config: ${{ !(github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]'))) && (matrix.config.target == 'Win64' && 'RelWithDebInfo' || 'Debug') || 'Release' }}
           export-pdb: true
           export-symbols: true
           target: ${{ matrix.config.target }}
@@ -108,7 +108,7 @@ jobs:
   release:
     name: Create Draft Release
     runs-on: ubuntu-latest
-    if: ${{ !( github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]')) ) }}
+    if: ${{ github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]')) }}
     needs: [ 'package' ]
     permissions:
       contents: write

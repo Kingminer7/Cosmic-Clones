@@ -92,7 +92,7 @@ jobs:
   nightly:
     name: Create Nightly Release
     runs-on: ubuntu-latest
-    if: env.BUILD_TYPE != 'release'
+    if: ${{ env.BUILD_TYPE != 'release' }}
     needs: [ 'package' ]
     permissions:
       contents: write
@@ -119,7 +119,7 @@ jobs:
   release:
     name: Create Draft Release
     runs-on: ubuntu-latest
-    if: env.BUILD_TYPE == 'release'
+    if: ${{ env.BUILD_TYPE == 'release' }}
     needs: [ 'package' ]
     permissions:
       contents: write

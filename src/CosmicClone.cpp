@@ -307,14 +307,14 @@ void CosmicClone::updateStyle(Style style) {
             plr->enableCustomGlowColor(ccColor3B{13, 23, 64});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Disabled);
+            // plr->toggleGhostEffect(GhostType::Disabled);
         } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
             plr->setColor(ccColor3B{60, 20, 21});
             plr->setSecondColor(ccColor3B{243, 235, 87});
             plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Disabled);
+            // plr->toggleGhostEffect(GhostType::Disabled);
         } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
             plr->setColor(ccColor3B{155, 63, 181});
             plr->setSecondColor(ccColor3B{191, 29, 51});
@@ -322,8 +322,10 @@ void CosmicClone::updateStyle(Style style) {
             plr->m_hasGlow = false;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Enabled);
-            plr->m_ghostTrail->m_color = ccColor3B{255, 0, 0};
-            plr->m_ghostTrail->m_fadeInterval = .4f;
+            // if (auto trail = plr->m_ghostTrail) {
+            //     trail->m_color = ccColor3B{255, 0, 0};
+            //     trail->m_fadeInterval = .4f;
+            // }
         } else {
             plr->setColor(style.col1);
             plr->setSecondColor(style.col2);
@@ -335,7 +337,7 @@ void CosmicClone::updateStyle(Style style) {
                 plr->m_hasGlow = false;
             }
             plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Disabled);
+            // plr->toggleGhostEffect(GhostType::Disabled);
         }
     }
 }

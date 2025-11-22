@@ -1,3 +1,5 @@
+# 1.1.1
+- <cr>Temporarily(?) remove trail from badeline style, as it was broken in 1.1.0 along with crashing with force ghost trail</c>
 # 1.1.0
 - <cg>Allow multiple clone types (this will reset your previously selected config, sorry!)</c>
 - <cg>Add a toggle for sound effects</c>

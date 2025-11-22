@@ -20,12 +20,13 @@ void CosmicClonesPlayLayer::resetLevel() {
         for (auto clone = fields->m_clones.begin(); clone != fields->m_clones.end();) {
             if (clone->get()->getDelay() > tick) {
                 auto p1 = clone->get()->getP1();
-                p1->toggleGhostEffect(GhostType::Disabled);
+                // p1->toggleGhostEffect(GhostType::Disabled);
+                // p1->m_ghostTrail->stopTrail();
                 p1->removeFromParent();
 
                 auto p2 = clone->get()->getP2();
-                p2->toggleGhostEffect(GhostType::Disabled);
-                p2->removeFromParent();
+                // p2->toggleGhostEffect(GhostType::Disabled);
+                // p2->m_ghostTrail->stopTrail();
                 fields->m_clones.erase(clone);
             } else {
                 ++clone;
@@ -37,12 +38,14 @@ void CosmicClonesPlayLayer::resetLevel() {
     } else {
         for (auto clone : fields->m_clones) {
             auto p1 = clone->getP1();
-            p1->toggleGhostEffect(GhostType::Disabled);
+            // p1->toggleGhostEffect(GhostType::Disabled);
+            // p1->m_ghostTrail->stopTrail();
             p1->removeFromParent();
 
             auto p2 = clone->getP2();
             if (p2) {
-                p2->toggleGhostEffect(GhostType::Disabled);
+                // p2->toggleGhostEffect(GhostType::Disabled);
+                // p2->m_ghostTrail->stopTrail();
                 p2->removeFromParent();
             }
         }

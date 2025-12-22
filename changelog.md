@@ -1,3 +1,5 @@
+# 1.1.2
+- <cy>Fix a few visual bugs</c>
 # 1.1.1
 - <cr>Temporarily(?) remove trail from badeline style, as it was broken in 1.1.0 along with crashing with force ghost trail</c>
 # 1.1.0

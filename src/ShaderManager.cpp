@@ -57,9 +57,10 @@ bool CosmicSprite::init() {
     m_normalTex = CCTextureCache::get()->addImage("normal.png"_spr, false)->getName();
     m_overlayTex = CCTextureCache::get()->addImage("star.png"_spr, false)->getName();
 
-    m_renderTexture = CCRenderTexture::create(60, 60);
-    m_renderTexture->setContentSize({60, 60});
+    m_renderTexture = CCRenderTexture::create(240, 240);
+    m_renderTexture->setContentSize({240, 240});
     m_renderTexture->setVisible(false);
+    m_renderTexture->getSprite()->setVisible(false);
     addChild(m_renderTexture);
 
     if (!CCSprite::initWithTexture(m_renderTexture->m_pTexture)) return false;
@@ -92,6 +93,7 @@ void CosmicSprite::resetRenderTexture() {
     m_renderTexture = CCRenderTexture::create(60, 60);
     m_renderTexture->setContentSize({60, 60});
     m_renderTexture->setVisible(false);
+    m_renderTexture->getSprite()->setVisible(false);
     addChild(m_renderTexture);
     setTexture(m_renderTexture->m_pTexture);
     for (auto child : nodes) {

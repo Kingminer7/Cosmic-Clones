@@ -12,7 +12,8 @@
   "developer": "km7dev",
   "description": "Adds chasers to levels.",
   "dependencies": {
-    "geode.node-ids": ">=v1.20.0"
+    "geode.node-ids": ">=v1.20.0",
+    "alphalaneous.alphas-ui-pack": ">=v1.0.0"
   },
   "tags": [
     "gameplay",

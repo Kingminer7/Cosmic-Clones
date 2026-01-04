@@ -41,9 +41,9 @@ CCGLProgram* ShaderManager::getCosmicShader() {
     return shader;
 }
 
-CosmicSprite* CosmicSprite::create() {
+CosmicSprite* CosmicSprite::create(CCNode* node, bool constrain) {
     auto ret = new CosmicSprite;
-    if (ret->init()) {
+    if (ret->init(node, constrain)) {
         ret->autorelease();
         return ret;
     }
@@ -52,23 +52,11 @@ CosmicSprite* CosmicSprite::create() {
     return nullptr;
 }
 
-bool CosmicSprite::init() {
+bool CosmicSprite::init(CCNode* node, bool constrain) {
+    if (!RenderNode::init(node, constrain)) return false;
     m_cosmicTex = CCTextureCache::get()->addImage("cosmic.png"_spr, false)->getName();
     m_normalTex = CCTextureCache::get()->addImage("normal.png"_spr, false)->getName();
     m_overlayTex = CCTextureCache::get()->addImage("star.png"_spr, false)->getName();
-
-    m_renderTexture = CCRenderTexture::create(240, 240);
-    m_renderTexture->setContentSize({240, 240});
-    m_renderTexture->setVisible(false);
-    m_renderTexture->getSprite()->setVisible(false);
-    addChild(m_renderTexture);
-
-    if (!CCSprite::initWithTexture(m_renderTexture->m_pTexture)) return false;
-
-    scheduleUpdate();
-
-    setScaleY(-1);
-
     return true;
 }
 
@@ -78,33 +66,6 @@ void CosmicSprite::updateStyle(Style style) {
     else setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
 }
 
-void CosmicSprite::resetRenderTexture() {
-    std::vector<CCNode*> nodes;
-    if (m_renderTexture) {
-        for (auto child : m_renderTexture->getChildrenExt<CCNode*>()) {
-            if (child == m_renderTexture->m_pSprite) continue;
-            nodes.push_back(child);
-            child->retain();
-            child->removeFromParent();
-        }
-        m_renderTexture->removeFromParent();
-        m_renderTexture = nullptr;
-    }
-    m_renderTexture = CCRenderTexture::create(60, 60);
-    m_renderTexture->setContentSize({60, 60});
-    m_renderTexture->setVisible(false);
-    m_renderTexture->getSprite()->setVisible(false);
-    addChild(m_renderTexture);
-    setTexture(m_renderTexture->m_pTexture);
-    for (auto child : nodes) {
-        m_renderTexture->addChild(child);
-        child->release();
-    }
-}
-
-CCRenderTexture* CosmicSprite::getRenderTexture() {
-    return m_renderTexture;
-}
 
 $on_mod(Loaded) {
     listenForSettingChanges("styles", [](std::vector<Style> style) {
@@ -137,17 +98,8 @@ unsigned int* getNumberOfDraws() {
 
 void CosmicSprite::update(float dt) {
     m_time += dt;
+    RenderNode::update(dt);
 }
-
-void CosmicSprite::visit() {
-    m_renderTexture->beginWithClear(0, 0, 0, 0);
-    for (auto child : m_renderTexture->getChildrenExt<CCNode*>()) {
-        child->visit();
-    }
-    m_renderTexture->end();
-    CCSprite::visit();
-}
-
 
 void CosmicSprite::draw() {
     if (m_style.type != "Cosmic Mario\n(SMG 1)") return CCSprite::draw();

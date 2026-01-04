@@ -40,13 +40,13 @@ void CosmicClonesPlayLayer::resetLevel() {
             auto p1 = clone->getP1();
             // p1->toggleGhostEffect(GhostType::Disabled);
             // p1->m_ghostTrail->stopTrail();
-            p1->removeFromParent();
+            clone->getP1Sprite()->removeFromParent();
 
             auto p2 = clone->getP2();
             if (p2) {
                 // p2->toggleGhostEffect(GhostType::Disabled);
                 // p2->m_ghostTrail->stopTrail();
-                p2->removeFromParent();
+                clone->getP2Sprite()->removeFromParent();
             }
         }
         fields->m_clones.clear();

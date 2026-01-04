@@ -8,13 +8,13 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     auto fields = m_fields.self();
     if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processCommands(dt);
     int tick = m_gameState.m_currentProgress - fields->m_offset;
-    for (auto clone : fields->m_clones) {
+    for (const auto& clone : fields->m_clones) {
         auto del = tick - clone->getDelay();
         if (fields->m_snapshots.contains(del)) {
             auto snap = fields->m_snapshots.at(del);
             clone->setDual(snap.dualEnabled);
             auto p1 = clone->getP1();
-            clone->getP1Sprite()->setPosition(snap.pos);
+            p1->setPosition(snap.pos);
             p1->setScale(snap.scale);
             p1->setRotation(snap.rotation);
             p1->setVisible(snap.visible);
@@ -26,7 +26,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             clone->animate(snap.anim, 1);
             if (snap.dualEnabled) {
                 auto p2 = clone->getP2();
-                clone->getP2Sprite()->setPosition(snap.pos2);
+                p2->setPosition(snap.pos2);
                 p2->setScale(snap.scale2);
                 p2->setRotation(snap.rotation2);
                 p2->setVisible(snap.visible2);
@@ -39,14 +39,14 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             }
         }
     }
-    auto styles = getSettingFast<"styles", std::vector<Style>>();
+    const auto& styles = getSettingFast<"styles", std::vector<Style>>();
     for (int i = 1; i <= fields->m_count; i++) {
         auto del = ((i - 1) * fields->m_delay + fields->m_initialDelay) * 240;
         if (tick == del) {
             auto clone = CosmicClone::create(del, m_isPlatformer);
             clone->updateStyle(styles[(i - 1) % styles.size()]);
-            m_objectLayer->addChild(clone->getP1Sprite());
-            m_objectLayer->addChild(clone->getP2Sprite());
+            addChild(clone->getP1Sprite());
+            addChild(clone->getP2Sprite());
             fields->m_clones.push_back(clone);
             if (getSettingFast<"sfx", bool>()) {
                 auto id = clone->playSFX(i > 1 ? CosmicCloneSFXType::Spawn : CosmicCloneSFXType::FirstSpawn);

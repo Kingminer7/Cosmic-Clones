@@ -26,16 +26,14 @@ void CosmicClone::init(const int delay, bool plat) {
     m_p1->m_fields->m_clone = this;
     m_p1->setID(fmt::format("cosmic-clone-{}"_spr, delay));
     m_p1->togglePlatformerMode(plat);
-    m_p1spr = CosmicSprite::create();
-    m_p1spr->getRenderTexture()->addChildAtPosition(m_p1, Anchor::Center);
+    m_p1spr = CosmicSprite::create(m_p1);
 
     auto sdi = Loader::get()->getLoadedMod("weebify.separate_dual_icons");
     m_p2 = CosmicPlayerObject::createCosmic(sdi ? sdi->getSavedValue<int>("cube", gm->getPlayerFrame()) : gm->getPlayerFrame(), 1, pl, pl, true);
     m_p2->m_fields->m_clone = this;
     m_p2->setID(fmt::format("cosmic-clone-dual-{}"_spr, delay));
     m_p2->togglePlatformerMode(plat);
-    m_p2spr = CosmicSprite::create();
-    m_p2spr->getRenderTexture()->addChildAtPosition(m_p2, Anchor::Center);
+    m_p2spr = CosmicSprite::create(m_p2);
 }
 
 std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat) {
@@ -298,7 +296,6 @@ void CosmicClone::updateStyle(Style style) {
     m_style = std::move(style);
     m_p1spr->updateStyle(m_style);
     m_p2spr->updateStyle(m_style);
-
     for (auto plr : {m_p1, m_p2}) {
         if (m_style.type == "Cosmic Mario\n(SMG 1)") {
             // This won't really be seen normally but just in case

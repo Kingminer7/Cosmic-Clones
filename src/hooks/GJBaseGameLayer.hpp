@@ -9,9 +9,6 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
         std::map<int, Snapshot> m_snapshots;
         std::vector<int> m_sfxIds;
 
-        float m_initialDelay = 0.f;
-        float m_delay;
-        int m_count;
         int m_offset = 0;
         int m_p1Immunity = 0;
         int m_p2Immunity = 0;
@@ -21,8 +18,14 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
         bool m_p2Jump = false;
         bool m_p1Frozen = false;
         bool m_p2Frozen = false;
-        bool m_enabled = geode::Mod::get()->getSettingValue<bool>("enabled");
+
+        bool m_enabled;
+        float m_initialDelay;
+        float m_delay;
+        int m_count;
     };
 
     void processCommands(float dt);
+    bool updateSettings(Fields* fields);
+    bool init();
 };

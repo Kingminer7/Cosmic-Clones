@@ -4,6 +4,7 @@
 
 class $modify(CosmicClonesPlayLayer, PlayLayer) {
     void resetLevel();
+    void fullReset();
     void setupHasCompleted();
     void levelComplete();
 };

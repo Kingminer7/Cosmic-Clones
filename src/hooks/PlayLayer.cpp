@@ -4,10 +4,15 @@
 #include "../Utils.hpp"
 
 void CosmicClonesPlayLayer::resetLevel() {
-    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
-    if (!fields->m_enabled) return PlayLayer::resetLevel();
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
     auto tick = m_gameState.m_currentProgress - fields->m_offset;
     fields->m_stopped = false;
+    if (!fields->m_enabled) {
+        PlayLayer::resetLevel();
+        if (bgl->updateSettings(fields)) fields->m_offset = m_gameState.m_currentProgress;
+        return;
+    }
     // wow one of my first actual explaining comments
     // basically in practice mode, it'd be better if the clones reset to where they were at said checkpoint
     // so we don't reset them.
@@ -20,13 +25,14 @@ void CosmicClonesPlayLayer::resetLevel() {
         for (auto clone = fields->m_clones.begin(); clone != fields->m_clones.end();) {
             if (clone->get()->getDelay() > tick) {
                 auto p1 = clone->get()->getP1();
-                // p1->toggleGhostEffect(GhostType::Disabled);
-                // p1->m_ghostTrail->stopTrail();
-                p1->removeFromParent();
+                p1->toggleGhostEffect(GhostType::Disabled);
+                p1->m_ghostTrail->stopTrail();
+                clone->get()->getSprite()->removeFromParent();
 
                 auto p2 = clone->get()->getP2();
-                // p2->toggleGhostEffect(GhostType::Disabled);
-                // p2->m_ghostTrail->stopTrail();
+                p2->toggleGhostEffect(GhostType::Disabled);
+                p2->m_ghostTrail->stopTrail();
+                // clone->get()->getP2Sprite()->removeFromParent();
                 fields->m_clones.erase(clone);
             } else {
                 ++clone;
@@ -36,48 +42,82 @@ void CosmicClonesPlayLayer::resetLevel() {
             return time.first > tick;
         });
     } else {
-        for (auto clone : fields->m_clones) {
+        for (const auto& clone : fields->m_clones) {
             auto p1 = clone->getP1();
-            // p1->toggleGhostEffect(GhostType::Disabled);
-            // p1->m_ghostTrail->stopTrail();
-            clone->getP1Sprite()->removeFromParent();
-
+            p1->toggleGhostEffect(GhostType::Disabled);
+            if (p1->m_ghostTrail) {
+                p1->m_ghostTrail->stopTrail();
+                p1->m_ghostTrail->stopAllActions();
+            }
             auto p2 = clone->getP2();
             if (p2) {
-                // p2->toggleGhostEffect(GhostType::Disabled);
-                // p2->m_ghostTrail->stopTrail();
-                clone->getP2Sprite()->removeFromParent();
+                p2->toggleGhostEffect(GhostType::Disabled);
+                if (p2->m_ghostTrail) {
+                    p2->m_ghostTrail->stopTrail();
+                    p2->m_ghostTrail->stopAllActions();
+                }
             }
+            clone->getSprite()->removeFromParent();
         }
         fields->m_clones.clear();
         fields->m_snapshots.clear();
-
-        fields->m_count = getSettingFast<"clones", int>();
-        fields->m_delay = getSettingFast<"delay", float>();
-        PlayLayer::resetLevel();
-        fields->m_offset = m_gameState.m_currentProgress;
-        fields->m_initialDelay = getSettingFast<"spawn-delay", float>();
-        fields->m_sfxIds.erase(
-            std::remove_if(fields->m_sfxIds.begin(), fields->m_sfxIds.end(), [](int channel) {
-                return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
-            }), fields->m_sfxIds.end());
+        std::erase_if(fields->m_sfxIds, [](int channel) {
+            return FMODAudioEngine::get()->m_stoppedChannels.contains(channel);
+        });
         for (auto channel : fields->m_sfxIds) {
             FMODAudioEngine::get()->stopChannel(channel);
         }
+        if (!bgl->updateSettings(fields)) return;
+        PlayLayer::resetLevel();
+        fields->m_offset = m_gameState.m_currentProgress;
     }
+}
+
+void CosmicClonesPlayLayer::fullReset() {
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
+    if (!fields->m_enabled) {
+        PlayLayer::resetLevel();
+        if (bgl->updateSettings(fields)) fields->m_offset = m_gameState.m_currentProgress;
+        return;
+    }
+    for (const auto& clone : fields->m_clones) {
+        auto p1 = clone->getP1();
+        p1->toggleGhostEffect(GhostType::Disabled);
+        if (p1->m_ghostTrail) {
+            p1->m_ghostTrail->stopTrail();
+            p1->m_ghostTrail->stopAllActions();
+        }
+        auto p2 = clone->getP2();
+        if (p2) {
+            p2->toggleGhostEffect(GhostType::Disabled);
+            if (p2->m_ghostTrail) {
+                p2->m_ghostTrail->stopTrail();
+                p2->m_ghostTrail->stopAllActions();
+            }
+        }
+        clone->getSprite()->removeFromParent();
+    }
+    fields->m_clones.clear();
+    fields->m_snapshots.clear();
+    std::erase_if(fields->m_sfxIds, [](int channel) {
+        return FMODAudioEngine::get()->m_stoppedChannels.contains(channel);
+    });
+    for (auto channel : fields->m_sfxIds) {
+        FMODAudioEngine::get()->stopChannel(channel);
+    }
+    if (!bgl->updateSettings(fields)) return;
+    PlayLayer::resetLevel();
+    fields->m_offset = m_gameState.m_currentProgress;
 }
 
 void CosmicClonesPlayLayer::setupHasCompleted() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
-    if (!m_isPlatformer && !getSettingFast<"normal-mode", bool>()) fields->m_enabled = false;
-    if (!fields->m_enabled) return PlayLayer::setupHasCompleted();
-    fields->m_count = getSettingFast<"clones", int>();
-    fields->m_delay = getSettingFast<"delay", float>();
+    if (!bgl->updateSettings(fields)) return PlayLayer::setupHasCompleted();
     fields->m_stopped = false;
     PlayLayer::setupHasCompleted();
     fields->m_offset = m_gameState.m_currentProgress;
-    fields->m_initialDelay = getSettingFast<"spawn-delay", float>();
 }
 
 void CosmicClonesPlayLayer::levelComplete() {

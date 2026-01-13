@@ -1,3 +1,7 @@
 - level creator stuff
 - custom sfx for custom style
 - particles
+
+# IMPORTANT
+- collision in editor fix
+- clear editor clones on stop

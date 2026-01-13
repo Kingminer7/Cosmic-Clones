@@ -17,28 +17,31 @@ int getFrame(const IconType type) {
     }
 }
 
-void CosmicClone::init(const int delay, bool plat) {
+void CosmicClone::init(const int delay, bool plat, GJBaseGameLayer* gjbgl) {
     m_delay = delay;
-    const auto pl = PlayLayer::get();
 
     auto gm = GameManager::sharedState();
-    m_p1 = CosmicPlayerObject::createCosmic(gm->getPlayerFrame(), 1, pl, pl, true);
+    m_p1 = CosmicPlayerObject::createCosmic(gm->getPlayerFrame(), 1, gjbgl, gjbgl, PlayLayer::get());
     m_p1->m_fields->m_clone = this;
     m_p1->setID(fmt::format("cosmic-clone-{}"_spr, delay));
     m_p1->togglePlatformerMode(plat);
-    m_p1spr = CosmicSprite::create(m_p1);
 
     auto sdi = Loader::get()->getLoadedMod("weebify.separate_dual_icons");
-    m_p2 = CosmicPlayerObject::createCosmic(sdi ? sdi->getSavedValue<int>("cube", gm->getPlayerFrame()) : gm->getPlayerFrame(), 1, pl, pl, true);
+    m_p2 = CosmicPlayerObject::createCosmic(sdi ? sdi->getSavedValue<int>("cube", gm->getPlayerFrame()) : gm->getPlayerFrame(), 1, gjbgl, gjbgl, PlayLayer::get());
     m_p2->m_fields->m_clone = this;
     m_p2->setID(fmt::format("cosmic-clone-dual-{}"_spr, delay));
     m_p2->togglePlatformerMode(plat);
-    m_p2spr = CosmicSprite::create(m_p2);
+
+    auto layer = CCNode::create();
+    layer->addChild(m_p1);
+    layer->addChild(m_p2);
+    m_spr = CosmicSprite::create(layer);
+    m_spr->setAnchorPoint(CCPoint{0, 0});
 }
 
-std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat) {
+std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat, GJBaseGameLayer* gjbgl) {
     auto ret = std::make_shared<CosmicClone>();
-    ret->init(delay, plat);
+    ret->init(delay, plat, gjbgl);
     return ret;
 }
 
@@ -46,16 +49,12 @@ CosmicPlayerObject* CosmicClone::getP1() const {
     return m_p1;
 }
 
-CosmicSprite* CosmicClone::getP1Sprite() const {
-    return m_p1spr;
+CosmicSprite* CosmicClone::getSprite() const {
+    return m_spr;
 }
 
 CosmicPlayerObject* CosmicClone::getP2() const {
     return m_p2;
-}
-
-CosmicSprite* CosmicClone::getP2Sprite() const {
-    return m_p2spr;
 }
 
 int CosmicClone::getDelay() const {
@@ -63,16 +62,16 @@ int CosmicClone::getDelay() const {
 }
 
 void CosmicClone::checkCollision(PlayerObject* player) const {
-    const auto pl = PlayLayer::get();
+    if (!player) return;
     auto rect1 = m_p1->getObjectRect();
-    rect1.origin = m_p1spr->getPosition() - rect1.size / 2;
+    // rect1.origin = m_spr->getPosition() - rect1.size / 2;
     if (rect1.intersectsRect(player->getObjectRect())) {
-        pl->destroyPlayer(player, nullptr);
+        player->m_gameLayer->destroyPlayer(player, nullptr);
     } else if (m_dual) {
         auto rect2 = m_p2->getObjectRect();
-        rect2.origin = m_p2spr->getPosition() - rect2.size / 2;
+        // rect2.origin = m_p2spr->getPosition() - rect2.size / 2;
         if (rect2.intersectsRect(player->getObjectRect())) {
-            pl->destroyPlayer(player, nullptr);
+            player->m_gameLayer->destroyPlayer(player, nullptr);
         }
     }
 }
@@ -294,8 +293,7 @@ CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBas
 
 void CosmicClone::updateStyle(Style style) {
     m_style = std::move(style);
-    m_p1spr->updateStyle(m_style);
-    m_p2spr->updateStyle(m_style);
+    m_spr->updateStyle(m_style);
     for (auto plr : {m_p1, m_p2}) {
         if (m_style.type == "Cosmic Mario\n(SMG 1)") {
             // This won't really be seen normally but just in case
@@ -304,14 +302,14 @@ void CosmicClone::updateStyle(Style style) {
             plr->enableCustomGlowColor(ccColor3B{13, 23, 64});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
-            // plr->toggleGhostEffect(GhostType::Disabled);
+            plr->toggleGhostEffect(GhostType::Disabled);
         } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
             plr->setColor(ccColor3B{60, 20, 21});
             plr->setSecondColor(ccColor3B{243, 235, 87});
             plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
             plr->m_hasGlow = true;
             plr->updateGlowColor();
-            // plr->toggleGhostEffect(GhostType::Disabled);
+            plr->toggleGhostEffect(GhostType::Disabled);
         } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
             plr->setColor(ccColor3B{155, 63, 181});
             plr->setSecondColor(ccColor3B{191, 29, 51});
@@ -319,10 +317,10 @@ void CosmicClone::updateStyle(Style style) {
             plr->m_hasGlow = false;
             plr->updateGlowColor();
             plr->toggleGhostEffect(GhostType::Enabled);
-            // if (auto trail = plr->m_ghostTrail) {
-            //     trail->m_color = ccColor3B{255, 0, 0};
-            //     trail->m_fadeInterval = .4f;
-            // }
+            if (auto trail = plr->m_ghostTrail) {
+                trail->m_color = ccColor3B{255, 0, 0};
+                trail->m_fadeInterval = .4f;
+            }
         } else {
             plr->setColor(style.col1);
             plr->setSecondColor(style.col2);
@@ -334,7 +332,7 @@ void CosmicClone::updateStyle(Style style) {
                 plr->m_hasGlow = false;
             }
             plr->updateGlowColor();
-            // plr->toggleGhostEffect(GhostType::Disabled);
+            plr->toggleGhostEffect(GhostType::Disabled);
         }
     }
 }

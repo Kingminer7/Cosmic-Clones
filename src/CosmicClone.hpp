@@ -58,9 +58,8 @@ class CosmicClone {
 protected:
     int m_delay = 0;
     CosmicPlayerObject* m_p1 = nullptr;
-    CosmicSprite* m_p1spr = nullptr;
+    CosmicSprite* m_spr = nullptr;
     CosmicPlayerObject* m_p2 = nullptr;
-    CosmicSprite* m_p2spr = nullptr;
     Style m_style;
 
     bool m_dual = false;
@@ -69,13 +68,12 @@ protected:
     Animation m_p1anim = Animation::None;
     Animation m_p2anim = Animation::None;
 
-    void init(int delay, bool plat);
+    void init(int delay, bool plat, GJBaseGameLayer* gjbgl);
 public:
-    static std::shared_ptr<CosmicClone> create(int delay, bool plat);
+    static std::shared_ptr<CosmicClone> create(int delay, bool plat, GJBaseGameLayer* gjbgl);
     CosmicPlayerObject* getP1() const;
-    CosmicSprite* getP1Sprite() const;
+    CosmicSprite* getSprite() const;
     CosmicPlayerObject* getP2() const;
-    CosmicSprite* getP2Sprite() const;
     int getDelay() const;
     void checkCollision(PlayerObject* player) const;
     void setDual(bool dual);

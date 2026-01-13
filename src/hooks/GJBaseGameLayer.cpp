@@ -4,13 +4,19 @@
 #include "../CloneStyleSetting.hpp"
 
 void CosmicClonesGJBGL::processCommands(float dt) {
-    if (!PlayLayer::get()) return GJBaseGameLayer::processCommands(dt);
     auto fields = m_fields.self();
     if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processCommands(dt);
     int tick = m_gameState.m_currentProgress - fields->m_offset;
     for (const auto& clone : fields->m_clones) {
         auto del = tick - clone->getDelay();
         if (fields->m_snapshots.contains(del)) {
+            auto spr = clone->getSprite();
+            spr->setPosition(-m_objectLayer->getPosition() / cocos2d::CCPoint{m_objectLayer->getScaleX(), m_objectLayer->getScaleY()});
+            spr->setScaleX(1 / m_objectLayer->getScaleX());
+            spr->setScaleY(1 / m_objectLayer->getScaleY());
+            auto layer = spr->getNode();
+            layer->setPosition(m_objectLayer->getPosition());
+            layer->setScale(m_objectLayer->getScaleX(), m_objectLayer->getScaleY());
             auto snap = fields->m_snapshots.at(del);
             clone->setDual(snap.dualEnabled);
             auto p1 = clone->getP1();
@@ -43,10 +49,10 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     for (int i = 1; i <= fields->m_count; i++) {
         auto del = ((i - 1) * fields->m_delay + fields->m_initialDelay) * 240;
         if (tick == del) {
-            auto clone = CosmicClone::create(del, m_isPlatformer);
+            auto clone = CosmicClone::create(del, m_isPlatformer, this);
             clone->updateStyle(styles[(i - 1) % styles.size()]);
-            addChild(clone->getP1Sprite());
-            addChild(clone->getP2Sprite());
+            m_objectLayer->addChild(clone->getSprite());
+            clone->getSprite()->setZOrder(m_player1->getZOrder());
             fields->m_clones.push_back(clone);
             if (getSettingFast<"sfx", bool>()) {
                 auto id = clone->playSFX(i > 1 ? CosmicCloneSFXType::Spawn : CosmicCloneSFXType::FirstSpawn);
@@ -142,4 +148,23 @@ void CosmicClonesGJBGL::processCommands(float dt) {
             if (clone->getDelay() <= tick) clone->checkCollision(m_player2);
         }
     }
+}
+
+bool CosmicClonesGJBGL::updateSettings(Fields* fields) {
+    fields->m_enabled = geode::Mod::get()->getSettingValue<bool>("enabled") && (m_isPlatformer || getSettingFast<"normal-mode", bool>());
+    if (!fields->m_enabled) return false;
+    fields->m_count = getSettingFast<"clones", int>();
+    fields->m_delay = getSettingFast<"delay", float>();
+    fields->m_initialDelay = getSettingFast<"spawn-delay", float>();
+    return true;
+}
+
+bool CosmicClonesGJBGL::init() {
+    auto fields = m_fields.self();
+    if (!updateSettings(fields)) return GJBaseGameLayer::init();
+    geode::log::info("should be enabled");
+    if (!GJBaseGameLayer::init()) return false;
+    fields->m_stopped = false;
+    fields->m_offset = m_gameState.m_currentProgress;
+    return true;
 }

@@ -31,6 +31,6 @@ void CosmicClonesLevelEditorLayer::onStopPlaytest() {
     for (auto channel : fields->m_sfxIds) {
         FMODAudioEngine::get()->stopChannel(channel);
     }
-    if (!bgl->updateSettings(fields)) return;
     LevelEditorLayer::onStopPlaytest();
+    bgl->updateSettings(fields);
 }

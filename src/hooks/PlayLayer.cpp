@@ -45,8 +45,8 @@ void CosmicClonesPlayLayer::resetLevel() {
         for (auto channel : fields->m_sfxIds) {
             FMODAudioEngine::get()->stopChannel(channel);
         }
-        if (!bgl->updateSettings(fields)) return;
         PlayLayer::resetLevel();
+        if (!bgl->updateSettings(fields)) return;
         fields->m_offset = m_gameState.m_currentProgress;
     }
 }
@@ -55,7 +55,7 @@ void CosmicClonesPlayLayer::fullReset() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
     if (!fields->m_enabled) {
-        PlayLayer::resetLevel();
+        PlayLayer::fullReset();
         if (bgl->updateSettings(fields)) fields->m_offset = m_gameState.m_currentProgress;
         return;
     }
@@ -70,7 +70,7 @@ void CosmicClonesPlayLayer::fullReset() {
     for (auto channel : fields->m_sfxIds) {
         FMODAudioEngine::get()->stopChannel(channel);
     }
-    PlayLayer::resetLevel();
+    PlayLayer::fullReset();
     if (!bgl->updateSettings(fields)) return;
     fields->m_offset = m_gameState.m_currentProgress;
 }

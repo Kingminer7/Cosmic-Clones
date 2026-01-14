@@ -69,13 +69,28 @@ void CosmicSprite::updateStyle(Style style) {
 
 $on_mod(Loaded) {
     listenForSettingChanges("styles", [](std::vector<Style> style) {
-        if (auto pl = reinterpret_cast<CosmicClonesGJBGL*>(PlayLayer::get())) {
-            auto fields = pl->m_fields.self();
+        if (auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(GJBaseGameLayer::get())) {
+            auto fields = bgl->m_fields.self();
             int i = 0;
-            for (auto clone : fields->m_clones) {
-                if (clone == nullptr) continue;
-                clone->updateStyle(style[i % style.size()]);
-                i++;
+            if (!fields->m_enabled) return;
+            if (!bgl->updateSettings(fields)) {
+                for (const auto& clone : fields->m_clones) {
+                    clone->remove();
+                }
+                fields->m_clones.clear();
+                fields->m_snapshots.clear();
+                std::erase_if(fields->m_sfxIds, [](int channel) {
+                    return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
+                });
+                for (auto channel : fields->m_sfxIds) {
+                    FMODAudioEngine::get()->stopChannel(channel);
+                }
+            } else {
+                for (const auto& clone : fields->m_clones) {
+                    if (clone == nullptr) continue;
+                    clone->updateStyle(style[i % style.size()]);
+                    i++;
+                }
             }
         }
     });

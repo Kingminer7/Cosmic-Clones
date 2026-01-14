@@ -86,4 +86,6 @@ public:
     int playSFX(CosmicCloneSFXType type);
 
     void updateStyle(Style style);
+    void remove();
+    void removePlayer(PlayerObject* player);
 };

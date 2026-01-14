@@ -151,7 +151,9 @@ void CosmicClonesGJBGL::processCommands(float dt) {
 }
 
 bool CosmicClonesGJBGL::updateSettings(Fields* fields) {
-    fields->m_enabled = geode::Mod::get()->getSettingValue<bool>("enabled") && (m_isPlatformer || getSettingFast<"normal-mode", bool>());
+    fields->m_enabled = getSettingFast<"enabled", bool>()
+                     && (m_isPlatformer || getSettingFast<"normal-mode", bool>())
+                     && (!m_isEditor || getSettingFast<"editor", bool>());
     if (!fields->m_enabled) return false;
     fields->m_count = getSettingFast<"clones", int>();
     fields->m_delay = getSettingFast<"delay", float>();
@@ -162,7 +164,6 @@ bool CosmicClonesGJBGL::updateSettings(Fields* fields) {
 bool CosmicClonesGJBGL::init() {
     auto fields = m_fields.self();
     if (!updateSettings(fields)) return GJBaseGameLayer::init();
-    geode::log::info("should be enabled");
     if (!GJBaseGameLayer::init()) return false;
     fields->m_stopped = false;
     fields->m_offset = m_gameState.m_currentProgress;

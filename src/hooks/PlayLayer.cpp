@@ -24,45 +24,23 @@ void CosmicClonesPlayLayer::resetLevel() {
         std::vector<std::shared_ptr<CosmicClone>> toRem;
         for (auto clone = fields->m_clones.begin(); clone != fields->m_clones.end();) {
             if (clone->get()->getDelay() > tick) {
-                auto p1 = clone->get()->getP1();
-                p1->toggleGhostEffect(GhostType::Disabled);
-                p1->m_ghostTrail->stopTrail();
-                clone->get()->getSprite()->removeFromParent();
-
-                auto p2 = clone->get()->getP2();
-                p2->toggleGhostEffect(GhostType::Disabled);
-                p2->m_ghostTrail->stopTrail();
-                // clone->get()->getP2Sprite()->removeFromParent();
+                clone->get()->remove();
                 fields->m_clones.erase(clone);
             } else {
                 ++clone;
             }
         }
-        erase_if(fields->m_snapshots, [tick](std::pair<const int, Snapshot> time) {
+        erase_if(fields->m_snapshots, [tick](const std::pair<const int, Snapshot>& time) {
             return time.first > tick;
         });
     } else {
         for (const auto& clone : fields->m_clones) {
-            auto p1 = clone->getP1();
-            p1->toggleGhostEffect(GhostType::Disabled);
-            if (p1->m_ghostTrail) {
-                p1->m_ghostTrail->stopTrail();
-                p1->m_ghostTrail->stopAllActions();
-            }
-            auto p2 = clone->getP2();
-            if (p2) {
-                p2->toggleGhostEffect(GhostType::Disabled);
-                if (p2->m_ghostTrail) {
-                    p2->m_ghostTrail->stopTrail();
-                    p2->m_ghostTrail->stopAllActions();
-                }
-            }
-            clone->getSprite()->removeFromParent();
+            clone->remove();
         }
         fields->m_clones.clear();
         fields->m_snapshots.clear();
         std::erase_if(fields->m_sfxIds, [](int channel) {
-            return FMODAudioEngine::get()->m_stoppedChannels.contains(channel);
+            return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
         });
         for (auto channel : fields->m_sfxIds) {
             FMODAudioEngine::get()->stopChannel(channel);
@@ -82,32 +60,18 @@ void CosmicClonesPlayLayer::fullReset() {
         return;
     }
     for (const auto& clone : fields->m_clones) {
-        auto p1 = clone->getP1();
-        p1->toggleGhostEffect(GhostType::Disabled);
-        if (p1->m_ghostTrail) {
-            p1->m_ghostTrail->stopTrail();
-            p1->m_ghostTrail->stopAllActions();
-        }
-        auto p2 = clone->getP2();
-        if (p2) {
-            p2->toggleGhostEffect(GhostType::Disabled);
-            if (p2->m_ghostTrail) {
-                p2->m_ghostTrail->stopTrail();
-                p2->m_ghostTrail->stopAllActions();
-            }
-        }
-        clone->getSprite()->removeFromParent();
+        clone->remove();
     }
     fields->m_clones.clear();
     fields->m_snapshots.clear();
     std::erase_if(fields->m_sfxIds, [](int channel) {
-        return FMODAudioEngine::get()->m_stoppedChannels.contains(channel);
+        return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
     });
     for (auto channel : fields->m_sfxIds) {
         FMODAudioEngine::get()->stopChannel(channel);
     }
-    if (!bgl->updateSettings(fields)) return;
     PlayLayer::resetLevel();
+    if (!bgl->updateSettings(fields)) return;
     fields->m_offset = m_gameState.m_currentProgress;
 }
 

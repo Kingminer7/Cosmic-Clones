@@ -13,7 +13,9 @@ class $modify(ClonesPauseLayer, PauseLayer) {
         spr->getNode()->setPosition(spr->getContentSize().width / 2, spr->getContentSize().height / 2);
         spr->updateStyle(Style{});
 
-        auto btn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::MediumAlt), [](auto) {
+        auto btnSpr = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::MediumAlt);
+        btnSpr->setScale(.6f);
+        auto btn = CCMenuItemExt::createSpriteExtra(btnSpr, [](auto) {
            openSettingsPopup(Mod::get(), true);
         });
         spr->setScale(.75);

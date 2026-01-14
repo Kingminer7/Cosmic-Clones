@@ -17,6 +17,12 @@ int getFrame(const IconType type) {
     }
 }
 
+CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBaseGameLayer* gameLayer, CCLayer* layer,bool playLayer) {
+    auto ret = static_cast<CosmicPlayerObject*>(PlayerObject::create(player, ship, gameLayer, layer, playLayer));
+    ret->m_fields->m_isCosmic = true;
+    return ret;
+}
+
 void CosmicClone::init(const int delay, bool plat, GJBaseGameLayer* gjbgl) {
     m_delay = delay;
 
@@ -64,14 +70,14 @@ int CosmicClone::getDelay() const {
 void CosmicClone::checkCollision(PlayerObject* player) const {
     if (!player) return;
     auto rect1 = m_p1->getObjectRect();
-    // rect1.origin = m_spr->getPosition() - rect1.size / 2;
     if (rect1.intersectsRect(player->getObjectRect())) {
         player->m_gameLayer->destroyPlayer(player, nullptr);
+        player->m_maybeIsColliding = true; // for editor
     } else if (m_dual) {
         auto rect2 = m_p2->getObjectRect();
-        // rect2.origin = m_p2spr->getPosition() - rect2.size / 2;
         if (rect2.intersectsRect(player->getObjectRect())) {
             player->m_gameLayer->destroyPlayer(player, nullptr);
+            player->m_maybeIsColliding = true; // for editor
         }
     }
 }
@@ -79,6 +85,10 @@ void CosmicClone::checkCollision(PlayerObject* player) const {
 void CosmicClone::setDual(const bool dual) {
     m_p2->setVisible(dual);
     m_dual = dual;
+}
+
+IconType CosmicClone::getType(const int player) const {
+    return player == 2 ? m_p2type : m_p1type;
 }
 
 void CosmicClone::setType(const IconType type, const int player) {
@@ -280,63 +290,6 @@ void CosmicClone::updateAnimation(const int player) const {
     }
 }
 
-IconType CosmicClone::getType(const int player) const {
-    return player == 2 ? m_p2type : m_p1type;
-}
-
-CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBaseGameLayer* gameLayer, CCLayer* layer,
-                                                     bool playLayer) {
-    auto ret = static_cast<CosmicPlayerObject*>(PlayerObject::create(player, ship, gameLayer, layer, playLayer));
-    ret->m_fields->m_isCosmic = true;
-    return ret;
-}
-
-void CosmicClone::updateStyle(Style style) {
-    m_style = std::move(style);
-    m_spr->updateStyle(m_style);
-    for (auto plr : {m_p1, m_p2}) {
-        if (m_style.type == "Cosmic Mario\n(SMG 1)") {
-            // This won't really be seen normally but just in case
-            plr->setColor(ccColor3B{12, 11, 56});
-            plr->setSecondColor(ccColor3B{11, 27, 56});
-            plr->enableCustomGlowColor(ccColor3B{13, 23, 64});
-            plr->m_hasGlow = true;
-            plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Disabled);
-        } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
-            plr->setColor(ccColor3B{60, 20, 21});
-            plr->setSecondColor(ccColor3B{243, 235, 87});
-            plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
-            plr->m_hasGlow = true;
-            plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Disabled);
-        } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
-            plr->setColor(ccColor3B{155, 63, 181});
-            plr->setSecondColor(ccColor3B{191, 29, 51});
-            plr->disableCustomGlowColor();
-            plr->m_hasGlow = false;
-            plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Enabled);
-            if (auto trail = plr->m_ghostTrail) {
-                trail->m_color = ccColor3B{255, 0, 0};
-                trail->m_fadeInterval = .4f;
-            }
-        } else {
-            plr->setColor(style.col1);
-            plr->setSecondColor(style.col2);
-            if (style.useGlow) {
-                plr->enableCustomGlowColor(style.glow);
-                plr->m_hasGlow = true;
-            } else {
-                plr->disableCustomGlowColor();
-                plr->m_hasGlow = false;
-            }
-            plr->updateGlowColor();
-            plr->toggleGhostEffect(GhostType::Disabled);
-        }
-    }
-}
-
 int CosmicClone::playSFX(CosmicCloneSFXType type) {
     switch (type) {
         case CosmicCloneSFXType::Spawn:
@@ -362,4 +315,91 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) {
             return -1;
     }
     return -1;
+}
+
+void CosmicClone::updateStyle(Style style) {
+    m_style = std::move(style);
+    m_spr->updateStyle(m_style);
+    for (auto plr : {m_p1, m_p2}) {
+        if (m_style.type == "Cosmic Mario\n(SMG 1)") {
+            // This won't really be seen normally but just in case
+            plr->setColor(ccColor3B{12, 11, 56});
+            plr->setSecondColor(ccColor3B{11, 27, 56});
+            plr->enableCustomGlowColor(ccColor3B{13, 23, 64});
+            plr->m_hasGlow = true;
+            plr->updateGlowColor();
+            if (!plr->m_gameLayer->m_isEditor)plr->toggleGhostEffect(GhostType::Disabled);
+        } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
+            plr->setColor(ccColor3B{60, 20, 21});
+            plr->setSecondColor(ccColor3B{243, 235, 87});
+            plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
+            plr->m_hasGlow = true;
+            plr->updateGlowColor();
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+        } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
+            plr->setColor(ccColor3B{155, 63, 181});
+            plr->setSecondColor(ccColor3B{191, 29, 51});
+            plr->disableCustomGlowColor();
+            plr->m_hasGlow = false;
+            plr->updateGlowColor();
+            if (!plr->m_gameLayer->m_isEditor) {
+                plr->toggleGhostEffect(GhostType::Enabled);
+                if (auto trail = plr->m_ghostTrail) {
+                    trail->m_color = ccColor3B{255, 0, 0};
+                    trail->m_fadeInterval = .4f;
+                }
+            }
+        } else {
+            plr->setColor(style.col1);
+            plr->setSecondColor(style.col2);
+            if (style.useGlow) {
+                plr->enableCustomGlowColor(style.glow);
+                plr->m_hasGlow = true;
+            } else {
+                plr->disableCustomGlowColor();
+                plr->m_hasGlow = false;
+            }
+            plr->updateGlowColor();
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+        }
+    }
+}
+
+void CosmicClone::remove() {
+    removePlayer(m_p1);
+    removePlayer(m_p2);
+    m_spr->removeFromParent();
+    m_p1 = nullptr;
+    m_p2 = nullptr;
+    m_spr = nullptr;
+}
+
+void CosmicClone::removePlayer(PlayerObject* player) {
+    // Borrowed from Globed, thanks dank
+    // https://github.com/GlobedGD/globed2/blob/5b79e2e613464915deb932e447e93536e7dcd7e1/src/core/game/VisualPlayer.cpp#L643
+#define $clear(x) if (x) x->removeFromParent(); x = nullptr
+
+    // Robtop does not properly remove most/all those nodes from the playerobject in the destructor,
+    // so whenever someone leaves the level, these nodes are never deleted until you leave the level too.
+
+    // Thanks sleepyut for finding this :)
+
+    $clear(player->m_shipStreak);
+    $clear(player->m_regularTrail);
+    $clear(player->m_waveTrail);
+    $clear(player->m_ghostTrail);
+
+    $clear(player->m_playerGroundParticles);
+    $clear(player->m_trailingParticles);
+    $clear(player->m_shipClickParticles);
+    $clear(player->m_vehicleGroundParticles);
+    $clear(player->m_ufoClickParticles);
+    $clear(player->m_robotBurstParticles);
+    $clear(player->m_dashParticles);
+    $clear(player->m_swingBurstParticles1);
+    $clear(player->m_swingBurstParticles2);
+    $clear(player->m_landParticles0);
+    $clear(player->m_landParticles1);
+
+#undef $clear
 }

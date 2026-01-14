@@ -3,6 +3,7 @@
 
 void CosmicClonesPlayerObject::incrementJumps() {
     PlayerObject::incrementJumps();
+    if (!m_gameLayer) return;
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(m_gameLayer)->m_fields.self();
     if (!fields->m_enabled) return;
     if (this == m_gameLayer->m_player1) {
@@ -14,6 +15,7 @@ void CosmicClonesPlayerObject::incrementJumps() {
 
 void CosmicClonesPlayerObject::enablePlayerControls() {
     PlayerObject::enablePlayerControls();
+    if (!m_gameLayer) return;
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(m_gameLayer)->m_fields.self();
     if (!fields->m_enabled) return;
     if (this == m_gameLayer->m_player1) {
@@ -27,6 +29,7 @@ void CosmicClonesPlayerObject::enablePlayerControls() {
 
 void CosmicClonesPlayerObject::disablePlayerControls() {
     PlayerObject::disablePlayerControls();
+    if (!m_gameLayer) return;
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(m_gameLayer)->m_fields.self();
     if (!fields->m_enabled) return;
     if (this == m_gameLayer->m_player1) {

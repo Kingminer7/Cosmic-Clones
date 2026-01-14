@@ -1,3 +1,8 @@
+# 1.2.0
+- <cg>Clones can now work in the editor (off by default)</c>
+- <cg>Add a button to the pause menu</c>
+- <cg>Readd the trail for the badeline style</c>
+- <cy>Internal changes</c>
 # 1.1.2
 - <cy>Fix a few visual bugs</c>
 # 1.1.1

@@ -3,24 +3,24 @@
 #include <Geode/loader/SettingV3.hpp>
 
 struct Style {
-    Style() {};
-    Style(std::string type) : type(type) {}
-    Style(std::string type, cocos2d::ccColor3B col1, cocos2d::ccColor3B col2, bool useGlow, cocos2d::ccColor3B glow) : type(type), col1(col1), col2(col2), useGlow(useGlow), glow(glow) {}
-    std::string type = "Cosmic Mario\n(SMG 1)";
-    cocos2d::ccColor3B col1 = cocos2d::ccWHITE;
-    cocos2d::ccColor3B col2 = cocos2d::ccWHITE;
-    bool useGlow = false;
-    cocos2d::ccColor3B glow = cocos2d::ccWHITE;
+  Style() {};
+  Style(std::string type) : type(type) {}
+  Style(std::string type, cocos2d::ccColor3B col1, cocos2d::ccColor3B col2, bool useGlow, cocos2d::ccColor3B glow) : type(type), col1(col1), col2(col2), useGlow(useGlow), glow(glow) {}
+  std::string type = "Cosmic Mario\n(SMG 1)";
+  cocos2d::ccColor3B col1 = cocos2d::ccWHITE;
+  cocos2d::ccColor3B col2 = cocos2d::ccWHITE;
+  bool useGlow = false;
+  cocos2d::ccColor3B glow = cocos2d::ccWHITE;
 
-    bool operator==(const Style& other) const {
-        if (type != other.type) return false;
-        if (type != "Custom") return true;
-        return col1 == other.col1 && col2 == other.col2 && useGlow == other.useGlow && (!useGlow || glow == other.glow);
-    }
+  bool operator==(const Style& other) const {
+    if (type != other.type) return false;
+    if (type != "Custom") return true;
+    return col1 == other.col1 && col2 == other.col2 && useGlow == other.useGlow && (!useGlow || glow == other.glow);
+  }
 
-    bool operator!=(const Style& other) const {
-        return !(*this == other);
-    }
+  bool operator!=(const Style& other) const {
+    return !(*this == other);
+  }
 };
 
 template <>
@@ -59,42 +59,39 @@ public:
 
 template <>
 struct geode::SettingTypeForValueType<std::vector<Style>> {
-    using SettingType = CloneStyleSetting;
+  using SettingType = CloneStyleSetting;
 };
 
 class StyleNode;
 
 class CloneStyleSettingNode : public geode::SettingValueNodeV3<CloneStyleSetting> {
 protected:
-    bool init(std::shared_ptr<CloneStyleSetting> setting, float width);
-    void updateState(CCNode* invoker) override;
+  bool init(std::shared_ptr<CloneStyleSetting> setting, float width);
+  void updateState(CCNode* invoker) override;
 
-    std::vector<StyleNode*> m_nodes;
-    CCMenuItemSpriteExtra* m_addBtn = nullptr;
+  std::vector<StyleNode*> m_nodes;
+  CCMenuItemSpriteExtra* m_addBtn = nullptr;
 public:
-    void setNodeValue(StyleNode* node, Style value);
-    void remove(int id);
+  void setNodeValue(StyleNode* node, Style value);
+  void remove(int id);
 
-    static CloneStyleSettingNode* create(std::shared_ptr<CloneStyleSetting> setting, float width);
+  static CloneStyleSettingNode* create(std::shared_ptr<CloneStyleSetting> setting, float width);
 };
 
 
-class StyleNode : public cocos2d::CCMenu, geode::ColorPickPopupDelegate {
+class StyleNode : public cocos2d::CCMenu {
 protected:
-    bool init(CloneStyleSettingNode* setting, Style value);
+  bool init(CloneStyleSettingNode* setting, Style value);
 
-    static std::vector<Style> m_styles;
-    Style m_style;
-    cocos2d::CCLabelBMFont* m_label = nullptr;
-    CloneStyleSettingNode* m_setting = nullptr;
-    CCMenu* m_customMenu = nullptr;
+  static std::vector<Style> m_styles;
+  Style m_style;
+  cocos2d::CCLabelBMFont* m_label = nullptr;
+  CloneStyleSettingNode* m_setting = nullptr;
+  CCMenu* m_customMenu = nullptr;
 
-    std::string m_currentlyEditing = "none";
-
-    void updateColor(cocos2d::ccColor4B const& color) override;
 public:
-    void updateState(Style style);
-    Style getStyle() { return m_style; }
+  void updateState(Style style);
+  Style getStyle() { return m_style; }
 
-    static StyleNode* create(CloneStyleSettingNode* setting, Style value);
+  static StyleNode* create(CloneStyleSettingNode* setting, Style value);
 };

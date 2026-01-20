@@ -103,11 +103,11 @@ void CloneStyleSettingNode::setNodeValue(StyleNode* node, Style value) {
 }
 
 void CloneStyleSettingNode::remove(int id) {
-    auto val = getValue();
-    if (id < 0 || id >= static_cast<int>(val.size()))
-        return;
-    val.erase(val.begin() + id);
-    setValue(val, this);
+  auto val = getValue();
+  if (id < 0 || id >= static_cast<int>(val.size()))
+    return;
+  val.erase(val.begin() + id);
+  setValue(val, this);
 }
 
 
@@ -179,9 +179,11 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     col1Spr->setColor(m_style.col1);
     col1Spr->setScale(.7f);
     auto col1Btn = CCMenuItemExt::createSpriteExtra(col1Spr, [this](auto) {
-        m_currentlyEditing = "col1";
         auto popup = ColorPickPopup::create(m_style.col1);
-        popup->setDelegate(this);
+        popup->setCallback([this](ccColor4B const& color) {
+            m_style.col1 = ccColor3B(color.r, color.g, color.b);
+            m_setting->setNodeValue(this, m_style);
+        });
         popup->show();
     });
     col1Btn->setID("col1");
@@ -197,9 +199,11 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     col2Spr->setColor(m_style.col2);
     col2Spr->setScale(.7f);
     auto col2Btn = CCMenuItemExt::createSpriteExtra(col2Spr, [this](auto) {
-        m_currentlyEditing = "col2";
         auto popup = ColorPickPopup::create(m_style.col2);
-        popup->setDelegate(this);
+        popup->setCallback([this](ccColor4B const& color) {
+            m_style.col2 = ccColor3B(color.r, color.g, color.b);
+            m_setting->setNodeValue(this, m_style);
+        });
         popup->show();
     });
     col2Btn->setID("col2");
@@ -215,9 +219,11 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     glowSpr->setColor(m_style.glow);
     glowSpr->setScale(.7f);
     auto glowBtn = CCMenuItemExt::createSpriteExtra(glowSpr, [this](auto) {
-        m_currentlyEditing = "glow";
         auto popup = ColorPickPopup::create(m_style.glow);
-        popup->setDelegate(this);
+        popup->setCallback([this](ccColor4B const& color) {
+            m_style.glow = ccColor3B(color.r, color.g, color.b);
+            m_setting->setNodeValue(this, m_style);
+        });
         popup->show();
     });
     glowBtn->setID("glow");
@@ -237,47 +243,34 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     return true;
 }
 
-void StyleNode::updateColor(ccColor4B const& color) {
-    if (m_currentlyEditing == "col1") {
-        m_style.col1 = ccColor3B(color.r, color.g, color.b);
-    } else if (m_currentlyEditing == "col2") {
-        m_style.col2 = ccColor3B(color.r, color.g, color.b);
-    } else if (m_currentlyEditing == "glow") {
-        m_style.glow = ccColor3B(color.r, color.g, color.b);
-    } else {
-        return;
-    }
-    m_setting->setNodeValue(this, m_style);
-}
-
 void StyleNode::updateState(Style value) {
-    m_style = std::move(value);
-    m_label->setString(m_style.type.c_str());
-    if (auto width = m_label->getContentWidth(); width > 0.001f)
-        m_label->setScale(std::min(80.f / width, .45f));
-    else
-        m_label->setScale(.001f);
-    setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
-    m_customMenu->setVisible(m_style.type == "Custom");
-    m_customMenu->getChildByID("col1")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col1);
+  m_style = std::move(value);
+  m_label->setString(m_style.type.c_str());
+  if (auto width = m_label->getContentWidth(); width > 0.001f)
+    m_label->setScale(std::min(80.f / width, .45f));
+  else
+    m_label->setScale(.001f);
+  setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
+  m_customMenu->setVisible(m_style.type == "Custom");
+  m_customMenu->getChildByID("col1")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col1);
     m_customMenu->getChildByID("col2")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col2);
     auto glowBtn = m_customMenu->getChildByID("glow");
     glowBtn->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.glow);
     typeinfo_cast<CCMenuItemSpriteExtra*>(glowBtn)->setEnabled(m_style.useGlow);
     typeinfo_cast<CCMenuItemToggler*>(m_customMenu->getChildByID("glow-toggler"))->toggle(m_style.useGlow);
-    updateLayout();
+  updateLayout();
 }
 
 StyleNode* StyleNode::create(CloneStyleSettingNode* setting, Style value) {
-    auto ret = new StyleNode();
-    if (ret->init(setting, value)) {
-        ret->autorelease();
-        return ret;
-    }
-    delete ret;
-    return nullptr;
+  auto ret = new StyleNode();
+  if (ret->init(setting, value)) {
+    ret->autorelease();
+    return ret;
+  }
+  delete ret;
+  return nullptr;
 }
 
 $execute {
-    (void)Mod::get()->registerCustomSettingType("clone-style", &CloneStyleSetting::parse);
+  (void)Mod::get()->registerCustomSettingType("clone-style", &CloneStyleSetting::parse);
 }

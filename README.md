@@ -1,6 +1,8 @@
 # Cosmic Clones
 Ever played a platformer and thought it was too easy? Well not anymore! \
-This mod adds clones of the player that kill you if you touch it. These clones follow with a delay, changable in settings.
+This mod adds clones of the player that kill you if you touch it. These clones follow with a delay, changeable in settings.
+
+Click Between Steps may cause unexpected issues.
 
 ## Styles
 This mod comes with a few styles!

@@ -2,7 +2,10 @@
 - <cg>Clones can now work in the editor (off by default)</c>
 - <cg>Add a button to the pause menu</c>
 - <cg>Readd the trail for the badeline style</c>
-- <cy>Internal changes</c>
+- <cy>Fix some memory leaks</c>
+- <ca>Updated Geode version</c>
+- <ca>Removed dependency on Alpha's UI Pack</c>
+- <cy>Other internal changes and optimizations</c>
 # 1.1.2
 - <cy>Fix a few visual bugs</c>
 # 1.1.1

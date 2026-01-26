@@ -1,7 +1,6 @@
 #include "ShaderManager.hpp"
 
-#include <utility>
-
+#include "Utils.hpp"
 #include "hooks/GJBaseGameLayer.hpp"
 #include "Shaders.hpp"
 #include "CloneStyleSetting.hpp"
@@ -66,7 +65,7 @@ void ShaderManager::update(const float dt) {
 $on_mod(Loaded) {
     CCScheduler::get()->scheduleUpdateForTarget(&ShaderManager::get(), 0, false);
 
-    listenForSettingChanges("styles", [](const std::vector<Style>& style) {
+    listenForAllSettingChanges([](auto s) {
         if (auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(GJBaseGameLayer::get())) {
             auto fields = bgl->m_fields.self();
             int i = 0;
@@ -84,9 +83,10 @@ $on_mod(Loaded) {
                     FMODAudioEngine::get()->stopChannel(channel);
                 }
             } else {
+                const auto& styles = getSettingFast<"styles", std::vector<Style>>();
                 for (const auto& clone : fields->m_clones) {
                     if (clone == nullptr) continue;
-                    clone->updateStyle(style[i % style.size()]);
+                    clone->updateStyle(styles[i % styles.size()]);
                     i++;
                 }
             }

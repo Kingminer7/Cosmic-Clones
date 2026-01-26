@@ -18,6 +18,7 @@ class $modify(ClonesPauseLayer, PauseLayer) {
            openSettingsPopup(Mod::get(), true);
         });
         spr->setScale(.75);
+        btn->setID("clones-settings-btn"_spr);
 
         auto menu = getChildByID("left-button-menu");
         menu->addChild(btn);

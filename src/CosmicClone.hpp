@@ -58,7 +58,6 @@ class CosmicClone {
 protected:
     int m_delay = 0;
     CosmicPlayerObject* m_p1 = nullptr;
-    CosmicSprite* m_spr = nullptr;
     CosmicPlayerObject* m_p2 = nullptr;
     Style m_style;
 
@@ -72,7 +71,6 @@ protected:
 public:
     static std::shared_ptr<CosmicClone> create(int delay, bool plat, GJBaseGameLayer* gjbgl);
     CosmicPlayerObject* getP1() const;
-    CosmicSprite* getSprite() const;
     CosmicPlayerObject* getP2() const;
     int getDelay() const;
     void checkCollision(PlayerObject* player) const;
@@ -87,5 +85,6 @@ public:
 
     void updateStyle(Style style);
     void remove();
-    void removePlayer(PlayerObject* player);
+    static void removePlayer(PlayerObject* player);
+    static void updateShaderForPlayer(PlayerObject* player, cocos2d::CCGLProgram* shader);
 };

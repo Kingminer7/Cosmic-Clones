@@ -2,21 +2,15 @@
 
 #include "../Utils.hpp"
 #include "../CloneStyleSetting.hpp"
+#include <Geode/Geode.hpp>
 
-void CosmicClonesGJBGL::processCommands(float dt) {
+void CosmicClonesGJBGL::processCommands(float dt, bool half, bool last) {
     auto fields = m_fields.self();
-    if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processCommands(dt);
+    if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processCommands(dt, half, last);
     int tick = m_gameState.m_currentProgress - fields->m_offset;
     for (const auto& clone : fields->m_clones) {
         auto del = tick - clone->getDelay();
         if (fields->m_snapshots.contains(del)) {
-            auto spr = clone->getSprite();
-            spr->setPosition(-m_objectLayer->getPosition() / cocos2d::CCPoint{m_objectLayer->getScaleX(), m_objectLayer->getScaleY()});
-            spr->setScaleX(1 / m_objectLayer->getScaleX());
-            spr->setScaleY(1 / m_objectLayer->getScaleY());
-            auto layer = spr->getNode();
-            layer->setPosition(m_objectLayer->getPosition());
-            layer->setScale(m_objectLayer->getScaleX(), m_objectLayer->getScaleY());
             auto snap = fields->m_snapshots.at(del);
             clone->setDual(snap.dualEnabled);
             auto p1 = clone->getP1();
@@ -51,8 +45,10 @@ void CosmicClonesGJBGL::processCommands(float dt) {
         if (tick == del) {
             auto clone = CosmicClone::create(del, m_isPlatformer, this);
             clone->updateStyle(styles[(i - 1) % styles.size()]);
-            m_objectLayer->addChild(clone->getSprite());
-            clone->getSprite()->setZOrder(m_player1->getZOrder());
+            m_objectLayer->addChild(clone->getP1());
+            m_objectLayer->addChild(clone->getP2());
+            clone->getP1()->setZOrder(m_player1->getZOrder());
+            clone->getP2()->setZOrder(m_player2->getZOrder());
             fields->m_clones.push_back(clone);
             if (getSettingFast<"sfx", bool>()) {
                 auto id = clone->playSFX(i > 1 ? CosmicCloneSFXType::Spawn : CosmicCloneSFXType::FirstSpawn);
@@ -132,7 +128,7 @@ void CosmicClonesGJBGL::processCommands(float dt) {
     }
     fields->m_snapshots[tick] = std::move(snap);
 
-    GJBaseGameLayer::processCommands(dt);
+    GJBaseGameLayer::processCommands(dt, half, last);
     if (getSettingFast<"friendly", bool>()) return;
     if (!fields->m_p1Frozen && fields->m_p1Immunity > 0) {
         fields->m_p1Immunity--;

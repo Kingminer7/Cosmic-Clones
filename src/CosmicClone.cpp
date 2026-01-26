@@ -1,4 +1,5 @@
 #include "CosmicClone.hpp"
+#include "Geode/cocos/shaders/CCShaderCache.h"
 
 using namespace geode::prelude;
 
@@ -37,12 +38,6 @@ void CosmicClone::init(const int delay, bool plat, GJBaseGameLayer* gjbgl) {
     m_p2->m_fields->m_clone = this;
     m_p2->setID(fmt::format("cosmic-clone-dual-{}"_spr, delay));
     m_p2->togglePlatformerMode(plat);
-
-    auto layer = CCNode::create();
-    layer->addChild(m_p1);
-    layer->addChild(m_p2);
-    m_spr = CosmicSprite::create(layer);
-    m_spr->setAnchorPoint(CCPoint{0, 0});
 }
 
 std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat, GJBaseGameLayer* gjbgl) {
@@ -53,10 +48,6 @@ std::shared_ptr<CosmicClone> CosmicClone::create(const int delay, bool plat, GJB
 
 CosmicPlayerObject* CosmicClone::getP1() const {
     return m_p1;
-}
-
-CosmicSprite* CosmicClone::getSprite() const {
-    return m_spr;
 }
 
 CosmicPlayerObject* CosmicClone::getP2() const {
@@ -130,10 +121,12 @@ void CosmicClone::setType(const IconType type, const int player) {
             case IconType::Robot:
                 m_p1->toggleRobotMode(true, true);
                 m_p1->updatePlayerRobotFrame(gm->getPlayerRobot());
+                m_p1->m_robotBatchNode->setShaderProgram(m_p1->getShaderProgram());
                 break;
             case IconType::Spider:
                 m_p1->toggleSpiderMode(true, true);
                 m_p1->updatePlayerSpiderFrame(gm->getPlayerSpider());
+                m_p1->m_spiderBatchNode->setShaderProgram(m_p1->getShaderProgram());
                 break;
             case IconType::Swing:
                 m_p1->toggleSwingMode(true, true);
@@ -180,10 +173,12 @@ void CosmicClone::setType(const IconType type, const int player) {
             case IconType::Robot:
                 m_p2->toggleRobotMode(true, true);
                 m_p2->updatePlayerRobotFrame(sdi ? sdi->getSavedValue<int>("robot", gm->getPlayerRobot()) : gm->getPlayerRobot());
+                m_p2->m_spiderBatchNode->setShaderProgram(m_p2->getShaderProgram());                
                 break;
             case IconType::Spider:
                 m_p2->toggleSpiderMode(true, true);
                 m_p2->updatePlayerSpiderFrame(sdi ? sdi->getSavedValue<int>("spider", gm->getPlayerSpider()) : gm->getPlayerSpider());
+                m_p2->m_spiderBatchNode->setShaderProgram(m_p2->getShaderProgram());
                 break;
             case IconType::Swing:
                 m_p2->toggleSwingMode(true, true);
@@ -319,9 +314,9 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) {
 
 void CosmicClone::updateStyle(Style style) {
     m_style = std::move(style);
-    m_spr->updateStyle(m_style);
     for (auto plr : {m_p1, m_p2}) {
         if (m_style.type == "Cosmic Mario\n(SMG 1)") {
+            auto gm = GameManager::get();
             // This won't really be seen normally but just in case
             plr->setColor(ccColor3B{12, 11, 56});
             plr->setSecondColor(ccColor3B{11, 27, 56});
@@ -329,6 +324,7 @@ void CosmicClone::updateStyle(Style style) {
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             if (!plr->m_gameLayer->m_isEditor)plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, ShaderManager::get().getCosmicShader());
         } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
             plr->setColor(ccColor3B{60, 20, 21});
             plr->setSecondColor(ccColor3B{243, 235, 87});
@@ -336,6 +332,7 @@ void CosmicClone::updateStyle(Style style) {
             plr->m_hasGlow = true;
             plr->updateGlowColor();
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
             plr->setColor(ccColor3B{155, 63, 181});
             plr->setSecondColor(ccColor3B{191, 29, 51});
@@ -349,6 +346,7 @@ void CosmicClone::updateStyle(Style style) {
                     trail->m_fadeInterval = .4f;
                 }
             }
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         } else {
             plr->setColor(style.col1);
             plr->setSecondColor(style.col2);
@@ -361,17 +359,18 @@ void CosmicClone::updateStyle(Style style) {
             }
             plr->updateGlowColor();
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         }
     }
 }
 
 void CosmicClone::remove() {
     removePlayer(m_p1);
-    removePlayer(m_p2);
-    m_spr->removeFromParent();
+    m_p1->removeFromParent();
     m_p1 = nullptr;
+    removePlayer(m_p2);
+    m_p2->removeFromParent();
     m_p2 = nullptr;
-    m_spr = nullptr;
 }
 
 void CosmicClone::removePlayer(PlayerObject* player) {
@@ -402,4 +401,32 @@ void CosmicClone::removePlayer(PlayerObject* player) {
     $clear(player->m_landParticles1);
 
 #undef $clear
+}
+
+void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader) {
+    if (!player) return log::error("Cannot set  shader for a nullptr PlayerObject.");
+    if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
+
+#define $apply(sprite, shader) if(sprite) sprite->setShaderProgram(shader); else log::error("Could not find {}.", #sprite)
+    
+    // Only doing this so the gjrobotsprite logic later on knows what shader to apply, has no visual effect afaik
+    $apply(player, shader);
+
+    $apply(player->m_iconSprite, shader);
+    $apply(player->m_iconSpriteSecondary, shader);
+    $apply(player->m_iconSpriteWhitener, shader);
+    $apply(player->m_iconGlow, shader);
+    $apply(player->m_vehicleSprite, shader);
+    $apply(player->m_vehicleSpriteSecondary, shader);
+    $apply(player->m_birdVehicle, shader);
+    $apply(player->m_vehicleSprite, shader);
+    $apply(player->m_vehicleGlow, shader);
+    $apply(player->m_swingFireBottom, shader);
+    $apply(player->m_swingFireMiddle, shader);
+    $apply(player->m_swingFireTop, shader);
+
+    // Robot and spider sprites will be handled with gamemode changes
+
+#undef $apply
+
 }

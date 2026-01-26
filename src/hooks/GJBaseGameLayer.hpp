@@ -25,7 +25,7 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
         int m_count;
     };
 
-    void processCommands(float dt);
+    void processCommands(float dt, bool half, bool last);
     bool updateSettings(Fields* fields);
     bool init();
 };

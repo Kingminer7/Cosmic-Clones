@@ -1,5 +1,6 @@
 #include "ShaderManager.hpp"
 
+#include "Geode/loader/SettingV3.hpp"
 #include "Utils.hpp"
 #include "hooks/GJBaseGameLayer.hpp"
 #include "Shaders.hpp"
@@ -65,7 +66,7 @@ void ShaderManager::update(const float dt) {
 $on_mod(Loaded) {
     CCScheduler::get()->scheduleUpdateForTarget(&ShaderManager::get(), 0, false);
 
-    listenForAllSettingChanges([](auto s) {
+    listenForAllSettingChanges([](auto k, auto s) {
         if (auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(GJBaseGameLayer::get())) {
             auto fields = bgl->m_fields.self();
             int i = 0;

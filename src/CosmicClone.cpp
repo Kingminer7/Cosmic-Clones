@@ -403,7 +403,7 @@ void CosmicClone::removePlayer(PlayerObject* player) {
 #undef $clear
 }
 
-void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader) {
+void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader, bool applyToRobotSprites) {
     if (!player) return log::error("Cannot set  shader for a nullptr PlayerObject.");
     if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
 
@@ -425,7 +425,11 @@ void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shade
     $apply(player->m_swingFireMiddle, shader);
     $apply(player->m_swingFireTop, shader);
 
-    // Robot and spider sprites will be handled with gamemode changes
+    if (applyToRobotSprites) {
+        $apply(player->m_robotBatchNode, shader);
+        $apply(player->m_spiderBatchNode, shader);
+    }
+    // Robot and spider sprites will be handled with gamemode changes if false
 
 #undef $apply
 

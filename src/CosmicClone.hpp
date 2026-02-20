@@ -86,5 +86,5 @@ public:
     void updateStyle(Style style);
     void remove();
     static void removePlayer(PlayerObject* player);
-    static void updateShaderForPlayer(PlayerObject* player, cocos2d::CCGLProgram* shader);
+    static void updateShaderForPlayer(PlayerObject* player, cocos2d::CCGLProgram* shader, bool applyToRobotSprites = false);
 };

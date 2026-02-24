@@ -1,3 +1,8 @@
+# 1.2.1
+
+- <cy>Fix for MacOS</c>
+- <cg>Added an easter egg</c>
+
 # 1.2.0
 
 - <cg>Clones can now work in the editor (off by default)</c>

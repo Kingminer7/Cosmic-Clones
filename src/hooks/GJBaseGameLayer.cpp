@@ -4,9 +4,18 @@
 #include "../CloneStyleSetting.hpp"
 #include <Geode/Geode.hpp>
 
+#ifndef GEODE_IS_MACOS
 void CosmicClonesGJBGL::processCommands(float dt, bool half, bool last) {
+#else
+void CosmicClonesGJBGL::processQueuedButtons(float dt, bool clear) {
+#endif
     auto fields = m_fields.self();
+
+#ifndef GEODE_IS_MACOS
     if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processCommands(dt, half, last);
+#else
+    if (!fields->m_enabled || fields->m_stopped) return GJBaseGameLayer::processQueuedButtons(dt, clear);
+#endif
     int tick = m_gameState.m_currentProgress - fields->m_offset;
     for (const auto& clone : fields->m_clones) {
         auto del = tick - clone->getDelay();
@@ -127,8 +136,13 @@ void CosmicClonesGJBGL::processCommands(float dt, bool half, bool last) {
         }
     }
     fields->m_snapshots[tick] = std::move(snap);
-
+    
+#ifndef GEODE_IS_MACOS
     GJBaseGameLayer::processCommands(dt, half, last);
+#else
+    GJBaseGameLayer::processQueuedButtons(dt, clear);
+#endif
+
     if (getSettingFast<"friendly", bool>()) return;
     if (!fields->m_p1Frozen && fields->m_p1Immunity > 0) {
         fields->m_p1Immunity--;

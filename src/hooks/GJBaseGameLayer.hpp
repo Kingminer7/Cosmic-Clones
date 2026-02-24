@@ -25,7 +25,12 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer) {
         int m_count;
     };
 
+    #ifndef GEODE_IS_MACOS
     void processCommands(float dt, bool half, bool last);
+    #else
+    void processQueuedButtons(float dt, bool clear);
+    #endif
+    
     bool updateSettings(Fields* fields);
     bool init();
 };

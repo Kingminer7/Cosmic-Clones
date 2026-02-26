@@ -12,7 +12,11 @@
     "developer": "km7dev",
     "description": "Adds chasers to levels.",
     "dependencies": {
-        "geode.node-ids": ">=v1.22.0"
+        "geode.node-ids": ">=v1.22.0",
+        "undefined0.icon_ninja": {
+            "version": "1.4.3",
+            "required": false
+        }
     },
     "tags": [
         "gameplay",

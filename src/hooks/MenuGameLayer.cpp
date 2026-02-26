@@ -1,10 +1,11 @@
 #include <Geode/modify/MenuGameLayer.hpp>
-#include <Geode/ui/GeodeUI.hpp>
+#include <Geode/utils/random.hpp>
+
+#include <undefined0.icon_ninja/include/events.hpp>
 
 #include "../ShaderManager.hpp"
 #include "../CosmicClone.hpp"
 
-#include "Geode/utils/random.hpp"
 using namespace geode::prelude;
 
 class $modify(ClonesMenuGameLayer, MenuGameLayer) {
@@ -24,3 +25,11 @@ class $modify(ClonesMenuGameLayer, MenuGameLayer) {
         }
     }
 };
+
+$on_mod(Loaded) {
+    ninja::NewPlayerEvent().listen([](PlayerObject* player){
+        if (random::generate(308, 310) == 309) {
+            CosmicClone::updateShaderForPlayer(player, ShaderManager::get().getCosmicShader(), true);
+        }
+    }).leak();
+}

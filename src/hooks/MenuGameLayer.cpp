@@ -28,7 +28,7 @@ class $modify(ClonesMenuGameLayer, MenuGameLayer) {
 
 $on_mod(Loaded) {
     ninja::NewPlayerEvent().listen([](PlayerObject* player){
-        if (random::generate(308, 310) == 309) {
+        if (random::generate(0, 1000) == 309) {
             CosmicClone::updateShaderForPlayer(player, ShaderManager::get().getCosmicShader(), true);
         }
     }).leak();

@@ -1,3 +1,7 @@
+# 1.2.2
+
+- <cy>Reset a value that I forgot to change back from testing</c>
+
 # 1.2.1
 
 - <cy>Fix for MacOS</c>

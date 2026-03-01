@@ -17,12 +17,17 @@ protected:
     CCMenuItemToggler* m_multiToggle = nullptr;
     cocos2d::CCLabelBMFont* m_multiLabel = nullptr;
 
+    CCMenuItemToggler* m_disabledToggle = nullptr;
+    cocos2d::CCLabelBMFont* m_disabledLabel = nullptr;
+    CCMenuItemToggler* m_damageToggle = nullptr;
+    cocos2d::CCLabelBMFont* m_damageLabel = nullptr;
+
+
     geode::TextInput* m_countInput = nullptr;
     geode::TextInput* m_delayInput = nullptr;
     Slider* m_delaySlider = nullptr;
-    geode::Function<void(Slider* slider)> m_delayCallback = nullptr;
-
-    void activateCallback(CCObject* sender);
+    geode::TextInput* m_startDelayInput = nullptr;
+    Slider* m_startDelaySlider = nullptr;
 public:
     static ClonesTriggerPopup* create(CosmicClonesTrigger* trigger);
 };

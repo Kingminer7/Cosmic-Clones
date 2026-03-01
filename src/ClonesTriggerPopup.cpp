@@ -2,6 +2,16 @@
 
 using namespace geode::prelude;
 
+struct LambdaObj : CCNode {
+    Function<void(Slider* slider)> callback;
+    Slider* slider;
+    LambdaObj(Slider* slider, Function<void(Slider* slider)> callback) : slider(slider), callback(std::move(callback)) {}
+
+    void execute(CCObject*) {
+	callback(slider);
+    }
+};
+
 bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     if (!Popup::init(320, 260)) return false;
     m_trigger = trigger;
@@ -74,7 +84,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     auto multiContainer = CCMenu::create();
     multiContainer->setID("multi-container");
     multiContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(multiContainer, Anchor::BottomRight, {-75, 50});
+    m_mainLayer->addChildAtPosition(multiContainer, Anchor::BottomLeft, {20, 80});
 
     m_multiToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->m_isMultiTriggered = !toggle->isToggled();
@@ -96,7 +106,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     auto countContainer = CCMenu::create();
     countContainer->setID("count-container");
     countContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(countContainer, Anchor::TopLeft, {75, -75});
+    m_mainLayer->addChildAtPosition(countContainer, Anchor::Left, {75, 55});
 
     m_countInput = TextInput::create(70, nullptr);
     m_countInput->setID("count-input");
@@ -131,51 +141,131 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     auto delayContainer = CCMenu::create();
     delayContainer->setID("delay-container");
     delayContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(delayContainer, Anchor::TopRight, {-75, -80});
+    m_mainLayer->addChildAtPosition(delayContainer, Anchor::Right, {-90, 55});
 
-    m_delaySlider = Slider::create(this, menu_selector(ClonesTriggerPopup::activateCallback));
+    m_delaySlider = Slider::create(nullptr, nullptr);
+    auto lambda = new LambdaObj(m_delaySlider, [this](auto slider) {
+        m_trigger->setDelay(std::round(slider->getValue() * 20 * 100) / 100);
+        m_delayInput->setString(numToString(m_trigger->getDelay()));
+    });
+    lambda->autorelease();
+    m_delaySlider->m_touchLogic->m_thumb->m_pfnSelector = menu_selector(LambdaObj::execute);
+    m_delaySlider->m_touchLogic->m_thumb->m_pListener = lambda;
+    m_delaySlider->setUserObject("lambda", lambda);
     m_delaySlider->ignoreAnchorPointForPosition(false);
     m_delaySlider->setAnchorPoint({0, 0});
     m_delaySlider->setScale(.7f);
-    m_delayCallback = [this](auto slider) {
-        m_trigger->setCount(slider->getValue() * 20);
-        m_delayInput->setString(numToString(m_trigger->getCount()));
-    };
     m_delaySlider->setValue(m_trigger->getDelay() / 20);
     m_delaySlider->updateBar();
+    m_delaySlider->setID("delay-slider");
     delayContainer->addChild(m_delaySlider);
 
     m_delayInput = TextInput::create(70, nullptr);
     m_delayInput->setID("delay-input");
     m_delayInput->setScale(.9);
     m_delayInput->setCommonFilter(CommonFilter::Float);
-    m_delayInput->setString(numToString(trigger->getCount()));
+    m_delayInput->setString(numToString(trigger->getDelay()));
     m_delayInput->setCallback([this](const std::string& str) {
         auto res = numFromString<float>(str);
-        if (!res) return log::warn("Failed to convert contents of count '{}' to float: {}", str, res.unwrapErr());
-        m_trigger->setDelay(std::clamp(res.unwrap(), 0.f, 20.f));
-        m_delaySlider->setValue(m_trigger->getDelay() / 20);
+        if (!res) return log::warn("Failed to convert contents of delay '{}' to float: {}", str, res.unwrapErr());
+        m_trigger->setDelay(std::round(std::clamp(res.unwrap(), 0.f, 20.f) * 100) / 100);
+        m_delaySlider->setValue(m_trigger->getDelay() / 20.f);
         m_delaySlider->updateBar();
     });
-    delayContainer->addChildAtPosition(m_delayInput, Anchor::Center, {44.5, 30});
+    delayContainer->addChildAtPosition(m_delayInput, Anchor::Center, {34.5, 30});
 
-    auto delayLabel = CCLabelBMFont::create("Delay", "goldFont.fnt");
+    auto delayLabel = CCLabelBMFont::create("Delay", "chatFont.fnt");
     delayLabel->setID("delay-label");
-    delayLabel->setScale(.63);
+    delayLabel->setScale(.8);
     delayLabel->setAnchorPoint({1, .5});
-    delayContainer->addChildAtPosition(delayLabel, Anchor::Center, {0, 30});
+    delayContainer->addChildAtPosition(delayLabel, Anchor::Center, {-10, 30});
 
-    // input +25
-    // label 0 with anchor 1, .5
+    auto startDelayContainer = CCMenu::create();
+    startDelayContainer->setID("start-delay-container");
+    startDelayContainer->setContentSize({0, 0});
+    m_mainLayer->addChildAtPosition(startDelayContainer, Anchor::Right, {-90, -15});
+
+    m_startDelaySlider = Slider::create(nullptr, nullptr);
+    auto sdlambda = new LambdaObj(m_startDelaySlider, [this](auto slider) {
+        m_trigger->setStartDelay(std::round(slider->getValue() * 20 * 100) / 100);
+        m_startDelayInput->setString(numToString(m_trigger->getStartDelay()));
+    });
+    sdlambda->autorelease();
+    m_startDelaySlider->m_touchLogic->m_thumb->m_pfnSelector = menu_selector(LambdaObj::execute);
+    m_startDelaySlider->m_touchLogic->m_thumb->m_pListener = sdlambda;
+    m_startDelaySlider->setUserObject("lambda", sdlambda);
+    m_startDelaySlider->ignoreAnchorPointForPosition(false);
+    m_startDelaySlider->setAnchorPoint({0, 0});
+    m_startDelaySlider->setScale(.7f);
+    m_startDelaySlider->setValue(m_trigger->getStartDelay() / 20);
+    m_startDelaySlider->updateBar();
+    m_startDelaySlider->setID("start-delay-slider");
+    startDelayContainer->addChild(m_startDelaySlider);
+
+    m_startDelayInput = TextInput::create(70, nullptr);
+    m_startDelayInput->setID("start-delay-input");
+    m_startDelayInput->setScale(.9);
+    m_startDelayInput->setCommonFilter(CommonFilter::Float);
+    m_startDelayInput->setString(numToString(trigger->getStartDelay()));
+    m_startDelayInput->setCallback([this](const std::string& str) {
+        auto res = numFromString<float>(str, 2);
+        if (!res) return log::warn("Failed to convert contents of start delay '{}' to float: {}", str, res.unwrapErr());
+        m_trigger->setStartDelay(std::round(std::clamp(res.unwrap(), 0.f, 20.f) * 100) / 100);
+        m_startDelaySlider->setValue(m_trigger->getStartDelay() / 20.f);
+        m_startDelaySlider->updateBar();
+    });
+    startDelayContainer->addChildAtPosition(m_startDelayInput, Anchor::Center, {34.5, 30});
+
+    auto startDelayLabel = CCLabelBMFont::create("Start Delay", "chatFont.fnt");
+    startDelayLabel->setID("start-delay-label");
+    startDelayLabel->setScale(.8);
+    startDelayLabel->setAnchorPoint({1, .5});
+    startDelayContainer->addChildAtPosition(startDelayLabel, Anchor::Center, {-10, 30});
+
+    auto disabledContainer = CCMenu::create();
+    disabledContainer->setID("disabled-container");
+    disabledContainer->setContentSize({0, 0});
+    m_mainLayer->addChildAtPosition(disabledContainer, Anchor::BottomRight, {-75, 20});
+
+    m_disabledToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
+        m_trigger->setDisabled(!toggle->isToggled());
+    });
+    m_disabledToggle->toggle(trigger->isDisabled());
+    m_disabledToggle->setID("disabled-toggle");
+    disabledContainer->addChild(m_disabledToggle);
+
+    m_disabledLabel = CCLabelBMFont::create("Disable", "bigFont.fnt");
+    m_disabledLabel->setAnchorPoint({0, 0.5});
+    m_disabledLabel->setID("disabled-label");
+    m_disabledLabel->setScale(.35);
+    m_disabledLabel->setAlignment(kCCTextAlignmentLeft);
+    m_disabledLabel->setPositionX(20.35);
+    disabledContainer->addChild(m_disabledLabel);
+
+    auto damageContainer = CCMenu::create();
+    damageContainer->setID("damage-container");
+    damageContainer->setContentSize({0, 0});
+    m_mainLayer->addChildAtPosition(damageContainer, Anchor::BottomRight, {-75, 50});
+
+    m_damageToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
+        m_trigger->setDamaging(!toggle->isToggled());
+    });
+    m_damageToggle->toggle(trigger->isDamaging());
+    m_damageToggle->setID("damage-toggle");
+    damageContainer->addChild(m_damageToggle);
+
+    m_damageLabel = CCLabelBMFont::create("Damage", "bigFont.fnt");
+    m_damageLabel->setAnchorPoint({0, 0.5});
+    m_damageLabel->setID("damage-label");
+    m_damageLabel->setScale(.35);
+    m_damageLabel->setAlignment(kCCTextAlignmentLeft);
+    m_damageLabel->setPositionX(20.35);
+    damageContainer->addChild(m_damageLabel);
 
     auto okBtn = CCMenuItemSpriteExtra::create(ButtonSprite::create("OK",40,0,0.8,true,"goldFont.fnt", "GJ_button_01.png",30.0), this, menu_selector(ClonesTriggerPopup::onClose));
     m_buttonMenu->addChildAtPosition(okBtn, Anchor::Bottom, {0, 24});
 
     return true;
-}
-
-void ClonesTriggerPopup::activateCallback(CCObject* sender) {
-    if (sender == m_delaySlider) m_delayCallback(m_delaySlider);
 }
 
 ClonesTriggerPopup* ClonesTriggerPopup::create(CosmicClonesTrigger* trigger) {

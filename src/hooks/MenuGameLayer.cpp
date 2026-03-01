@@ -1,7 +1,7 @@
 #include <Geode/modify/MenuGameLayer.hpp>
 #include <Geode/utils/random.hpp>
 
-#include <undefined0.icon_ninja/include/events.hpp>
+//#include <undefined0.icon_ninja/include/events.hpp>
 
 #include "../ShaderManager.hpp"
 #include "../CosmicClone.hpp"
@@ -27,9 +27,9 @@ class $modify(ClonesMenuGameLayer, MenuGameLayer) {
 };
 
 $on_mod(Loaded) {
-    ninja::NewPlayerEvent().listen([](PlayerObject* player){
+    /* ninja::NewPlayerEvent().listen([](PlayerObject* player){
         if (random::generate(0, 1000) == 309) {
             CosmicClone::updateShaderForPlayer(player, ShaderManager::get().getCosmicShader(), true);
         }
-    }).leak();
+    }).leak(); */
 }

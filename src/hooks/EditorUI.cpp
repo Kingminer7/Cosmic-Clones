@@ -25,8 +25,7 @@ bool CosmicClonesEditorUI::init(LevelEditorLayer* editorLayer)
             auto spr = CCSprite::createWithSpriteFrameName("triggerMain.png"_spr);
             CosmicClonesTrigger::updateCloneTriggerSprite(spr);
             auto btn = createButton(spr, [this](auto btn) {
-                if (m_fields->m_selected)
-                {
+                if (m_fields->m_selected) {
                     m_fields->m_selected->setColor({255, 255, 255});
                     if (m_fields->m_selected == btn) {
                         m_selectedObjectIndex = 0;
@@ -149,6 +148,7 @@ void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, int uniqueID, gd
             isDamaging(),
             isDisabled(),
             getStyles());
+	if (isDisabled()) return;
         auto cLayer = static_cast<CosmicClonesGJBGL*>(layer);
         cLayer->updateFromTrigger(this);
         cLayer->startClones();
@@ -170,6 +170,7 @@ void CosmicClonesTrigger::setupCloneTrigger(bool initial)
         setDamaging(true);
         setDisabled(false);
         setStyles({"Cosmic Mario\n(SMG 1)"});
+	m_isMultiTriggered = false;
     }
 }
 

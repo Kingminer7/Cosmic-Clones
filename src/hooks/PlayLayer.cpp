@@ -7,7 +7,10 @@ void CosmicClonesPlayLayer::resetLevel() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
     auto tick = m_gameState.m_currentProgress - fields->m_offset;
-    fields->m_stopped = false;
+    fields->m_stopped = !fields->m_startsImmediately;
+    if (fields->m_startsImmediately) {
+        fields->m_offset = m_gameState.m_currentProgress;
+    }
     if (!fields->m_enabled) {
         PlayLayer::resetLevel();
         if (bgl->updateSettings(fields)) fields->m_offset = m_gameState.m_currentProgress;
@@ -79,9 +82,11 @@ void CosmicClonesPlayLayer::setupHasCompleted() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
     if (!bgl->updateSettings(fields)) return PlayLayer::setupHasCompleted();
-    fields->m_stopped = false;
     PlayLayer::setupHasCompleted();
-    fields->m_offset = m_gameState.m_currentProgress;
+    fields->m_stopped = !fields->m_startsImmediately;
+    if (fields->m_startsImmediately) {
+        fields->m_offset = m_gameState.m_currentProgress;
+    }
 }
 
 void CosmicClonesPlayLayer::levelComplete() {

@@ -8,7 +8,7 @@ class $modify(ClonesPauseLayer, PauseLayer) {
     void customSetup() {
         PauseLayer::customSetup();
 
-        auto spr = CCSprite::create("cube_1.png"_spr);
+        auto spr = CCSprite::createWithSpriteFrameName("cube_1.png"_spr);
         spr->setRotation(55);
         spr->setShaderProgram(ShaderManager::get().getCosmicShader());
 

@@ -7,9 +7,12 @@ void CosmicClonesLevelEditorLayer::onPlaytest() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
     if (!bgl->updateSettings(fields)) return LevelEditorLayer::onPlaytest();
-    fields->m_stopped = false;
+
     LevelEditorLayer::onPlaytest();
-    fields->m_offset = m_gameState.m_currentProgress;
+    fields->m_stopped = !fields->m_startsImmediately;
+    if (fields->m_startsImmediately) {
+        fields->m_offset = m_gameState.m_currentProgress;
+    }
 }
 
 void CosmicClonesLevelEditorLayer::onStopPlaytest() {

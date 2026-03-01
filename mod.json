@@ -1,5 +1,5 @@
 {
-    "geode": "5.0.0",
+    "geode": "5.1.0",
     "gd": {
         "win": "2.2081",
         "android": "2.2081",
@@ -13,8 +13,10 @@
     "description": "Adds chasers to levels.",
     "dependencies": {
         "geode.node-ids": ">=v1.22.0",
+        "razoom.save_level_data_api": ">=1.0.5",
+        "alphalaneous.editortab_api": ">=2.0.7",
         "undefined0.icon_ninja": {
-            "version": "1.4.3",
+            "version": ">=1.4.3",
             "required": false
         }
     },
@@ -126,7 +128,17 @@
             "resources/audio/*/*"
         ],
         "sprites": [
-            "resources/sprites/*.png"
-        ]
+            "resources/sprites/cosmic.png",
+            "resources/sprites/normal.png",
+            "resources/sprites/star.png"
+        ],
+        "spritesheets": {
+            "CloneSheet01": [
+                "resources/sprites/cube_1.png",
+                "resources/sprites/triggerInner.png",
+                "resources/sprites/triggerOutline.png",
+                "resources/sprites/triggerMain.png"
+            ]
+        }
     }
 }

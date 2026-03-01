@@ -4,6 +4,8 @@
 #include "../CloneStyleSetting.hpp"
 #include <Geode/Geode.hpp>
 
+#include "EditorUI.hpp"
+
 #ifndef GEODE_IS_MACOS
 void CosmicClonesGJBGL::processCommands(float dt, bool half, bool last) {
 #else
@@ -171,11 +173,29 @@ bool CosmicClonesGJBGL::updateSettings(Fields* fields) {
     return true;
 }
 
+void CosmicClonesGJBGL::updateFromTrigger(const CosmicClonesTrigger* trigger) {
+    auto fields = m_fields.self();
+    fields->m_count = trigger->getCount();
+    fields->m_initialDelay = trigger->getStartDelay();
+    fields->m_delay = trigger->getDelay();
+    fields->m_damage = trigger->isDamaging();
+    // fields->m_styles = trigger->getStyles();
+}
+
 bool CosmicClonesGJBGL::init() {
     auto fields = m_fields.self();
     if (!updateSettings(fields)) return GJBaseGameLayer::init();
     if (!GJBaseGameLayer::init()) return false;
+    if (fields->m_startsImmediately) {
+        fields->m_stopped = false;
+        fields->m_offset = m_gameState.m_currentProgress;
+    }
+    return true;
+}
+
+void CosmicClonesGJBGL::startClones() {
+    geode::log::info("Starting clones");
+    auto fields = m_fields.self();
     fields->m_stopped = false;
     fields->m_offset = m_gameState.m_currentProgress;
-    return true;
 }

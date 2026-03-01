@@ -1,7 +1,7 @@
 #include <unordered_map>
 #include "LevelEditorLayer.hpp"
 #include "GJBaseGameLayer.hpp"
-#include "../CosmicClone.hpp"
+#include "../internal/CosmicClone.hpp"
 
 void CosmicClonesLevelEditorLayer::onPlaytest() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);

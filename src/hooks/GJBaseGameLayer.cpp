@@ -1,7 +1,7 @@
 #include "GJBaseGameLayer.hpp"
 
 #include "../Utils.hpp"
-#include "../CloneStyleSetting.hpp"
+#include "../ui/CloneStyleSetting.hpp"
 #include <Geode/Geode.hpp>
 
 #include "EditorUI.hpp"

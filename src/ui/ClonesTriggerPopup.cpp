@@ -5,10 +5,10 @@ using namespace geode::prelude;
 struct LambdaObj : CCNode {
     Function<void(Slider* slider)> callback;
     Slider* slider;
-    LambdaObj(Slider* slider, Function<void(Slider* slider)> callback) : slider(slider), callback(std::move(callback)) {}
+    LambdaObj(Slider* slider, Function<void(Slider* slider)> callback) : callback(std::move(callback)), slider(slider) {}
 
     void execute(CCObject*) {
-	callback(slider);
+	    callback(slider);
     }
 };
 
@@ -30,7 +30,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     // 18, 18
 
     auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.f, [](auto){
-        FLAlertLayer::create("Help", "TODO", "OK")->show();
+        FLAlertLayer::create("Help", "TODO", "ok")->show();
     });
     m_buttonMenu->addChildAtPosition(infoBtn, Anchor::TopLeft, {18, -18});
 

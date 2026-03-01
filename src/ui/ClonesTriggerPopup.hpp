@@ -2,7 +2,7 @@
 
 #include <Geode/ui/Popup.hpp>
 
-#include "hooks/EditorUI.hpp"
+#include "../hooks/EditorUI.hpp"
 
 class ClonesTriggerPopup : public geode::Popup {
 protected:

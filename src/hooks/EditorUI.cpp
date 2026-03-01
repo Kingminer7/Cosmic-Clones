@@ -2,8 +2,8 @@
 #include <alphalaneous.editortab_api/include/EditorTabAPI.hpp>
 
 #include "GJBaseGameLayer.hpp"
-#include "../ClonesTriggerPopup.hpp"
-#include "../ShaderManager.hpp"
+#include "../ui/ClonesTriggerPopup.hpp"
+#include "../internal/ShaderManager.hpp"
 
 // sequence trigger
 #define TRIGGER_ID 3607

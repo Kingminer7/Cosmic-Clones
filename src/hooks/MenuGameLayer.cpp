@@ -3,8 +3,8 @@
 
 //#include <undefined0.icon_ninja/include/events.hpp>
 
-#include "../ShaderManager.hpp"
-#include "../CosmicClone.hpp"
+#include "../internal/ShaderManager.hpp"
+#include "../internal/CosmicClone.hpp"
 
 using namespace geode::prelude;
 

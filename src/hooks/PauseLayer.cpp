@@ -1,7 +1,7 @@
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/ui/GeodeUI.hpp>
 
-#include "../ShaderManager.hpp"
+#include "../internal/ShaderManager.hpp"
 using namespace geode::prelude;
 
 class $modify(ClonesPauseLayer, PauseLayer) {

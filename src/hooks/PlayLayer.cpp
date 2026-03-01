@@ -1,6 +1,6 @@
 #include "PlayLayer.hpp"
 #include "GJBaseGameLayer.hpp"
-#include "../CosmicClone.hpp"
+#include "../internal/CosmicClone.hpp"
 #include "../Utils.hpp"
 
 void CosmicClonesPlayLayer::resetLevel() {

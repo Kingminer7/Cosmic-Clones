@@ -1,5 +1,5 @@
 #pragma once
-#include "CloneStyleSetting.hpp"
+#include "../ui/CloneStyleSetting.hpp"
 
 // inheriting ccobject for scheduler update rip
 class ShaderManager : public cocos2d::CCObject {

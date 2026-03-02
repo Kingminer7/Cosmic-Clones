@@ -2,7 +2,6 @@
 
 #include <Geode/Geode.hpp>
 
-#include "../Utils.hpp"
 #include "../internal/CosmicClonesController.hpp"
 
 void CosmicClonesGJBGL::toHook() {

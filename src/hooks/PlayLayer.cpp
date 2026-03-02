@@ -20,9 +20,11 @@ void CosmicClonesPlayLayer::resetLevel() {
 
         if (fields->m_autoClones && !fields->m_controller->isStopped()) fields->m_controller->softReset(m_gameState.m_currentProgress);
     } else {
-        if (!fields->m_controller->isStopped()) {
-            fields->m_controller->stop(true);
+        if (!fields->m_controller->isStopped()) fields->m_controller->stop(true);
+        for (const auto& [id, cont] : fields->m_triggerControllers){
+            if (!cont->isStopped()) cont->stop(true);
         }
+
         fields->m_controller->loadConfigFromSettings();
         if (fields->m_autoClones) fields->m_controller->start();
     }
@@ -32,9 +34,11 @@ void CosmicClonesPlayLayer::fullReset() {
     PlayLayer::fullReset();
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
-    if (!fields->m_controller->isStopped()) {
-        fields->m_controller->stop(true);
+    if (!fields->m_controller->isStopped()) fields->m_controller->stop(true);
+    for (const auto& [id, cont] : fields->m_triggerControllers){
+        if (!cont->isStopped()) cont->stop(true);
     }
+
     fields->m_autoClones = getSettingFast<"enabled", bool>();
     fields->m_controller->loadConfigFromSettings();
     if (fields->m_autoClones) fields->m_controller->start();

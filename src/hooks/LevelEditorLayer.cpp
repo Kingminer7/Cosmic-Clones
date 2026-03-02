@@ -21,7 +21,7 @@ void CosmicClonesLevelEditorLayer::onPlaytest() {
     if (!fields->m_autoClones) return;
     fields->m_controller->loadConfigFromSettings();
     fields->m_controller->start();
-    for (auto [id, cont] : fields->m_triggerControllers){
+    for (const auto& [id, cont] : fields->m_triggerControllers){
         cont->loadConfigFromTrigger();
     }
 }
@@ -30,10 +30,8 @@ void CosmicClonesLevelEditorLayer::onStopPlaytest() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
     LevelEditorLayer::onStopPlaytest();
-    geode::log::info("Stopping");
     if (!fields->m_controller->isStopped()) fields->m_controller->stop(true);
-    for (auto [id, cont] : fields->m_triggerControllers){
+    for (const auto& [id, cont] : fields->m_triggerControllers){
         if (!cont->isStopped()) cont->stop(true);
-        geode::log::info("stopping a controller");
     }
 }

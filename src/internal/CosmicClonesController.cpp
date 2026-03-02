@@ -16,7 +16,7 @@ bool CosmicClonesController::start() {
         log::error("Could not start cosmic clones controller: GJBGL doesn't exist!");
         return false;
     }
-    log::dev("Starting!");
+    log::dev("Starting trigger!");
 
     m_stopped = false;
     m_startOffset = m_bgl->m_gameState.m_currentProgress;
@@ -25,6 +25,7 @@ bool CosmicClonesController::start() {
 
 void CosmicClonesController::stop(bool immediate) {
     if (m_stopped) return log::error("Could not stop cosmic clones controller: this controller is already stopped!");
+    log::dev("Stopping trigger!");
     if (!immediate) {
         bool hasSfxed = false;
         for (const auto& clone : m_clones) {
@@ -60,6 +61,7 @@ void CosmicClonesController::loadConfigFromTrigger(const CosmicClonesTrigger* tr
     m_damage = trigger->isDamaging();
     m_count = trigger->getCount();
     m_styles = trigger->getStyles();
+    m_sfx = true;
 }
 
 void CosmicClonesController::loadConfigFromTrigger() {
@@ -79,7 +81,6 @@ std::vector<std::shared_ptr<CosmicClone>> CosmicClonesController::getClones() co
 }
 
 void CosmicClonesController::cleanup() {
-    log::info("Cleanup");
     for (const auto& clone : m_clones) {
         clone->remove();
     }
@@ -128,7 +129,7 @@ void CosmicClonesController::tick(int prog) {
     }
     const auto& styles = m_styles;
     for (int i = 1; i <= m_count; i++) {
-        auto del = ((i - 1) * m_delay + m_initialDelay) * 240;
+        auto del = std::round(((i - 1) * m_delay + m_initialDelay) * 120) * 2;
         if (tick == del) {
             auto clone = CosmicClone::create(del, m_bgl->m_isPlatformer, m_bgl);
             clone->updateStyle(styles[(i - 1) % styles.size()]);

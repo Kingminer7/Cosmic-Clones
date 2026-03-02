@@ -81,7 +81,7 @@ GameObject* CosmicClonesEditorUI::createObject(const int id, CCPoint pos) {
 void CosmicClonesEditorUI::editObject(CCObject* sender) {
     if (m_selectedObject && m_selectedObject->m_objectID == TRIGGER_ID) {
         if (m_selectedObject->getUserFlag("clones-trigger"_spr)) {
-            auto popup = ClonesTriggerPopup::create(modify_cast<CosmicClonesTrigger*>(m_selectedObject));
+            auto popup = ClonesTriggerPopup::create(static_cast<CosmicClonesTrigger*>(m_selectedObject));
             popup->m_noElasticity = true;
             popup->show();
             return;
@@ -136,20 +136,21 @@ void CosmicClonesTrigger::customObjectSetup(gd::vector<gd::string>& values, gd::
 }
 
 void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, int uniqueID, gd::vector<int> const* remapKeys) {
+
     if (getUserFlag("clones-trigger"_spr)) {
-        // log::dev("Clone Trigger:\n"
-        //           "Count: {}\n"
-        //           "Start Delay: {}\n"
-        //           "Delay: {}\n"
-        //           "Damage Enabled: {}\n"
-        //           "Disabled: {}\n"
-        //           "Styles: {}",
-        //     getCount(),
-        //     getStartDelay(),
-        //     getDelay(),
-        //     isDamaging(),
-        //     isDisabled(),
-        //     matjson::Value(getStyles()).dump());
+        log::dev("Clone Trigger:\n"
+              "Count: {}\n"
+              "Start Delay: {}\n"
+              "Delay: {}\n"
+              "Damage Enabled: {}\n"
+              "Disabled: {}\n"
+              "Styles: {}",
+        getCount(),
+        getStartDelay(),
+        getDelay(),
+        isDamaging(),
+        isDisabled(),
+        matjson::Value(getStyles()).dump());
 	    if (isDisabled()) return;
         auto bgl = static_cast<CosmicClonesGJBGL*>(layer);
         auto bglFields = bgl->m_fields.self();
@@ -163,6 +164,7 @@ void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, int uniqueID, gd
         if (it == bglFields->m_triggerControllers.end() || it->second == nullptr) {
             auto controller = CosmicClonesController::createFromTrigger(bgl, this);
             bglFields->m_triggerControllers[id] = controller;
+            controller->loadConfigFromTrigger(this);
             controller->start();
         } else {
             it->second->loadConfigFromTrigger(this);
@@ -172,8 +174,6 @@ void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, int uniqueID, gd
     }
     SequenceTriggerGameObject::triggerObject(layer, uniqueID, remapKeys);
 }
-
-void CosmicClonesTrigger::resetObject() {}
 
 void CosmicClonesTrigger::setupCloneTrigger(bool initial) {
     setUserFlag("clones-trigger"_spr);
@@ -186,6 +186,7 @@ void CosmicClonesTrigger::setupCloneTrigger(bool initial) {
         setDelay(1);
         setDamaging(true);
         setDisabled(false);
+        setStopper(false);
         setStyles({
             {"Cosmic Mario\n(SMG 1)"},
             {"Cosmic Clone\n(SMG 2)"},
@@ -234,7 +235,7 @@ void CosmicClonesTrigger::setDamaging(const bool damaging) {
 
 bool CosmicClonesTrigger::isStopper() const {
     if (m_chanceObjects.size() < 1) return false;
-    return (m_chanceObjects[0].m_groupID & 1 << 1) != 0;
+    return m_chanceObjects[0].m_groupID & 1 << 1;
 }
 
 void CosmicClonesTrigger::setStopper(const bool stopper) {
@@ -253,11 +254,11 @@ void CosmicClonesTrigger::setDisabled(const bool disabled) {
 }
 
 int CosmicClonesTrigger::getControllerID() const {
-    return m_chanceObjects[0].m_chance;
+    return -m_chanceObjects[0].m_chance;
 }
 
 void CosmicClonesTrigger::setControllerID(const int id) {
-    m_chanceObjects[0].m_chance = id;
+    m_chanceObjects[0].m_chance = -id;
 }
 
 inline ccColor3B colorFromInt(int i) {

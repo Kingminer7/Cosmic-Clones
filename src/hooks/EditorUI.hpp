@@ -24,7 +24,6 @@ class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
 
     void customObjectSetup(gd::vector<gd::string>& values, gd::vector<void*>& exists);
     void triggerObject(GJBaseGameLayer* layer, int uniqueID, gd::vector<int> const* remapKeys);
-    void resetObject();
 
     void setupCloneTrigger(bool initial = false);
 

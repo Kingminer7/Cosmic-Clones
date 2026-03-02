@@ -138,6 +138,41 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     countLabel->setAnchorPoint({0.5, 0});
     countContainer->addChildAtPosition(countLabel, Anchor::Center, {0, 22.5});
 
+    auto idContainer = CCMenu::create();
+    idContainer->setID("id-container");
+    idContainer->setContentSize({0, 0});
+    m_mainLayer->addChildAtPosition(idContainer, Anchor::Left, {75, -15});
+
+    m_idInput = TextInput::create(70, nullptr);
+    m_idInput->setID("id-input");
+    m_idInput->setScale(.9);
+    m_idInput->setCommonFilter(CommonFilter::Uint);
+    m_idInput->setString(numToString(trigger->getControllerID()));
+    m_idInput->setCallback([this](const std::string& str) {
+        auto res = numFromString<int>(str);
+        if (!res) return log::warn("Failed to convert contents of id '{}' to integer: {}", str, res.unwrapErr());
+        m_trigger->setControllerID(std::clamp(res.unwrap(), 1, 100));
+    });
+    idContainer->addChild(m_idInput);
+
+    auto idLeftBtn = CCMenuItemExt::createSpriteExtraWithFrameName("edit_leftBtn_001.png", 1.08, [this](auto btn) {
+        m_idInput->setString(numToString(std::clamp(m_trigger->getControllerID() - 1, 1, 100)), true);
+    });
+    idLeftBtn->setID("id-left-btn");
+    idContainer->addChildAtPosition(idLeftBtn, Anchor::Center, {-54, 0});
+
+    auto idRightBtn = CCMenuItemExt::createSpriteExtraWithFrameName("edit_rightBtn_001.png", 1.08, [this](auto btn) {
+        m_idInput->setString(numToString(std::clamp(m_trigger->getControllerID() + 1, 1, 100)), true);
+    });
+    idRightBtn->setID("id-right-btn");
+    idContainer->addChildAtPosition(idRightBtn, Anchor::Center, {54, 0});
+
+    auto idLabel = CCLabelBMFont::create("Controller Id", "goldFont.fnt");
+    idLabel->setID("id-label");
+    idLabel->setScale(.63);
+    idLabel->setAnchorPoint({0.5, 0});
+    idContainer->addChildAtPosition(idLabel, Anchor::Center, {0, 22.5});
+
     auto delayContainer = CCMenu::create();
     delayContainer->setID("delay-container");
     delayContainer->setContentSize({0, 0});
@@ -145,7 +180,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
 
     m_delaySlider = Slider::create(nullptr, nullptr);
     auto lambda = new LambdaObj(m_delaySlider, [this](auto slider) {
-        m_trigger->setDelay(std::round(slider->getValue() * 20 * 100) / 100);
+        m_trigger->setDelay(std::round((.25 + slider->getValue() * 19.75) * 100) / 100);
         m_delayInput->setString(numToString(m_trigger->getDelay()));
     });
     lambda->autorelease();
@@ -168,7 +203,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_delayInput->setCallback([this](const std::string& str) {
         auto res = numFromString<float>(str);
         if (!res) return log::warn("Failed to convert contents of delay '{}' to float: {}", str, res.unwrapErr());
-        m_trigger->setDelay(std::round(std::clamp(res.unwrap(), 0.f, 20.f) * 100) / 100);
+        m_trigger->setDelay(std::round(std::clamp(res.unwrap(), 0.25f, 20.f) * 100) / 100);
         m_delaySlider->setValue(m_trigger->getDelay() / 20.f);
         m_delaySlider->updateBar();
     });
@@ -187,7 +222,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
 
     m_startDelaySlider = Slider::create(nullptr, nullptr);
     auto sdlambda = new LambdaObj(m_startDelaySlider, [this](auto slider) {
-        m_trigger->setStartDelay(std::round(slider->getValue() * 20 * 100) / 100);
+        m_trigger->setStartDelay(std::round((.25 + slider->getValue() * 19.75) * 100) / 100);
         m_startDelayInput->setString(numToString(m_trigger->getStartDelay()));
     });
     sdlambda->autorelease();
@@ -210,7 +245,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_startDelayInput->setCallback([this](const std::string& str) {
         auto res = numFromString<float>(str, 2);
         if (!res) return log::warn("Failed to convert contents of start delay '{}' to float: {}", str, res.unwrapErr());
-        m_trigger->setStartDelay(std::round(std::clamp(res.unwrap(), 0.f, 20.f) * 100) / 100);
+        m_trigger->setStartDelay(std::round(std::clamp(res.unwrap(), 0.25f, 20.f) * 100) / 100);
         m_startDelaySlider->setValue(m_trigger->getStartDelay() / 20.f);
         m_startDelaySlider->updateBar();
     });

@@ -25,6 +25,7 @@ protected:
     cocos2d::CCLabelBMFont* m_stopperLabel = nullptr;
 
     geode::TextInput* m_countInput = nullptr;
+    geode::TextInput* m_idInput = nullptr;
     geode::TextInput* m_delayInput = nullptr;
     Slider* m_delaySlider = nullptr;
     geode::TextInput* m_startDelayInput = nullptr;

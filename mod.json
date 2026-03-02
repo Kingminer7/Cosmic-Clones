@@ -13,7 +13,6 @@
     "description": "Adds chasers to levels.",
     "dependencies": {
         "geode.node-ids": ">=v1.22.0",
-        "razoom.save_level_data_api": ">=1.0.5",
         "alphalaneous.editortab_api": ">=2.0.7",
         "undefined0.icon_ninja": {
             "version": ">=1.4.3",

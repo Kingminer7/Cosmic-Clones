@@ -40,7 +40,8 @@ public:
     bool isStopped() const;
     std::vector<std::shared_ptr<CosmicClone>> getClones() const;
 
-    void tick();
+    void tick(int prog);
+    void softReset(int prog);
 
     static CosmicClonesController* createWithSettings(CosmicClonesGJBGL* bgl);
     static CosmicClonesController* createFromTrigger(CosmicClonesGJBGL* bgl, CosmicClonesTrigger* trigger);

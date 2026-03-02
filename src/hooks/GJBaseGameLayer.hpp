@@ -4,6 +4,8 @@
 #include "../internal/CosmicClone.hpp"
 
 struct CosmicClonesTrigger;
+class CosmicClonesController;
+
 class $modify(CosmicClonesGJBGL, GJBaseGameLayer)
 {
     struct Fields {
@@ -14,6 +16,11 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer)
         bool m_p2Jump = false;
         bool m_p1Frozen = false;
         bool m_p2Frozen = false;
+
+	// ste = start to end
+	bool m_steClones = false;
+
+	CosmicClonesController* m_mainController;
     };
 
     #ifndef GEODE_IS_MACOS

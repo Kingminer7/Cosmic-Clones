@@ -54,8 +54,23 @@ void CosmicClonesController::cleanup() {
     m_sfxIds.clear();
 }
 
-void CosmicClonesController::tick() {
+void CosmicClonesController::tick(int prog) {
+    
+}
 
+void CosmicClonesController::softReset(int prog) {
+    for (auto clone = m_clones.begin(); clone != m_clones.end();) {
+        if (clone->get()->getDelay() > prog - m_startOffset) {
+            clone->get()->remove();
+            m_clones.erase(clone);
+        } else {
+            ++clone;
+        }
+    }
+    std::erase_if(m_snapshots, [this, prog](const std::pair<const int, Snapshot>& snap) {
+	return snap.first > prog - m_startOffset;
+    });
+    
 }
 
 CosmicClonesController* CosmicClonesController::createWithSettings(CosmicClonesGJBGL* bgl) {

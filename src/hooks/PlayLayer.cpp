@@ -8,9 +8,7 @@ void CosmicClonesPlayLayer::resetLevel() {
     auto fields = bgl->m_fields.self();
     auto tick = m_gameState.m_currentProgress - fields->m_offset;
     fields->m_stopped = !fields->m_startsImmediately;
-    if (fields->m_startsImmediately) {
-        fields->m_offset = m_gameState.m_currentProgress;
-    }
+    
     if (!fields->m_enabled) {
         PlayLayer::resetLevel();
         if (bgl->updateSettings(fields)) fields->m_offset = m_gameState.m_currentProgress;
@@ -24,18 +22,6 @@ void CosmicClonesPlayLayer::resetLevel() {
         PlayLayer::resetLevel();
         fields->m_p1Immunity = 240; // 1s immunity (except for stinky tps bypass)
         fields->m_p2Immunity = 240;
-        std::vector<std::shared_ptr<CosmicClone>> toRem;
-        for (auto clone = fields->m_clones.begin(); clone != fields->m_clones.end();) {
-            if (clone->get()->getDelay() > tick) {
-                clone->get()->remove();
-                fields->m_clones.erase(clone);
-            } else {
-                ++clone;
-            }
-        }
-        erase_if(fields->m_snapshots, [tick](const std::pair<const int, Snapshot>& time) {
-            return time.first > tick;
-        });
     } else {
         for (const auto& clone : fields->m_clones) {
             clone->remove();

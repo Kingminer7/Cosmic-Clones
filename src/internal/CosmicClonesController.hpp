@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Geode/utils/ZStringView.hpp>
 #include "CosmicClone.hpp"
 #include "../hooks/EditorUI.hpp"
 
@@ -20,14 +19,18 @@ protected:
 
     bool m_stopped = true;
 
-    CosmicClonesController(CosmicClonesGJBGL* bgl);
+    CosmicClonesTrigger* m_trigger = nullptr;
 public:
+    CosmicClonesController(CosmicClonesGJBGL* bgl);
+    CosmicClonesController(CosmicClonesGJBGL* bgl, CosmicClonesTrigger* trigger);
+    ~CosmicClonesController();
+
     // i don't really wanna make getters/setters for the config options
     unsigned int m_count = 3;
     float m_initialDelay = 1.75;
     float m_delay = 1;
     bool m_damage = true;
-    std::vector<geode::ZStringView> m_styles = {"Cosmic Mario\n(SMG 1)"};
+    std::vector<Style> m_styles = {{"Cosmic Mario\n(SMG 1)"}};
     bool m_sfx = false;
 
     bool start();
@@ -35,6 +38,7 @@ public:
 
     void loadConfigFromSettings();
     void loadConfigFromTrigger(const CosmicClonesTrigger* trigger);
+    void loadConfigFromTrigger();
 
     unsigned int getOffset() const;
     bool isStopped() const;
@@ -43,6 +47,6 @@ public:
     void tick(int prog);
     void softReset(int prog);
 
-    static CosmicClonesController* createWithSettings(CosmicClonesGJBGL* bgl);
-    static CosmicClonesController* createFromTrigger(CosmicClonesGJBGL* bgl, CosmicClonesTrigger* trigger);
+    static std::shared_ptr<CosmicClonesController> createWithSettings(CosmicClonesGJBGL* bgl);
+    static std::shared_ptr<CosmicClonesController> createFromTrigger(CosmicClonesGJBGL* bgl, CosmicClonesTrigger* trigger);
 };

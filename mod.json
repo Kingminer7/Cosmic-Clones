@@ -120,6 +120,12 @@
             "description": "If clones should play sound effects (if the selected style has any)\nToggle suggested by Crafty-Jumper.",
             "type": "bool",
             "default": true
+        },
+        "dev-logging": {
+            "name": "Dev Logging",
+            "description": "Adds logging that I felt was a bit unnecessary to flood logs if you don't intentionally turn this on",
+            "type": "bool",
+            "default": false
         }
     },
     "resources": {

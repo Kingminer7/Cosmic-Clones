@@ -3,9 +3,28 @@
 #include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/SequenceTriggerGameObject.hpp>
 
-class $modify(CosmicClonesTrigger, SequenceTriggerGameObject) {
+struct Style;
+class CosmicClonesController;
+
+// Property mappings
+// int   count:        int   m_resetMode
+// float startDelay:   float m_reset
+// float delay:        float m_minInt
+// bool  isDisabled:   bool  m_uniqueRemap
+// int   controllerId: int   m_chanceObjects[0].m_chance
+// these ones use bitwise operators
+// bool  damaging:     int   m_chanceObjects[0].m_groupID (bit 0)
+// bool  stopper:      int   m_chanceObjects[0].m_groupID (bit 1)
+
+class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
+{
+    struct Fields {
+        std::shared_ptr<CosmicClonesController> controller = nullptr;
+    };
+
     void customObjectSetup(gd::vector<gd::string>& values, gd::vector<void*>& exists);
     void triggerObject(GJBaseGameLayer* layer, int uniqueID, gd::vector<int> const* remapKeys);
+    void resetObject();
 
     void setupCloneTrigger(bool initial = false);
 
@@ -24,11 +43,19 @@ class $modify(CosmicClonesTrigger, SequenceTriggerGameObject) {
     bool isDisabled() const;
     void setDisabled(bool disabled);
 
-    std::vector<std::string> getStyles() const;
-    void setStyles(const std::vector<std::string>& styles);
+    int getControllerID() const;
+    void setControllerID(int id);
 
-    static std::string intToStyle(int i);
-    static int styleToInt(std::string s);
+    bool isStopper() const;
+    void setStopper(bool stopper);
+
+    std::vector<Style> getStyles() const;
+    void setStyles(const std::vector<Style>& styles);
+
+    void fill10IfNeeded();
+
+    static Style chanceObjectsToCustomStyle(const ChanceObject& first, const ChanceObject& second);
+    static std::pair<ChanceObject, ChanceObject> customStyleToChanceObjects(const Style& s);
 
     static void updateCloneTriggerSprite(CCSprite* sprite, bool setFrame = true);
 };

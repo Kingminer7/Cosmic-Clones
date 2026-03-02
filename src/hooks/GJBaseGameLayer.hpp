@@ -1,7 +1,14 @@
 #pragma once
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
-#include "../internal/CosmicClone.hpp"
+
+#ifdef GEODE_IS_MACOS
+#define toHook() processQueuedButtons(float dt, bool clear)
+#define orig() processQueuedButtons(dt, clear)
+#else
+#define toHook() processCommands(float dt, bool half, bool last)
+#define orig() processCommands(dt, half, last)
+#endif
 
 struct CosmicClonesTrigger;
 class CosmicClonesController;
@@ -17,20 +24,10 @@ class $modify(CosmicClonesGJBGL, GJBaseGameLayer)
         bool m_p1Frozen = false;
         bool m_p2Frozen = false;
 
-	// ste = start to end
-	bool m_steClones = false;
-
-	CosmicClonesController* m_mainController;
+		bool m_autoClones = false;
+		std::shared_ptr<CosmicClonesController> m_controller;
+        std::unordered_map<int, std::shared_ptr<CosmicClonesController>> m_triggerControllers;
     };
 
-    #ifndef GEODE_IS_MACOS
-    void processCommands(float dt, bool half, bool last);
-    #else
-    void processQueuedButtons(float dt, bool clear);
-    #endif
-    
-    bool updateSettings(Fields* fields);
-    void updateFromTrigger(const CosmicClonesTrigger* trigger);
-    bool init();
-    void startClones();
+    void toHook();
 };

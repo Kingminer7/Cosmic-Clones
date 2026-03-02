@@ -262,6 +262,26 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_damageLabel->setPositionX(20.35);
     damageContainer->addChild(m_damageLabel);
 
+    auto stopperContainer = CCMenu::create();
+    stopperContainer->setID("stopper-container");
+    stopperContainer->setContentSize({0, 0});
+    m_mainLayer->addChildAtPosition(stopperContainer, Anchor::BottomRight, {-75, 80});
+
+    m_stopperToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
+        m_trigger->setStopper(!toggle->isToggled());
+    });
+    m_stopperToggle->toggle(trigger->isStopper());
+    m_stopperToggle->setID("stopper-toggle");
+    stopperContainer->addChild(m_stopperToggle);
+
+    m_stopperLabel = CCLabelBMFont::create("Stop", "bigFont.fnt");
+    m_stopperLabel->setAnchorPoint({0, 0.5});
+    m_stopperLabel->setID("stopper-label");
+    m_stopperLabel->setScale(.35);
+    m_stopperLabel->setAlignment(kCCTextAlignmentLeft);
+    m_stopperLabel->setPositionX(20.35);
+    stopperContainer->addChild(m_stopperLabel);
+
     auto okBtn = CCMenuItemSpriteExtra::create(ButtonSprite::create("OK",40,0,0.8,true,"goldFont.fnt", "GJ_button_01.png",30.0), this, menu_selector(ClonesTriggerPopup::onClose));
     m_buttonMenu->addChildAtPosition(okBtn, Anchor::Bottom, {0, 24});
 

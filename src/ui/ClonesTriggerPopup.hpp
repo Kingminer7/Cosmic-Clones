@@ -21,7 +21,8 @@ protected:
     cocos2d::CCLabelBMFont* m_disabledLabel = nullptr;
     CCMenuItemToggler* m_damageToggle = nullptr;
     cocos2d::CCLabelBMFont* m_damageLabel = nullptr;
-
+    CCMenuItemToggler* m_stopperToggle = nullptr;
+    cocos2d::CCLabelBMFont* m_stopperLabel = nullptr;
 
     geode::TextInput* m_countInput = nullptr;
     geode::TextInput* m_delayInput = nullptr;

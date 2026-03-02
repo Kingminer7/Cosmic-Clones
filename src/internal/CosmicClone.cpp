@@ -1,4 +1,6 @@
 #include "CosmicClone.hpp"
+
+#include "ShaderManager.hpp"
 #include "Geode/cocos/shaders/CCShaderCache.h"
 
 using namespace geode::prelude;
@@ -316,7 +318,6 @@ void CosmicClone::updateStyle(Style style) {
     m_style = std::move(style);
     for (auto plr : {m_p1, m_p2}) {
         if (m_style.type == "Cosmic Mario\n(SMG 1)") {
-            auto gm = GameManager::get();
             // This won't really be seen normally but just in case
             plr->setColor(ccColor3B{12, 11, 56});
             plr->setSecondColor(ccColor3B{11, 27, 56});
@@ -365,12 +366,16 @@ void CosmicClone::updateStyle(Style style) {
 }
 
 void CosmicClone::remove() {
-    removePlayer(m_p1);
-    m_p1->removeFromParent();
-    m_p1 = nullptr;
-    removePlayer(m_p2);
-    m_p2->removeFromParent();
-    m_p2 = nullptr;
+    if (m_p1) {
+        removePlayer(m_p1);
+        m_p1->removeFromParent();
+        m_p1 = nullptr;
+    }
+    if (m_p2) {
+        removePlayer(m_p2);
+        m_p2->removeFromParent();
+        m_p2 = nullptr;
+    }
 }
 
 void CosmicClone::removePlayer(PlayerObject* player) {

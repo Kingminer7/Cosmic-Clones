@@ -1,39 +1,39 @@
 #include <unordered_map>
 #include "LevelEditorLayer.hpp"
 #include "GJBaseGameLayer.hpp"
-#include "../internal/CosmicClone.hpp"
+#include "../Utils.hpp"
+#include "../internal/CosmicClonesController.hpp"
+
+bool CosmicClonesLevelEditorLayer::init(GJGameLevel* level, bool noUI) {
+    if (!LevelEditorLayer::init(level, noUI)) return false;
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
+    fields->m_autoClones = getSettingFast<"enabled", bool>();
+    fields->m_controller = CosmicClonesController::createWithSettings(bgl);
+    return true;
+}
 
 void CosmicClonesLevelEditorLayer::onPlaytest() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
-    if (!bgl->updateSettings(fields)) return LevelEditorLayer::onPlaytest();
-
     LevelEditorLayer::onPlaytest();
-    fields->m_stopped = !fields->m_startsImmediately;
-    if (fields->m_startsImmediately) {
-        fields->m_offset = m_gameState.m_currentProgress;
+    fields->m_autoClones = getSettingFast<"enabled", bool>() && getSettingFast<"editor", bool>();
+    if (!fields->m_autoClones) return;
+    fields->m_controller->loadConfigFromSettings();
+    fields->m_controller->start();
+    for (auto [id, cont] : fields->m_triggerControllers){
+        cont->loadConfigFromTrigger();
     }
 }
 
 void CosmicClonesLevelEditorLayer::onStopPlaytest() {
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
-    if (!fields->m_enabled) {
-        LevelEditorLayer::onStopPlaytest();
-        if (bgl->updateSettings(fields)) fields->m_offset = m_gameState.m_currentProgress;
-        return;
-    }
-    for (const auto& clone : fields->m_clones) {
-        clone->remove();
-    }
-    fields->m_clones.clear();
-    fields->m_snapshots.clear();
-    std::erase_if(fields->m_sfxIds, [](int channel) {
-        return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
-    });
-    for (auto channel : fields->m_sfxIds) {
-        FMODAudioEngine::get()->stopChannel(channel);
-    }
     LevelEditorLayer::onStopPlaytest();
-    bgl->updateSettings(fields);
+    geode::log::info("Stopping");
+    if (!fields->m_controller->isStopped()) fields->m_controller->stop(true);
+    for (auto [id, cont] : fields->m_triggerControllers){
+        if (!cont->isStopped()) cont->stop(true);
+        geode::log::info("stopping a controller");
+    }
 }

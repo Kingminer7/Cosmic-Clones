@@ -3,7 +3,6 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 #include "../ui/CloneStyleSetting.hpp"
-#include "ShaderManager.hpp"
 
 enum class Animation {
     Jump,

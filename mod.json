@@ -27,20 +27,22 @@
         "source": "https://github.com/kingminer7/cosmic-clones"
     },
     "settings": {
-        "enabled": {
-            "name": "Enabled",
-            "description": "A soft toggle for the mod. Requires reentering any active level.",
-            "type": "bool",
-            "default": true
-        },
         "gameplay-header": {
             "type": "title",
-            "name": "Gameplay Options"
+            "name": "Gameplay Options",
+            "description": "These do not modify clones from the clones trigger. "
+        },
+        "enabled": {
+            "name": "Clones in Every Level",
+            "description": "Spawns clones in every level. When this is disabled, you can enable them for specific levels in level options.",
+            "type": "bool",
+            "default": true
         },
         "spawn-delay": {
             "name": "Initial Delay",
             "description": "Delay between the player spawning and the clones spawning. <cy>This is recommended to be higher than the main delay.</c>",
             "type": "float",
+            "enable-if": "enabled",
             "default": 1.5,
             "min": 0.25,
             "max": 20,
@@ -57,6 +59,7 @@
             "name": "Delay",
             "description": "Delay between cosmic clones spawn.",
             "type": "float",
+            "enable-if": "enabled",
             "default": 1,
             "min": 0.25,
             "max": 20,
@@ -73,24 +76,28 @@
             "name": "Enable in Normal Mode",
             "description": "If clones should spawn in normal mode.",
             "type": "bool",
+            "enable-if": "enabled",
             "default": false
         },
         "editor": {
             "name": "Enable in Editor",
             "description": "If clones should spawn in the editor.",
             "type": "bool",
+            "enable-if": "enabled",
             "default": false
         },
         "friendly": {
             "name": "No Damage",
             "description": "Prevents clones from damaging you.\nSuggested by DragosDobrican.",
             "type": "bool",
+            "enable-if": "enabled",
             "default": false
         },
         "clones": {
             "name": "Clone Count",
             "description": "How many clones can spawn.",
             "type": "int",
+            "enable-if": "enabled",
             "default": 3,
             "min": 1,
             "max": 20,
@@ -101,14 +108,11 @@
                 "arrow-step": 1
             }
         },
-        "style-header": {
-            "type": "title",
-            "name": "Style Options"
-        },
         "styles": {
             "type": "custom:clone-style",
             "name": "Clone Style",
             "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**\nSelecting multiple styles suggested by NonCloud9.",
+            "enable-if": "enabled",
             "default": [
                 {
                     "type": "Cosmic Mario\n(SMG 1)"
@@ -119,7 +123,12 @@
             "name": "Sound Effects Enabled",
             "description": "If clones should play sound effects (if the selected style has any)\nToggle suggested by Crafty-Jumper.",
             "type": "bool",
-            "default": true
+            "default": true,
+            "enable-if": "enabled"
+        },
+        "misc-header": {
+            "name": "Miscellaneous Options",
+            "type": "title"
         },
         "dev-logging": {
             "name": "Dev Logging",

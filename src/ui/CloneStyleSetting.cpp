@@ -58,6 +58,10 @@ void CloneStyleSettingNode::updateState(CCNode *invoker) {
     bm->setContentHeight(h);
     setContentHeight(h);
     bm->updateLayout();
+
+    auto enable = getSetting()->shouldEnable();
+    getButtonMenu()->setTouchEnabled(enable);
+    getButtonMenu()->setOpacity(enable ? 255 : 127);
 }
 
 bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, float width)  {
@@ -235,6 +239,7 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
             m_setting->setNodeValue(this, m_style);
         });
     });
+    toggle->setCascadeOpacityEnabled(true);
     glowBtn->setEnabled(m_style.useGlow);
     toggle->setID("glow-toggler");
     m_customMenu->addChildAtPosition(toggle, Anchor::Center, {20, -30});
@@ -244,33 +249,35 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
 }
 
 void StyleNode::updateState(Style value) {
-  m_style = std::move(value);
-  m_label->setString(m_style.type.c_str());
-  if (auto width = m_label->getContentWidth(); width > 0.001f)
-    m_label->setScale(std::min(80.f / width, .45f));
-  else
-    m_label->setScale(.001f);
-  setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
-  m_customMenu->setVisible(m_style.type == "Custom");
-  m_customMenu->getChildByID("col1")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col1);
+    m_style = std::move(value);
+    m_label->setString(m_style.type.c_str());
+    if (auto width = m_label->getContentWidth(); width > 0.001f) m_label->setScale(std::min(80.f / width, .45f));
+    else m_label->setScale(.001f);
+    setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
+    m_customMenu->setVisible(m_style.type == "Custom");
+
+    m_customMenu->getChildByID("col1")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col1);
     m_customMenu->getChildByID("col2")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col2);
     auto glowBtn = m_customMenu->getChildByID("glow");
     glowBtn->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.glow);
     typeinfo_cast<CCMenuItemSpriteExtra*>(glowBtn)->setEnabled(m_style.useGlow);
     typeinfo_cast<CCMenuItemToggler*>(m_customMenu->getChildByID("glow-toggler"))->toggle(m_style.useGlow);
-  updateLayout();
+    bool enable = m_setting->getSetting()->shouldEnable();
+    setTouchEnabled(enable);
+    m_customMenu->setTouchEnabled(enable);
+    updateLayout();
 }
 
-StyleNode* StyleNode::create(CloneStyleSettingNode* setting, Style value) {
-  auto ret = new StyleNode();
-  if (ret->init(setting, value)) {
-    ret->autorelease();
-    return ret;
-  }
-  delete ret;
-  return nullptr;
+StyleNode* StyleNode::create(CloneStyleSettingNode* setting, const Style& value) {
+    auto ret = new StyleNode();
+    if (ret->init(setting, value)) {
+        ret->autorelease();
+        return ret;
+    }
+    delete ret;
+    return nullptr;
 }
 
 $execute {
-  (void)Mod::get()->registerCustomSettingType("clone-style", &CloneStyleSetting::parse);
+    (void)Mod::get()->registerCustomSettingType("clone-style", &CloneStyleSetting::parse);
 }

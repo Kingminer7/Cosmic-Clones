@@ -93,5 +93,5 @@ public:
   void updateState(Style style);
   Style getStyle() { return m_style; }
 
-  static StyleNode* create(CloneStyleSettingNode* setting, Style value);
+  static StyleNode* create(CloneStyleSettingNode* setting, const Style& value);
 };

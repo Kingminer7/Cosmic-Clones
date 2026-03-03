@@ -158,6 +158,7 @@ void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, int uniqueID, gd
         auto it = bglFields->m_triggerControllers.find(id);
         if (isStopper()) {
             if (it == bglFields->m_triggerControllers.end() || it->second == nullptr) return;
+            if (it->second->isStopped()) return;
             it->second->stop();
             return;
         }
@@ -167,6 +168,7 @@ void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, int uniqueID, gd
             controller->loadConfigFromTrigger(this);
             controller->start();
         } else {
+            if (!it->second->isStopped()) return;
             it->second->loadConfigFromTrigger(this);
             it->second->start();
         }
@@ -198,27 +200,27 @@ void CosmicClonesTrigger::setupCloneTrigger(bool initial) {
 }
 
 int CosmicClonesTrigger::getCount() const {
-    return m_resetMode;
+    return -m_resetMode;
 }
 
 void CosmicClonesTrigger::setCount(const int count) {
-    m_resetMode = count;
+    m_resetMode = -count;
 }
 
 float CosmicClonesTrigger::getStartDelay() const {
-    return m_reset;
+    return -m_reset;
 }
 
 void CosmicClonesTrigger::setStartDelay(const float startDelay) {
-    m_reset = startDelay;
+    m_reset = -startDelay;
 }
 
 float CosmicClonesTrigger::getDelay() const {
-    return m_minInt;
+    return -m_minInt;
 }
 
 void CosmicClonesTrigger::setDelay(const float delay) {
-    m_minInt = delay;
+    m_minInt = -delay;
 }
 
 bool CosmicClonesTrigger::isDamaging() const {
@@ -307,9 +309,9 @@ void CosmicClonesTrigger::setStyles(const std::vector<Style>& styles) {
         else if (styles[i].type == "Cosmic Clone\n(SMG 2)") m_chanceObjects.emplace_back(ChanceObject{-2, -1});
         else if (styles[i].type == "Badeline Chaser\n(Celeste)") m_chanceObjects.emplace_back(ChanceObject{-3, -1});
         else if (styles[i].type == "Custom") {
-            const auto& ret = customStyleToChanceObjects(styles[i]);
-            m_chanceObjects.emplace_back(ret.first);
-            m_chanceObjects.emplace_back(ret.second);
+            const auto& [first, second] = customStyleToChanceObjects(styles[i]);
+            m_chanceObjects.emplace_back(first);
+            m_chanceObjects.emplace_back(second);
         }
     }
 }
@@ -324,10 +326,10 @@ void CosmicClonesTrigger::fill10IfNeeded() {
 }
 
 Style CosmicClonesTrigger::chanceObjectsToCustomStyle(const ChanceObject& first, const ChanceObject& second) {
-    auto col1 = colorFromInt(first.m_chance);
-    auto col2 = colorFromInt(second.m_groupID);
-    bool glowOn = second.m_chance >> 24 & 1;
-    auto glow = colorFromInt(second.m_chance);
+    auto col1 = colorFromInt(-first.m_chance);
+    auto col2 = colorFromInt(-second.m_groupID);
+    bool glowOn = -second.m_chance >> 24 & 1;
+    auto glow = colorFromInt(-second.m_chance);
     return {"Custom", col1, col2, glowOn, glow};
 }
 
@@ -335,5 +337,5 @@ std::pair<ChanceObject, ChanceObject> CosmicClonesTrigger::customStyleToChanceOb
     const auto col1 = colorToInt(s.col1);
     const auto col2 = colorToInt(s.col2);
     const auto glow = colorToInt(s.glow) | s.useGlow << 24;
-    return {ChanceObject{-4, col1}, ChanceObject{col2, glow}};
+    return {ChanceObject{-4, -col1}, ChanceObject{-col2, -glow}};
 }

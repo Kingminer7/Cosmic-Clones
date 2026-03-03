@@ -10,19 +10,24 @@ protected:
 
     CosmicClonesTrigger* m_trigger = nullptr;
 
+    cocos2d::CCMenu* m_spawnContainer = nullptr;
+    cocos2d::CCMenu* m_touchContainer = nullptr;
+    cocos2d::CCMenu* m_multiContainer = nullptr;
+    cocos2d::CCMenu* m_countContainer = nullptr;
+    cocos2d::CCMenu* m_idContainer = nullptr;
+    cocos2d::CCMenu* m_delayContainer = nullptr;
+    cocos2d::CCMenu* m_startDelayContainer = nullptr;
+    cocos2d::CCMenu* m_disabledContainer = nullptr;
+    cocos2d::CCMenu* m_damageContainer = nullptr;
+    cocos2d::CCMenu* m_stopperContainer = nullptr;
+
     CCMenuItemToggler* m_spawnToggle = nullptr;
-    cocos2d::CCLabelBMFont* m_spawnLabel = nullptr;
     CCMenuItemToggler* m_touchToggle = nullptr;
-    cocos2d::CCLabelBMFont* m_touchLabel = nullptr;
     CCMenuItemToggler* m_multiToggle = nullptr;
-    cocos2d::CCLabelBMFont* m_multiLabel = nullptr;
 
     CCMenuItemToggler* m_disabledToggle = nullptr;
-    cocos2d::CCLabelBMFont* m_disabledLabel = nullptr;
     CCMenuItemToggler* m_damageToggle = nullptr;
-    cocos2d::CCLabelBMFont* m_damageLabel = nullptr;
     CCMenuItemToggler* m_stopperToggle = nullptr;
-    cocos2d::CCLabelBMFont* m_stopperLabel = nullptr;
 
     geode::TextInput* m_countInput = nullptr;
     geode::TextInput* m_idInput = nullptr;

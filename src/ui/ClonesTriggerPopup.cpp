@@ -8,7 +8,7 @@ struct LambdaObj : CCNode {
     LambdaObj(Slider* slider, Function<void(Slider* slider)> callback) : callback(std::move(callback)), slider(slider) {}
 
     void execute(CCObject*) {
-	    callback(slider);
+        callback(slider);
     }
 };
 
@@ -25,9 +25,37 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_buttonMenu->setID("button-menu");
     m_closeBtn->removeFromParent();
     setID("ClonesTriggerPopup");
+
+    m_page1 = CCLayer::create();
+    m_page1->setID("page-1");
+    m_page1->ignoreAnchorPointForPosition(false);
+    m_mainLayer->addChildAtPosition(m_page1, Anchor::Center);
+
+    m_page2 = CCLayer::create();
+    m_page2->setID("page-2");
+    m_page2->setVisible(false);
+    m_page2->ignoreAnchorPointForPosition(false);
+    m_mainLayer->addChildAtPosition(m_page2, Anchor::Center);
+
+    static_cast<CopySizeLayout*>(m_mainLayer->getLayout())->add(m_page1);
+    static_cast<CopySizeLayout*>(m_mainLayer->getLayout())->add(m_page2);
     m_mainLayer->updateLayout();
 
-    // 18, 18
+    auto left = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_arrow_01_001.png", .7f, [this](auto){
+	m_page1->setVisible(!m_page1->isVisible());
+	m_page2->setVisible(!m_page2->isVisible());
+
+    });
+    left->setID("left-button");
+    m_buttonMenu->addChildAtPosition(left, Anchor::Left, {-15, 0});
+    
+    auto right = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_arrow_01_001.png", .7f, [this](auto){
+	m_page1->setVisible(!m_page1->isVisible());
+	m_page2->setVisible(!m_page2->isVisible());
+    });
+    static_cast<CCSprite*>(right->getNormalImage())->setFlipX(true);
+    right->setID("right-button");
+    m_buttonMenu->addChildAtPosition(right, Anchor::Right, {15, 0});
 
     auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.f, [this](auto){
         // // TODO: Type this
@@ -39,7 +67,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_spawnContainer = CCMenu::create();
     m_spawnContainer->setID("spawn-container");
     m_spawnContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_spawnContainer, Anchor::BottomLeft, {20, 20});
+    m_page1->addChildAtPosition(m_spawnContainer, Anchor::BottomLeft, {20, 20});
     m_spawnToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->m_isSpawnTriggered = !toggle->isToggled();
         m_trigger->m_isTouchTriggered = false;
@@ -61,7 +89,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_touchContainer = CCMenu::create();
     m_touchContainer->setID("touch-container");
     m_touchContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_touchContainer, Anchor::BottomLeft, {20, 50});
+    m_page1->addChildAtPosition(m_touchContainer, Anchor::BottomLeft, {20, 50});
 
     m_touchToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->m_isTouchTriggered = !toggle->isToggled();
@@ -84,14 +112,14 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_multiContainer = CCMenu::create();
     m_multiContainer->setID("multi-container");
     m_multiContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_multiContainer, Anchor::BottomLeft, {20, 80});
+    m_multiContainer->setVisible(m_trigger->m_isTouchTriggered || m_trigger->m_isSpawnTriggered);
+    m_page1->addChildAtPosition(m_multiContainer, Anchor::BottomLeft, {20, 80});
 
     m_multiToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->m_isMultiTriggered = !toggle->isToggled();
     });
     m_multiToggle->toggle(trigger->m_isMultiTriggered);
     m_multiToggle->setID("multi-toggle");
-    m_multiToggle->setVisible(trigger->m_isTouchTriggered || trigger->m_isSpawnTriggered);
     m_multiContainer->addChild(m_multiToggle);
 
     auto multiLabel = CCLabelBMFont::create("Multi\nTrigger", "bigFont.fnt");
@@ -100,13 +128,12 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     multiLabel->setScale(.35);
     multiLabel->setAlignment(kCCTextAlignmentLeft);
     multiLabel->setPositionX(20.35);
-    multiLabel->setVisible(trigger->m_isTouchTriggered || trigger->m_isSpawnTriggered);
     m_multiContainer->addChild(multiLabel);
 
     m_countContainer = CCMenu::create();
     m_countContainer->setID("count-container");
     m_countContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_countContainer, Anchor::Left, {75, 55});
+    m_page1->addChildAtPosition(m_countContainer, Anchor::Left, {75, 55});
 
     m_countInput = TextInput::create(70, nullptr);
     m_countInput->setID("count-input");
@@ -141,7 +168,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_idContainer = CCMenu::create();
     m_idContainer->setID("id-container");
     m_idContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_idContainer, Anchor::Left, {75, -15});
+    m_page1->addChildAtPosition(m_idContainer, Anchor::Left, {75, -15});
 
     m_idInput = TextInput::create(70, nullptr);
     m_idInput->setID("id-input");
@@ -176,7 +203,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_delayContainer = CCMenu::create();
     m_delayContainer->setID("delay-container");
     m_delayContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_delayContainer, Anchor::Right, {-90, 55});
+    m_page1->addChildAtPosition(m_delayContainer, Anchor::Right, {-90, 55});
 
     m_delaySlider = Slider::create(nullptr, nullptr);
     auto lambda = new LambdaObj(m_delaySlider, [this](auto slider) {
@@ -218,7 +245,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_startDelayContainer = CCMenu::create();
     m_startDelayContainer->setID("start-delay-container");
     m_startDelayContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_startDelayContainer, Anchor::Right, {-90, -15});
+    m_page1->addChildAtPosition(m_startDelayContainer, Anchor::Right, {-90, -15});
 
     m_startDelaySlider = Slider::create(nullptr, nullptr);
     auto sdlambda = new LambdaObj(m_startDelaySlider, [this](auto slider) {
@@ -260,7 +287,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_disabledContainer = CCMenu::create();
     m_disabledContainer->setID("disabled-container");
     m_disabledContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_disabledContainer, Anchor::BottomRight, {-75, 80});
+    m_page1->addChildAtPosition(m_disabledContainer, Anchor::BottomRight, {-75, 80});
 
     m_disabledToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->setDisabled(!toggle->isToggled());
@@ -280,7 +307,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_damageContainer = CCMenu::create();
     m_damageContainer->setID("damage-container");
     m_damageContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_damageContainer, Anchor::BottomRight, {-75, 50});
+    m_page1->addChildAtPosition(m_damageContainer, Anchor::BottomRight, {-75, 50});
 
     m_damageToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->setDamaging(!toggle->isToggled());
@@ -300,12 +327,11 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_stopperContainer = CCMenu::create();
     m_stopperContainer->setID("stopper-container");
     m_stopperContainer->setContentSize({0, 0});
-    m_mainLayer->addChildAtPosition(m_stopperContainer, Anchor::BottomRight, {-75, 20});
+    m_page1->addChildAtPosition(m_stopperContainer, Anchor::BottomRight, {-75, 20});
 
     m_stopperToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->setStopper(!toggle->isToggled());
         m_countContainer->setVisible(toggle->isToggled());
-        m_idContainer->setVisible(toggle->isToggled());
         m_delayContainer->setVisible(toggle->isToggled());
         m_startDelayContainer->setVisible(toggle->isToggled());
         m_disabledContainer->setVisible(toggle->isToggled());
@@ -313,7 +339,6 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     });
     bool stopper = trigger->isStopper();
     m_countContainer->setVisible(!stopper);
-    m_idContainer->setVisible(!stopper);
     m_delayContainer->setVisible(!stopper);
     m_startDelayContainer->setVisible(!stopper);
     m_disabledContainer->setVisible(!stopper);
@@ -329,6 +354,28 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     stopperLabel->setAlignment(kCCTextAlignmentLeft);
     stopperLabel->setPositionX(20.35);
     m_stopperContainer->addChild(stopperLabel);
+
+
+    m_sfxContainer = CCMenu::create();
+    m_sfxContainer->setID("sfx-container");
+    m_sfxContainer->setContentSize({0, 0});
+    m_page2->addChildAtPosition(m_sfxContainer, Anchor::BottomRight, {-75, 20});
+
+    m_sfxToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
+        m_trigger->setSfx(!toggle->isToggled());
+    });
+    m_sfxToggle->toggle(trigger->isSfx());
+    m_sfxToggle->setID("sfx-toggle");
+    m_sfxContainer->addChild(m_sfxToggle);
+
+    auto sfxLabel = CCLabelBMFont::create("SFX", "bigFont.fnt");
+    sfxLabel->setAnchorPoint({0, 0.5});
+    sfxLabel->setID("sfx-label");
+    sfxLabel->setScale(.35);
+    sfxLabel->setAlignment(kCCTextAlignmentLeft);
+    sfxLabel->setPositionX(20.35);
+    m_sfxContainer->addChild(sfxLabel);
+
 
     auto okBtn = CCMenuItemSpriteExtra::create(ButtonSprite::create("OK",40,0,0.8,true,"goldFont.fnt", "GJ_button_01.png",30.0), this, menu_selector(ClonesTriggerPopup::onClose));
     m_buttonMenu->addChildAtPosition(okBtn, Anchor::Bottom, {0, 24});

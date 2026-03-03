@@ -39,11 +39,9 @@ void ShaderManager::setup() {
 
     CCShaderCache::sharedShaderCache()->addProgram(m_shader, "cosmic"_spr);
 
-    m_glCosmic = CCTextureCache::get()->addImage("cosmic.png"_spr, false)->getName();
-    m_glNormal = CCTextureCache::get()->addImage("normal.png"_spr, false)->getName();
-    m_glOverlay = CCTextureCache::get()->addImage("star.png"_spr, false)->getName();
-    m_glTime = m_shader->getUniformLocationForName("u_time");
-    m_glScreenSize = m_shader->getUniformLocationForName("u_screenSize");
+    m_cosmicTex = CCTextureCache::get()->addImage("cosmic.png"_spr, false);
+    m_normalTex = CCTextureCache::get()->addImage("normal.png"_spr, false);
+    m_overlayTex = CCTextureCache::get()->addImage("star.png"_spr, false);
 }
 
 void ShaderManager::update(const float dt) {
@@ -52,15 +50,17 @@ void ShaderManager::update(const float dt) {
     m_shader->use();
     m_shader->setUniformsForBuiltins();
 
-    ccGLBindTexture2DN(1, m_glCosmic);
-    ccGLBindTexture2DN(2, m_glNormal);
-    ccGLBindTexture2DN(3, m_glOverlay);
+    ccGLBindTexture2DN(1, m_cosmicTex->getName());
+    ccGLBindTexture2DN(2, m_normalTex->getName());
+    ccGLBindTexture2DN(3, m_overlayTex->getName());
 
     m_time += dt;
-    m_shader->setUniformLocationWith1f(m_glTime, m_time);
+    auto uTime = m_shader->getUniformLocationForName("u_time");
+    m_shader->setUniformLocationWith1f(uTime, m_time);
 
     auto size = CCDirector::sharedDirector()->getVisibleSize();
-    m_shader->setUniformLocationWith2f(m_glScreenSize, size.width, size.height);
+    auto uScreenSize = m_shader->getUniformLocationForName("u_screenSize");
+    m_shader->setUniformLocationWith2f(uScreenSize, size.width, size.height);
 }
 
 $on_mod(Loaded) {

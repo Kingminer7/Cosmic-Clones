@@ -15,6 +15,7 @@ class CosmicClonesController;
 // these ones use bitwise operators
 // bool  damaging:     int   m_chanceObjects[0].m_groupID (bit 0)
 // bool  stopper:      int   m_chanceObjects[0].m_groupID (bit 1)
+// bool  sfx:          int   m_chanceObjects[0].m_groupID (bit 2)
 
 class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
 {
@@ -47,6 +48,9 @@ class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
 
     bool isStopper() const;
     void setStopper(bool stopper);
+
+    bool isSfx() const;
+    void setSfx(bool sfx);
 
     std::vector<Style> getStyles() const;
     void setStyles(const std::vector<Style>& styles);

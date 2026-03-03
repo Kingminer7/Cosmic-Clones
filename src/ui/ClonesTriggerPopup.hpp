@@ -20,6 +20,7 @@ protected:
     cocos2d::CCMenu* m_disabledContainer = nullptr;
     cocos2d::CCMenu* m_damageContainer = nullptr;
     cocos2d::CCMenu* m_stopperContainer = nullptr;
+    cocos2d::CCMenu* m_sfxContainer = nullptr;
 
     CCMenuItemToggler* m_spawnToggle = nullptr;
     CCMenuItemToggler* m_touchToggle = nullptr;
@@ -28,6 +29,7 @@ protected:
     CCMenuItemToggler* m_disabledToggle = nullptr;
     CCMenuItemToggler* m_damageToggle = nullptr;
     CCMenuItemToggler* m_stopperToggle = nullptr;
+    CCMenuItemToggler* m_sfxToggle = nullptr;
 
     geode::TextInput* m_countInput = nullptr;
     geode::TextInput* m_idInput = nullptr;
@@ -35,6 +37,9 @@ protected:
     Slider* m_delaySlider = nullptr;
     geode::TextInput* m_startDelayInput = nullptr;
     Slider* m_startDelaySlider = nullptr;
+
+    cocos2d::CCLayer* m_page1 = nullptr;
+    cocos2d::CCLayer* m_page2 = nullptr;
 public:
     static ClonesTriggerPopup* create(CosmicClonesTrigger* trigger);
 };

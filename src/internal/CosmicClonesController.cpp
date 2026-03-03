@@ -61,7 +61,7 @@ void CosmicClonesController::loadConfigFromTrigger(const CosmicClonesTrigger* tr
     m_damage = trigger->isDamaging();
     m_count = trigger->getCount();
     m_styles = trigger->getStyles();
-    m_sfx = true;
+    m_sfx = trigger->isSfx();
 }
 
 void CosmicClonesController::loadConfigFromTrigger() {

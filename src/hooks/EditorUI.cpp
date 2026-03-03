@@ -189,6 +189,7 @@ void CosmicClonesTrigger::setupCloneTrigger(bool initial) {
         setDamaging(true);
         setDisabled(false);
         setStopper(false);
+	setSfx(true);
         setStyles({
             {"Cosmic Mario\n(SMG 1)"},
             {"Cosmic Clone\n(SMG 2)"},
@@ -247,6 +248,18 @@ void CosmicClonesTrigger::setStopper(const bool stopper) {
     else m_chanceObjects[0].m_groupID &= ~(1 << 1);
 }
 
+bool CosmicClonesTrigger::isSfx() const {
+    if (m_chanceObjects.size() < 1) return false;
+    return m_chanceObjects[0].m_groupID & 1 << 2;
+}
+
+void CosmicClonesTrigger::setSfx(const bool sfx) {
+    fill10IfNeeded();
+
+    if (sfx) m_chanceObjects[0].m_groupID |= (1 << 2);
+    else m_chanceObjects[0].m_groupID &= ~(1 << 2);
+}
+
 bool CosmicClonesTrigger::isDisabled() const {
     return m_uniqueRemap;
 }
@@ -296,6 +309,7 @@ std::vector<Style> CosmicClonesTrigger::getStyles() const {
         }
         i++;
     }
+    if (ret.empty()) return getSettingFast<"styles", std::vector<Style>>();
     return ret;
 }
 

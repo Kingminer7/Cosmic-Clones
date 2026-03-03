@@ -14,8 +14,13 @@
     "dependencies": {
         "geode.node-ids": ">=v1.22.0",
         "alphalaneous.editortab_api": ">=2.0.7",
+        "cvolton.level-id-api": ">=2.0.0",
         "undefined0.icon_ninja": {
             "version": ">=1.4.3",
+            "required": false
+        },
+        "ninxout.options_api": {
+            "version": ">=1.0.3-beta.1",
             "required": false
         }
     },
@@ -34,7 +39,7 @@
         },
         "enabled": {
             "name": "Clones in Every Level",
-            "description": "Spawns clones in every level. When this is disabled, you can enable them for specific levels in level options.",
+            "description": "Spawns clones from the start of every level. When this is disabled, you can enable them for specific levels in level options.",
             "type": "bool",
             "default": true
         },

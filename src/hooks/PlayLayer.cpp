@@ -2,13 +2,22 @@
 #include "GJBaseGameLayer.hpp"
 #include "../internal/CosmicClonesController.hpp"
 #include "../Utils.hpp"
+#include <ninxout.options_api/include/API.hpp>
+#include <cvolton.level-id-api/include/EditorIDs.hpp>
+
+inline bool isEnabledForLevel(GJGameLevel* level) {
+    if (level->m_levelType == GJLevelType::Editor) {
+        return Mod::get()->getSavedValue<bool>(fmt::format("enable-in-editor-{}", EditorIDs::getID(level)));
+    }
+    return Mod::get()->getSavedValue<bool>(fmt::format("enable-in-{}", level->m_levelID));
+}
 
 void CosmicClonesPlayLayer::resetLevel() {
     PlayLayer::resetLevel();
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
     if (!fields->m_controller) return;
-    fields->m_autoClones = getSettingFast<"enabled", bool>();
+    fields->m_autoClones = getSettingFast<"enabled", bool>() || isEnabledForLevel(m_level);
 
     // wow one of my first actual explaining comments
     // basically in practice mode, it'd be better if the clones reset to where they were at said checkpoint
@@ -39,7 +48,7 @@ void CosmicClonesPlayLayer::fullReset() {
         if (!cont->isStopped()) cont->stop(true);
     }
 
-    fields->m_autoClones = getSettingFast<"enabled", bool>();
+    fields->m_autoClones = getSettingFast<"enabled", bool>() || isEnabledForLevel(m_level);
     fields->m_controller->loadConfigFromSettings();
     if (fields->m_autoClones) fields->m_controller->start();
 }
@@ -48,7 +57,7 @@ void CosmicClonesPlayLayer::setupHasCompleted() {
     PlayLayer::setupHasCompleted();
     auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
     auto fields = bgl->m_fields.self();
-    fields->m_autoClones = getSettingFast<"enabled", bool>();
+    fields->m_autoClones = getSettingFast<"enabled", bool>() || isEnabledForLevel(m_level);
     fields->m_controller = CosmicClonesController::createWithSettings(bgl);
     if (fields->m_autoClones) fields->m_controller->start();
 }
@@ -58,4 +67,24 @@ void CosmicClonesPlayLayer::levelComplete() {
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
     if (fields->m_controller->isStopped()) return;
     fields->m_controller->stop();
+}
+
+$on_mod(Loaded) {
+    OptionsAPI::addPreLevelSetting<bool>(
+        "Clones in This Level",
+        "clones-in-level"_spr,
+        [](GJGameLevel* level) {
+            std::string key;
+            if (level->m_levelType != GJLevelType::Editor) {
+                key = fmt::format("enable-in-{}", level->m_levelID);
+            } else {
+                key = fmt::format("enable-in-editor-{}", EditorIDs::getID(level));
+            }
+            Mod::get()->setSavedValue<bool>(key, !Mod::get()->getSavedValue<bool>(key, false));
+        },
+        [](GJGameLevel* level) {
+            return isEnabledForLevel(level);
+        },
+        "If clones should spawn from the start in this level. No effect if \"Clones in Every Level\" is enabled."
+    );
 }

@@ -312,7 +312,6 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
         m_damageContainer->setVisible(toggle->isToggled());
     });
     bool stopper = trigger->isStopper();
-    m_trigger->setStopper(!stopper);
     m_countContainer->setVisible(!stopper);
     m_idContainer->setVisible(!stopper);
     m_delayContainer->setVisible(!stopper);

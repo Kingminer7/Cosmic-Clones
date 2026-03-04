@@ -2,6 +2,7 @@
 
 #include <Geode/ui/Popup.hpp>
 
+#include "CloneStyleSetting.hpp"
 #include "../hooks/EditorUI.hpp"
 
 class ClonesTriggerPopup : public geode::Popup {
@@ -38,8 +39,35 @@ protected:
     geode::TextInput* m_startDelayInput = nullptr;
     Slider* m_startDelaySlider = nullptr;
 
-    cocos2d::CCLayer* m_page1 = nullptr;
-    cocos2d::CCLayer* m_page2 = nullptr;
+    CCLayer* m_page1 = nullptr;
+    CCLayer* m_page2 = nullptr;
+
+    geode::ScrollLayer* m_styleScroll = nullptr;
 public:
+    void onClose(CCObject* ) override;
+
+    geode::ScrollLayer* getScroll() const;
+
     static ClonesTriggerPopup* create(CosmicClonesTrigger* trigger);
+};
+
+
+class StyleNode : public cocos2d::CCMenu {
+protected:
+    bool init(ClonesTriggerPopup* popup, Style value);
+
+    static std::vector<Style> m_styles;
+    Style m_style;
+    cocos2d::CCLabelBMFont* m_label = nullptr;
+    ClonesTriggerPopup* m_popup = nullptr;
+    CCMenu* m_customMenu = nullptr;
+
+    SimplePlayer* m_preview = nullptr;
+public:
+    void updateState(const Style& style);
+    const Style& getStyle() { return m_style; }
+
+    ClonesTriggerPopup* getPopup() const;
+
+    static StyleNode* create(ClonesTriggerPopup* popup, const Style& value);
 };

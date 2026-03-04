@@ -1,5 +1,7 @@
 #include "ClonesTriggerPopup.hpp"
 
+#include "../internal/ShaderManager.hpp"
+
 using namespace geode::prelude;
 
 struct LambdaObj : CCNode {
@@ -42,16 +44,15 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_mainLayer->updateLayout();
 
     auto left = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_arrow_01_001.png", .7f, [this](auto){
-	m_page1->setVisible(!m_page1->isVisible());
-	m_page2->setVisible(!m_page2->isVisible());
-
+	    m_page1->setVisible(!m_page1->isVisible());
+	    m_page2->setVisible(!m_page2->isVisible());
     });
     left->setID("left-button");
     m_buttonMenu->addChildAtPosition(left, Anchor::Left, {-15, 0});
     
     auto right = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_arrow_01_001.png", .7f, [this](auto){
-	m_page1->setVisible(!m_page1->isVisible());
-	m_page2->setVisible(!m_page2->isVisible());
+	    m_page1->setVisible(!m_page1->isVisible());
+	    m_page2->setVisible(!m_page2->isVisible());
     });
     static_cast<CCSprite*>(right->getNormalImage())->setFlipX(true);
     right->setID("right-button");
@@ -62,6 +63,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
         // FLAlertLayer::create("Help", "TODO", "ok")->show();
         SetupSequenceTriggerPopup::create(m_trigger)->show();
     });
+    infoBtn->setID("info-button");
     m_buttonMenu->addChildAtPosition(infoBtn, Anchor::TopLeft, {18, -18});
 
     m_spawnContainer = CCMenu::create();
@@ -329,13 +331,16 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_stopperContainer->setContentSize({0, 0});
     m_page1->addChildAtPosition(m_stopperContainer, Anchor::BottomRight, {-75, 20});
 
-    m_stopperToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
-        m_trigger->setStopper(!toggle->isToggled());
-        m_countContainer->setVisible(toggle->isToggled());
-        m_delayContainer->setVisible(toggle->isToggled());
-        m_startDelayContainer->setVisible(toggle->isToggled());
-        m_disabledContainer->setVisible(toggle->isToggled());
-        m_damageContainer->setVisible(toggle->isToggled());
+    m_stopperToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this, left, right](CCMenuItemToggler* toggle) {
+        bool stopper = !toggle->isToggled();
+        m_trigger->setStopper(stopper);
+        m_countContainer->setVisible(!stopper);
+        m_delayContainer->setVisible(!stopper);
+        m_startDelayContainer->setVisible(!stopper);
+        m_disabledContainer->setVisible(!stopper);
+        m_damageContainer->setVisible(!stopper);
+        left->setVisible(!stopper);
+        right->setVisible(!stopper);
     });
     bool stopper = trigger->isStopper();
     m_countContainer->setVisible(!stopper);
@@ -343,6 +348,8 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_startDelayContainer->setVisible(!stopper);
     m_disabledContainer->setVisible(!stopper);
     m_damageContainer->setVisible(!stopper);
+    left->setVisible(!stopper);
+    right->setVisible(!stopper);
     m_stopperToggle->toggle(stopper);
     m_stopperToggle->setID("stopper-toggle");
     m_stopperContainer->addChild(m_stopperToggle);
@@ -355,6 +362,22 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     stopperLabel->setPositionX(20.35);
     m_stopperContainer->addChild(stopperLabel);
 
+
+    m_styleScroll = ScrollLayer::create({155, 180});
+    m_styleScroll->ignoreAnchorPointForPosition(false);
+    m_styleScroll->setID("style-scroll");
+    m_page2->addChildAtPosition(m_styleScroll, Anchor::Center, {0, 10});
+
+    float y = 0;
+    for (const auto& style : trigger->getStyles()) {
+        auto node = StyleNode::create(this, style);
+        node->updateState(style);
+        y += node->getContentHeight();
+        m_styleScroll->m_contentLayer->addChild(node);
+    }
+    m_styleScroll->m_contentLayer->setContentHeight(std::max(y, m_styleScroll->getContentHeight()));
+    m_styleScroll->m_contentLayer->setLayout(ColumnLayout::create()->setAxisReverse(true)->setAxisAlignment(AxisAlignment::End)->ignoreInvisibleChildren(false)->setAutoScale(false)->setCrossAxisOverflow(false));
+    m_styleScroll->scrollToTop();
 
     m_sfxContainer = CCMenu::create();
     m_sfxContainer->setID("sfx-container");
@@ -376,15 +399,217 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     sfxLabel->setPositionX(20.35);
     m_sfxContainer->addChild(sfxLabel);
 
-
     auto okBtn = CCMenuItemSpriteExtra::create(ButtonSprite::create("OK",40,0,0.8,true,"goldFont.fnt", "GJ_button_01.png",30.0), this, menu_selector(ClonesTriggerPopup::onClose));
+    okBtn->setID("ok-button");
     m_buttonMenu->addChildAtPosition(okBtn, Anchor::Bottom, {0, 24});
 
     return true;
+}
+
+void ClonesTriggerPopup::onClose(CCObject *sender) {
+    std::vector<Style> styles;
+    for (const auto child : m_styleScroll->m_contentLayer->getChildrenExt<StyleNode*>()) {
+        styles.push_back(child->getStyle());
+    }
+    m_trigger->setStyles(styles);
+    Popup::onClose(sender);
+}
+
+ScrollLayer* ClonesTriggerPopup::getScroll() const {
+    return m_styleScroll;
 }
 
 ClonesTriggerPopup* ClonesTriggerPopup::create(CosmicClonesTrigger* trigger) {
     auto ret = new ClonesTriggerPopup();
     if (!ret->init(trigger)) return delete ret, nullptr;
     return ret->autorelease(), ret;
+}
+
+std::vector<Style> StyleNode::m_styles = {
+    {"Cosmic Mario\n(SMG 1)"},
+    {"Cosmic Clone\n(SMG 2)"},
+    {"Badeline Chaser\n(Celeste)"},
+    {"Custom"}
+};
+
+ClonesTriggerPopup* StyleNode::getPopup() const {
+    return m_popup;
+}
+
+bool StyleNode::init(ClonesTriggerPopup* popup, Style value) {
+    if (!CCMenu::init()) return false;
+    setID("clone-style-node");
+    m_popup = popup;
+    m_style = std::move(value);
+    ignoreAnchorPointForPosition(false);
+    setAnchorPoint({.5f, .5f});
+    setContentSize({155, m_style.type == "Custom" ? 120.f : 30.f});
+    m_label = CCLabelBMFont::create(value.type.c_str(), "bigFont.fnt");
+    m_label->setScale(75.f / m_label->getContentWidth());
+    m_label->setAlignment(kCCTextAlignmentCenter);
+    m_label->setID("display-label");
+    auto lArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this](auto) {
+        auto it = std::ranges::find(m_styles, m_style);
+        if (it == m_styles.begin() || it == m_styles.end()) it = m_styles.end() - 1;
+        else --it;
+        updateState(*it);
+    });
+    static_cast<CCSprite*>(lArrow->getNormalImage())->setFlipX(true);
+    lArrow->setID("left-arrow-button");
+    auto rArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this, value](auto) {
+        auto it = std::ranges::find(m_styles, m_style);
+        if (it == m_styles.end() - 1 || it == m_styles.end()) it = m_styles.begin();
+        else ++it;
+        updateState(*it);
+    });
+    rArrow->setID("right-arrow-button");
+
+    auto del = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_deleteIcon_001.png", .7f, [this](auto) {
+        removeFromParent();
+        auto scroll = m_popup->getScroll();
+        scroll->m_contentLayer->setContentHeight(std::max(scroll->m_contentLayer->getContentHeight() - getContentHeight(), scroll->getContentHeight()));
+        scroll->m_contentLayer->updateLayout();
+    });
+    del->setID("delete-button");
+
+    m_preview = SimplePlayer::create(1);
+    m_preview->setID("preview");
+    m_preview->setScale(5.f / 6);
+    addChildAtPosition(m_preview, Anchor::TopLeft, {15, -15});
+
+    addChildAtPosition(m_label, Anchor::Top, {5.f, -15.f});
+    addChildAtPosition(lArrow, Anchor::TopLeft, {35.f, -15.f});
+    addChildAtPosition(rArrow, Anchor::TopRight, {-25.f, -15.f});
+    addChildAtPosition(del, Anchor::TopRight, {-10.f, -15.f});
+
+    m_customMenu = CCMenu::create();
+    m_customMenu->setContentSize({155, 90});
+    m_customMenu->setAnchorPoint({.5f, .5f});
+    m_customMenu->ignoreAnchorPointForPosition(false);
+
+    auto col1Lab = CCLabelBMFont::create("Color 1", "bigFont.fnt");
+    col1Lab->setAnchorPoint({0.f, .5f});
+    col1Lab->setContentSize({120, 90.f});
+    col1Lab->setScale(.4f);
+    m_customMenu->addChildAtPosition(col1Lab, Anchor::Center, {-45, 30});
+
+    auto col1Spr = ColorChannelSprite::create();
+    col1Spr->setColor(m_style.col1);
+    col1Spr->setScale(.7f);
+    auto col1Btn = CCMenuItemExt::createSpriteExtra(col1Spr, [this](auto) {
+        auto popup = ColorPickPopup::create(m_style.col1);
+        popup->setCallback([this](ccColor4B const& color) {
+            m_style.col1 = ccColor3B(color.r, color.g, color.b);
+            updateState(m_style);
+        });
+        popup->show();
+    });
+    col1Btn->setID("col1");
+    m_customMenu->addChildAtPosition(col1Btn, Anchor::Center, {62.5, 30});
+
+    auto col2Lab = CCLabelBMFont::create("Color 2", "bigFont.fnt");
+    col2Lab->setAnchorPoint({0.f, .5f});
+    col2Lab->setContentSize({120, 90.f});
+    col2Lab->setScale(.4f);
+    m_customMenu->addChildAtPosition(col2Lab, Anchor::Center, {-45, 0});
+
+    auto col2Spr = ColorChannelSprite::create();
+    col2Spr->setColor(m_style.col2);
+    col2Spr->setScale(.7f);
+    auto col2Btn = CCMenuItemExt::createSpriteExtra(col2Spr, [this](auto) {
+        auto popup = ColorPickPopup::create(m_style.col2);
+        popup->setCallback([this](ccColor4B const& color) {
+            m_style.col2 = ccColor3B(color.r, color.g, color.b);
+            updateState(m_style);
+        });
+        popup->show();
+    });
+    col2Btn->setID("col2");
+    m_customMenu->addChildAtPosition(col2Btn, Anchor::Center, {62.5, 0});
+
+    auto glowLab = CCLabelBMFont::create("Glow", "bigFont.fnt");
+    glowLab->setAnchorPoint({0.f, .5f});
+    glowLab->setContentSize({120, 90.f});
+    glowLab->setScale(.4f);
+    m_customMenu->addChildAtPosition(glowLab, Anchor::Center, {-45, -30});
+
+    auto glowSpr = ColorChannelSprite::create();
+    glowSpr->setColor(m_style.glow);
+    glowSpr->setScale(.7f);
+    auto glowBtn = CCMenuItemExt::createSpriteExtra(glowSpr, [this](auto) {
+        auto popup = ColorPickPopup::create(m_style.glow);
+        popup->setCallback([this](ccColor4B const& color) {
+            m_style.glow = ccColor3B(color.r, color.g, color.b);
+            updateState(m_style);
+        });
+        popup->show();
+    });
+    glowBtn->setID("glow");
+    m_customMenu->addChildAtPosition(glowBtn, Anchor::Center, {62.5, -30});
+
+    auto toggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this, glowBtn](auto) {
+        queueInMainThread([this] {
+            m_style.useGlow = !m_style.useGlow;
+            updateState(m_style);
+        });
+    });
+    toggle->setCascadeOpacityEnabled(true);
+    glowBtn->setEnabled(m_style.useGlow);
+    toggle->setID("glow-toggler");
+    m_customMenu->addChildAtPosition(toggle, Anchor::Center, {32.5, -30});
+
+    addChildAtPosition(m_customMenu, Anchor::Center, {0, -15.f});
+    return true;
+}
+
+void StyleNode::updateState(const Style& style) {
+    if (style.type == "Custom" && m_style.type != "Custom") {
+        auto cl = m_popup->getScroll()->m_contentLayer;
+        cl->setPositionY(cl->getPositionY() - 90);
+        cl->setContentHeight(cl->getContentHeight() + 90);
+    } else if (m_style.type == "Custom" && style.type != "Custom") {
+        auto cl = m_popup->getScroll()->m_contentLayer;
+        cl->setPositionY(cl->getPositionY() + 90);
+        cl->setContentHeight(cl->getContentHeight() - 90);
+    }
+    m_style = std::move(style);
+    m_label->setString(m_style.type.c_str());
+    if (auto width = m_label->getContentWidth(); width > 0.001f) m_label->setScale(std::min(80.f / width, .45f));
+    else m_label->setScale(.001f);
+    setContentHeight(m_style.type == "Custom" ? 120.f : 30.f);
+    m_customMenu->setVisible(m_style.type == "Custom");
+
+    m_customMenu->getChildByID("col1")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col1);
+    m_customMenu->getChildByID("col2")->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.col2);
+    auto glowBtn = m_customMenu->getChildByID("glow");
+    glowBtn->getChildByType<ColorChannelSprite*>(0)->setColor(m_style.glow);
+    typeinfo_cast<CCMenuItemSpriteExtra*>(glowBtn)->setEnabled(m_style.useGlow);
+    typeinfo_cast<CCMenuItemToggler*>(m_customMenu->getChildByID("glow-toggler"))->toggle(m_style.useGlow);
+    updateLayout();
+
+    m_preview->setColors(style.getColor1(), style.getColor2());
+    if (style.isGlowEnabled()) m_preview->setGlowOutline(style.getGlowColor());
+    else m_preview->disableGlowOutline();
+    if (style.type == "Cosmic Mario\n(SMG 1)") {
+        const auto shader = ShaderManager::get().getCosmicShader();
+        m_preview->getChildByIndex(0)->setShaderProgram(shader);
+        for (const auto child : m_preview->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
+    }
+    else {
+        const auto shader = CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor);
+        m_preview->getChildByIndex(0)->setShaderProgram(shader);
+        for (const auto child : m_preview->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
+    }
+    auto scroll = m_popup->getScroll();
+    scroll->m_contentLayer->updateLayout();
+}
+
+StyleNode* StyleNode::create(ClonesTriggerPopup* popup, const Style& value) {
+    auto ret = new StyleNode();
+    if (ret->init(popup, value)) {
+        ret->autorelease();
+        return ret;
+    }
+    delete ret;
+    return nullptr;
 }

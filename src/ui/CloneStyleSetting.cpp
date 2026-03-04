@@ -2,12 +2,39 @@
 
 using namespace geode::prelude;
 
-std::vector<Style> StyleNode::m_styles = {
+std::vector<Style> StyleSettingNode::m_styles = {
     {"Cosmic Mario\n(SMG 1)"},
     {"Cosmic Clone\n(SMG 2)"},
     {"Badeline Chaser\n(Celeste)"},
     {"Custom"}
 };
+
+ccColor3B Style::getColor1() const {
+    if (type == "Cosmic Clone\n(SMG 2)") return {60, 20, 21};
+    if (type == "Badeline Chaser\n(Celeste)") return {155, 63, 181};
+    if (type == "Custom") return col1;
+    return {12, 11, 56};
+}
+
+ccColor3B Style::getColor2() const {
+    if (type == "Cosmic Clone\n(SMG 2)") return {243, 235, 87};
+    if (type == "Badeline Chaser\n(Celeste)") return {191, 29, 51};
+    if (type == "Custom") return col2;
+    return {11, 27, 56};
+}
+
+bool Style::isGlowEnabled() const {
+    if (type == "Badeline Chaser\n(Celeste)") return false;
+    if (type == "Custom") return useGlow;
+    return true;
+}
+
+ccColor3B Style::getGlowColor() const {
+    if (type == "Cosmic Clone\n(SMG 2)") return {193, 50, 54};
+    if (type == "Badeline Chaser\n(Celeste)") return ccWHITE;
+    if (type == "Custom") return glow;
+    return {13, 23, 64};
+}
 
 Result<std::shared_ptr<SettingV3>> CloneStyleSetting::parse(std::string const &key, std::string const &modID, matjson::Value const &json) {
     auto res = std::make_shared<CloneStyleSetting>();
@@ -29,7 +56,7 @@ void CloneStyleSettingNode::updateState(CCNode *invoker) {
     typeinfo_cast<AnchorLayoutOptions*>(getNameMenu()->getLayoutOptions())->setOffset({10.f, getContentHeight() / 2 - 15.f});
     if (m_nodes.size() < val.size()) {
         for (size_t i = m_nodes.size(); i < val.size(); ++i) {
-            auto node = StyleNode::create(this, val[i]);
+            auto node = StyleSettingNode::create(this, val[i]);
             node->setTag(static_cast<int>(i));
             node->getChildByID("delete-button")->setVisible(val.size() > 1);
             m_nodes.push_back(node);
@@ -82,7 +109,7 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
     int i = 0;
     auto val = getValue();
     for (auto value : val) {
-        auto node = StyleNode::create(this, value);
+        auto node = StyleSettingNode::create(this, value);
         node->setTag(i);
         node->getChildByID("delete-button")->setVisible(val.size() > 1);
         m_nodes.push_back(node);
@@ -100,7 +127,7 @@ bool CloneStyleSettingNode::init(std::shared_ptr<CloneStyleSetting> setting, flo
     return true;
 }
 
-void CloneStyleSettingNode::setNodeValue(StyleNode* node, Style value) {
+void CloneStyleSettingNode::setNodeValue(StyleSettingNode* node, Style value) {
     auto val = getValue();
     val[node->getTag()] = value;
     setValue(val, node);
@@ -125,7 +152,7 @@ CloneStyleSettingNode* CloneStyleSettingNode::create(std::shared_ptr<CloneStyleS
     return nullptr;
 }
 
-bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
+bool StyleSettingNode::init(CloneStyleSettingNode* setting, Style value) {
     if (!CCMenu::init()) return false;
     setID("clone-style-node");
     m_setting = setting;
@@ -248,8 +275,8 @@ bool StyleNode::init(CloneStyleSettingNode* setting, Style value) {
     return true;
 }
 
-void StyleNode::updateState(Style value) {
-    m_style = std::move(value);
+void StyleSettingNode::updateState(const Style& style) {
+    m_style = std::move(style);
     m_label->setString(m_style.type.c_str());
     if (auto width = m_label->getContentWidth(); width > 0.001f) m_label->setScale(std::min(80.f / width, .45f));
     else m_label->setScale(.001f);
@@ -268,8 +295,8 @@ void StyleNode::updateState(Style value) {
     updateLayout();
 }
 
-StyleNode* StyleNode::create(CloneStyleSettingNode* setting, const Style& value) {
-    auto ret = new StyleNode();
+StyleSettingNode* StyleSettingNode::create(CloneStyleSettingNode* setting, const Style& value) {
+    auto ret = new StyleSettingNode();
     if (ret->init(setting, value)) {
         ret->autorelease();
         return ret;

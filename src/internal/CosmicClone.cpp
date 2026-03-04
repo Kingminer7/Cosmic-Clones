@@ -317,29 +317,24 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) {
 void CosmicClone::updateStyle(Style style) {
     m_style = std::move(style);
     for (auto plr : {m_p1, m_p2}) {
+        plr->setColor(m_style.getColor1());
+        plr->setSecondColor(m_style.getColor2());
+        if (m_style.useGlow) {
+            plr->enableCustomGlowColor(m_style.getGlowColor());
+            plr->m_hasGlow = true;
+        } else {
+            plr->disableCustomGlowColor();
+            plr->m_hasGlow = true;
+        }
+        plr->updateGlowColor();
         if (m_style.type == "Cosmic Mario\n(SMG 1)") {
             // This won't really be seen normally but just in case
-            plr->setColor(ccColor3B{12, 11, 56});
-            plr->setSecondColor(ccColor3B{11, 27, 56});
-            plr->enableCustomGlowColor(ccColor3B{13, 23, 64});
-            plr->m_hasGlow = true;
-            plr->updateGlowColor();
-            if (!plr->m_gameLayer->m_isEditor)plr->toggleGhostEffect(GhostType::Disabled);
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, ShaderManager::get().getCosmicShader());
         } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
-            plr->setColor(ccColor3B{60, 20, 21});
-            plr->setSecondColor(ccColor3B{243, 235, 87});
-            plr->enableCustomGlowColor(ccColor3B{193, 50, 54});
-            plr->m_hasGlow = true;
-            plr->updateGlowColor();
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
-            plr->setColor(ccColor3B{155, 63, 181});
-            plr->setSecondColor(ccColor3B{191, 29, 51});
-            plr->disableCustomGlowColor();
-            plr->m_hasGlow = false;
-            plr->updateGlowColor();
             if (!plr->m_gameLayer->m_isEditor) {
                 plr->toggleGhostEffect(GhostType::Enabled);
                 if (auto trail = plr->m_ghostTrail) {
@@ -349,16 +344,6 @@ void CosmicClone::updateStyle(Style style) {
             }
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         } else {
-            plr->setColor(style.col1);
-            plr->setSecondColor(style.col2);
-            if (style.useGlow) {
-                plr->enableCustomGlowColor(style.glow);
-                plr->m_hasGlow = true;
-            } else {
-                plr->disableCustomGlowColor();
-                plr->m_hasGlow = false;
-            }
-            plr->updateGlowColor();
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         }

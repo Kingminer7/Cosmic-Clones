@@ -113,23 +113,22 @@
                 "arrow-step": 1
             }
         },
-        "styles": {
-            "type": "custom:clone-style",
-            "name": "Clone Style",
-            "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**\nSelecting multiple styles suggested by NonCloud9.",
-            "enable-if": "enabled",
-            "default": [
-                {
-                    "type": "Cosmic Mario\n(SMG 1)"
-                }
-            ]
-        },
         "sfx": {
             "name": "Sound Effects Enabled",
             "description": "If clones should play sound effects (if the selected style has any)\nToggle suggested by Crafty-Jumper.",
             "type": "bool",
             "default": true,
             "enable-if": "enabled"
+        },
+        "styles": {
+            "type": "custom:clone-style",
+            "name": "Clone Style",
+            "description": "How the clones should look.\n **<cy>This only recolors the icon (or applies a shader). This does not change the icon from your current icon.**\nSelecting multiple styles suggested by NonCloud9.",
+            "default": [
+                {
+                    "type": "Cosmic Mario\n(SMG 1)"
+                }
+            ]
         },
         "misc-header": {
             "name": "Miscellaneous Options",

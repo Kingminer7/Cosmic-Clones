@@ -297,7 +297,7 @@ inline int colorToInt(const ccColor3B color) {
 
 std::vector<Style> CosmicClonesTrigger::getStyles() const {
     std::vector<Style> ret;
-    if (10 >= m_chanceObjects.size()) return {};
+    if (10 >= m_chanceObjects.size()) return getSettingFast<"styles", std::vector<Style>>();
     for (int i = 10; i < m_chanceObjects.size();) {
         auto co = m_chanceObjects[i];
         if (co.m_groupID == -1) ret.push_back({"Cosmic Mario\n(SMG 1)"});

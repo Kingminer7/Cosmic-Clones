@@ -1,6 +1,7 @@
 #include "ClonesTriggerPopup.hpp"
 
 #include "../internal/ShaderManager.hpp"
+#include <Geode/ui/Button.hpp>
 
 using namespace geode::prelude;
 
@@ -362,21 +363,49 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     stopperLabel->setPositionX(20.35);
     m_stopperContainer->addChild(stopperLabel);
 
+    auto scrollBg = NineSlice::create("square02_001.png");
+    scrollBg->setContentSize({169, 180});
+    scrollBg->setOpacity(50);
+    m_page2->addChildAtPosition(scrollBg, Anchor::Center, {0, 10});
 
     m_styleScroll = ScrollLayer::create({155, 180});
     m_styleScroll->ignoreAnchorPointForPosition(false);
+    m_styleScroll->setZOrder(1);
     m_styleScroll->setID("style-scroll");
+    {
+        auto spacer = CCNode::create();
+        spacer->setContentHeight(7);
+        m_styleScroll->m_contentLayer->addChild(spacer, -1);
+    }
+    {
+        auto spacer = CCNode::create();
+        spacer->setContentHeight(7);
+        m_styleScroll->m_contentLayer->addChild(spacer, 2);
+    }
     m_page2->addChildAtPosition(m_styleScroll, Anchor::Center, {0, 10});
 
-    float y = 0;
+    auto newBtn = Button::createWithSpriteFrameName("edit_addCBtn_001.png", [this](auto) {
+        auto node = StyleNode::create(this, {});
+        node->updateState({});
+        m_styleScroll->m_contentLayer->addChild(node);
+
+        float height = m_styleScroll->m_contentLayer->getContentHeight();
+        m_styleScroll->m_contentLayer->updateLayout();
+        m_styleScroll->m_contentLayer->setPositionY(m_styleScroll->m_contentLayer->getPositionY() - (m_styleScroll->m_contentLayer->getContentHeight() - height));
+        auto diff = -m_styleScroll->m_contentLayer->getPositionY() + m_styleScroll->getContentHeight() - m_styleScroll->m_contentLayer->getContentHeight();
+        if (diff > 0) m_styleScroll->m_contentLayer->setPositionY(m_styleScroll->m_contentLayer->getPositionY() + diff);
+        m_styleScroll->scrollWheel(0, 0);
+    });
+    newBtn->setScale(.5f);
+    newBtn->setContentSize({30, 30});
+    m_styleScroll->m_contentLayer->addChild(newBtn, 1);
+
     for (const auto& style : trigger->getStyles()) {
         auto node = StyleNode::create(this, style);
         node->updateState(style);
-        y += node->getContentHeight();
         m_styleScroll->m_contentLayer->addChild(node);
     }
-    m_styleScroll->m_contentLayer->setContentHeight(std::max(y, m_styleScroll->getContentHeight()));
-    m_styleScroll->m_contentLayer->setLayout(ColumnLayout::create()->setAxisReverse(true)->setAxisAlignment(AxisAlignment::End)->ignoreInvisibleChildren(false)->setAutoScale(false)->setCrossAxisOverflow(false));
+    m_styleScroll->m_contentLayer->setLayout(ColumnLayout::create()->setAxisReverse(true)->setAxisAlignment(AxisAlignment::End)->ignoreInvisibleChildren(false)->setAutoScale(false)->setCrossAxisOverflow(false)->setAutoGrowAxis(180));
     m_styleScroll->scrollToTop();
 
     m_sfxContainer = CCMenu::create();
@@ -408,8 +437,10 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
 
 void ClonesTriggerPopup::onClose(CCObject *sender) {
     std::vector<Style> styles;
-    for (const auto child : m_styleScroll->m_contentLayer->getChildrenExt<StyleNode*>()) {
-        styles.push_back(child->getStyle());
+    for (const auto child : m_styleScroll->m_contentLayer->getChildrenExt<CCNode*>()) {
+        if (const auto sn = typeinfo_cast<StyleNode*>(child)) {
+            styles.push_back(sn->getStyle());
+        }
     }
     m_trigger->setStyles(styles);
     Popup::onClose(sender);
@@ -467,8 +498,10 @@ bool StyleNode::init(ClonesTriggerPopup* popup, Style value) {
     auto del = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_deleteIcon_001.png", .7f, [this](auto) {
         removeFromParent();
         auto scroll = m_popup->getScroll();
-        scroll->m_contentLayer->setContentHeight(std::max(scroll->m_contentLayer->getContentHeight() - getContentHeight(), scroll->getContentHeight()));
         scroll->m_contentLayer->updateLayout();
+        auto diff = -scroll->m_contentLayer->getPositionY() + scroll->getContentHeight() - scroll->m_contentLayer->getContentHeight();
+        if (diff > 0) scroll->m_contentLayer->setPositionY(scroll->m_contentLayer->getPositionY() + diff);
+        scroll->scrollWheel(0, 0);
     });
     del->setID("delete-button");
 
@@ -563,15 +596,6 @@ bool StyleNode::init(ClonesTriggerPopup* popup, Style value) {
 }
 
 void StyleNode::updateState(const Style& style) {
-    if (style.type == "Custom" && m_style.type != "Custom") {
-        auto cl = m_popup->getScroll()->m_contentLayer;
-        cl->setPositionY(cl->getPositionY() - 90);
-        cl->setContentHeight(cl->getContentHeight() + 90);
-    } else if (m_style.type == "Custom" && style.type != "Custom") {
-        auto cl = m_popup->getScroll()->m_contentLayer;
-        cl->setPositionY(cl->getPositionY() + 90);
-        cl->setContentHeight(cl->getContentHeight() - 90);
-    }
     m_style = std::move(style);
     m_label->setString(m_style.type.c_str());
     if (auto width = m_label->getContentWidth(); width > 0.001f) m_label->setScale(std::min(80.f / width, .45f));
@@ -601,7 +625,12 @@ void StyleNode::updateState(const Style& style) {
         for (const auto child : m_preview->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
     }
     auto scroll = m_popup->getScroll();
+    float height = scroll->m_contentLayer->getContentHeight();
     scroll->m_contentLayer->updateLayout();
+    scroll->m_contentLayer->setPositionY(scroll->m_contentLayer->getPositionY() - (scroll->m_contentLayer->getContentHeight() - height));
+    auto diff = -scroll->m_contentLayer->getPositionY() + scroll->getContentHeight() - scroll->m_contentLayer->getContentHeight();
+    if (diff > 0) scroll->m_contentLayer->setPositionY(scroll->m_contentLayer->getPositionY() + diff);
+    scroll->scrollWheel(0, 0);
 }
 
 StyleNode* StyleNode::create(ClonesTriggerPopup* popup, const Style& value) {

@@ -70,6 +70,9 @@ void CosmicClonesPlayLayer::levelComplete() {
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
     if (fields->m_controller->isStopped()) return;
     fields->m_controller->stop();
+    for (const auto& [id, cont] : fields->m_triggerControllers){
+        if (!cont->isStopped()) cont->stop();
+    }
 }
 
 $on_mod(Loaded) {

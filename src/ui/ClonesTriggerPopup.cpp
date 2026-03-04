@@ -290,7 +290,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_disabledContainer = CCMenu::create();
     m_disabledContainer->setID("disabled-container");
     m_disabledContainer->setContentSize({0, 0});
-    m_page1->addChildAtPosition(m_disabledContainer, Anchor::BottomRight, {-75, 80});
+    m_page1->addChildAtPosition(m_disabledContainer, Anchor::BottomRight, {-75, 20});
 
     m_disabledToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->setDisabled(!toggle->isToggled());
@@ -310,7 +310,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_damageContainer = CCMenu::create();
     m_damageContainer->setID("damage-container");
     m_damageContainer->setContentSize({0, 0});
-    m_page1->addChildAtPosition(m_damageContainer, Anchor::BottomRight, {-75, 50});
+    m_page1->addChildAtPosition(m_damageContainer, Anchor::BottomRight, {-75, 80});
 
     m_damageToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this](CCMenuItemToggler* toggle) {
         m_trigger->setDamaging(!toggle->isToggled());
@@ -330,7 +330,7 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_stopperContainer = CCMenu::create();
     m_stopperContainer->setID("stopper-container");
     m_stopperContainer->setContentSize({0, 0});
-    m_page1->addChildAtPosition(m_stopperContainer, Anchor::BottomRight, {-75, 20});
+    m_page1->addChildAtPosition(m_stopperContainer, Anchor::BottomRight, {-75, 50});
 
     m_stopperToggle = CCMenuItemExt::createTogglerWithStandardSprites(.7f, [this, left, right](CCMenuItemToggler* toggle) {
         bool stopper = !toggle->isToggled();
@@ -338,7 +338,6 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
         m_countContainer->setVisible(!stopper);
         m_delayContainer->setVisible(!stopper);
         m_startDelayContainer->setVisible(!stopper);
-        m_disabledContainer->setVisible(!stopper);
         m_damageContainer->setVisible(!stopper);
         left->setVisible(!stopper);
         right->setVisible(!stopper);
@@ -347,7 +346,6 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_countContainer->setVisible(!stopper);
     m_delayContainer->setVisible(!stopper);
     m_startDelayContainer->setVisible(!stopper);
-    m_disabledContainer->setVisible(!stopper);
     m_damageContainer->setVisible(!stopper);
     left->setVisible(!stopper);
     right->setVisible(!stopper);
@@ -372,22 +370,25 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_styleScroll->ignoreAnchorPointForPosition(false);
     m_styleScroll->setZOrder(1);
     m_styleScroll->setID("style-scroll");
-    {
-        auto spacer = CCNode::create();
-        spacer->setContentHeight(7);
-        m_styleScroll->m_contentLayer->addChild(spacer, -1);
-    }
-    {
-        auto spacer = CCNode::create();
-        spacer->setContentHeight(7);
-        m_styleScroll->m_contentLayer->addChild(spacer, 2);
-    }
     m_page2->addChildAtPosition(m_styleScroll, Anchor::Center, {0, 10});
 
-    auto newBtn = Button::createWithSpriteFrameName("edit_addCBtn_001.png", [this](auto) {
+    auto topSpacer = CCNode::create();
+    topSpacer->setContentHeight(2);
+    topSpacer->setID("top-spacer");
+    m_styleScroll->m_contentLayer->addChild(topSpacer, 2);
+
+    auto botSpacer = CCNode::create();
+    botSpacer->setContentHeight(2);
+    botSpacer->setID("bottom-spacer");
+    m_styleScroll->m_contentLayer->addChild(botSpacer, -1);
+
+    m_newBtn = Button::createWithSpriteFrameName("edit_addCBtn_001.png", [this](auto btn) {
         auto node = StyleNode::create(this, {});
         node->updateState({});
         m_styleScroll->m_contentLayer->addChild(node);
+        bool shouldEnable = m_styleScroll->m_contentLayer->getChildrenExt().size() - 3 < 20;
+        btn->setEnabled(shouldEnable);
+        btn->setOpacity(shouldEnable ? 255 : 127);
 
         float height = m_styleScroll->m_contentLayer->getContentHeight();
         m_styleScroll->m_contentLayer->updateLayout();
@@ -396,15 +397,20 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
         if (diff > 0) m_styleScroll->m_contentLayer->setPositionY(m_styleScroll->m_contentLayer->getPositionY() + diff);
         m_styleScroll->scrollWheel(0, 0);
     });
-    newBtn->setScale(.5f);
-    newBtn->setContentSize({30, 30});
-    m_styleScroll->m_contentLayer->addChild(newBtn, 1);
+    m_newBtn->setScale(.5f);
+    m_newBtn->setContentSize({30, 30});
+    m_styleScroll->m_contentLayer->addChild(m_newBtn, 1);
 
     for (const auto& style : trigger->getStyles()) {
         auto node = StyleNode::create(this, style);
         node->updateState(style);
         m_styleScroll->m_contentLayer->addChild(node);
     }
+
+    bool shouldEnable = m_styleScroll->m_contentLayer->getChildrenExt().size() - 3 < 20;
+    m_newBtn->setEnabled(shouldEnable);
+    m_newBtn->setOpacity(shouldEnable ? 255 : 127);
+
     m_styleScroll->m_contentLayer->setLayout(ColumnLayout::create()->setAxisReverse(true)->setAxisAlignment(AxisAlignment::End)->ignoreInvisibleChildren(false)->setAutoScale(false)->setCrossAxisOverflow(false)->setAutoGrowAxis(180));
     m_styleScroll->scrollToTop();
 
@@ -448,6 +454,10 @@ void ClonesTriggerPopup::onClose(CCObject *sender) {
 
 ScrollLayer* ClonesTriggerPopup::getScroll() const {
     return m_styleScroll;
+}
+
+Button* ClonesTriggerPopup::getNewBtn() const {
+    return m_newBtn;
 }
 
 ClonesTriggerPopup* ClonesTriggerPopup::create(CosmicClonesTrigger* trigger) {
@@ -498,6 +508,11 @@ bool StyleNode::init(ClonesTriggerPopup* popup, Style value) {
     auto del = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_deleteIcon_001.png", .7f, [this](auto) {
         removeFromParent();
         auto scroll = m_popup->getScroll();
+        auto btn = m_popup->getNewBtn();
+        bool shouldEnable = scroll->m_contentLayer->getChildrenExt().size() - 3 < 20;
+        btn->setEnabled(shouldEnable);
+        btn->setOpacity(shouldEnable ? 255 : 127);
+
         scroll->m_contentLayer->updateLayout();
         auto diff = -scroll->m_contentLayer->getPositionY() + scroll->getContentHeight() - scroll->m_contentLayer->getContentHeight();
         if (diff > 0) scroll->m_contentLayer->setPositionY(scroll->m_contentLayer->getPositionY() + diff);

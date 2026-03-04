@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Geode/ui/Button.hpp>
 #include <Geode/ui/Popup.hpp>
 
 #include "CloneStyleSetting.hpp"
@@ -43,10 +44,13 @@ protected:
     CCLayer* m_page2 = nullptr;
 
     geode::ScrollLayer* m_styleScroll = nullptr;
+    geode::Button* m_newBtn = nullptr; 
 public:
     void onClose(CCObject* ) override;
 
     geode::ScrollLayer* getScroll() const;
+
+    geode::Button* getNewBtn() const;
 
     static ClonesTriggerPopup* create(CosmicClonesTrigger* trigger);
 };

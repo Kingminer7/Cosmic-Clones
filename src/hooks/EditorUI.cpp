@@ -189,13 +189,8 @@ void CosmicClonesTrigger::setupCloneTrigger(bool initial) {
         setDamaging(true);
         setDisabled(false);
         setStopper(false);
-	setSfx(true);
-        setStyles({
-            {"Cosmic Mario\n(SMG 1)"},
-            {"Cosmic Clone\n(SMG 2)"},
-            {"Badeline Chaser\n(Celeste)"},
-            {"Custom", {174,0,255}, {255,0,174}, true, {0, 255, 0}},
-        });
+	    setSfx(true);
+        setStyles({{"Cosmic Mario\n(SMG 1)"}});
 	    m_isMultiTriggered = false;
     }
 }

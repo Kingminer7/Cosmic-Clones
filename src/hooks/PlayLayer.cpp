@@ -31,7 +31,10 @@ void CosmicClonesPlayLayer::resetLevel() {
     } else {
         if (!fields->m_controller->isStopped()) fields->m_controller->stop(true);
         for (const auto& [id, cont] : fields->m_triggerControllers){
-            if (!cont->isStopped()) cont->stop(true);
+            if (!cont->isStopped()) {
+                cont->stop(true);
+                if (cont->getOffset() <= m_gameState.m_currentProgress) cont->start();
+            }
         }
 
         fields->m_controller->loadConfigFromSettings();

@@ -65,12 +65,18 @@ void CosmicClonesEditorUI::onCreateObject(int id) {
     id = TRIGGER_ID;
     fields->m_creatingClone = true;
     EditorUI::onCreateObject(id);
+    if (fields->m_creatingClone) {
+        log::error("Failed to create clone trigger for some reason! Something has gone horribly wrong.");
+        fields->m_creatingClone = false;
+        return;
+    }
     fields->m_createdClone->setupCloneTrigger(true);
 }
 
-GameObject* CosmicClonesEditorUI::createObject(const int id, CCPoint pos) {
-    auto ret = EditorUI::createObject(id, std::move(pos));
-    auto fields = m_fields.self();
+GameObject* CosmicClonesEditorLayer::createObject(const int id, CCPoint pos, bool noUndo) {
+    auto ret = LevelEditorLayer::createObject(id, std::move(pos), noUndo);
+    auto eui = static_cast<CosmicClonesEditorUI*>(m_editorUI);
+    auto fields = eui->m_fields.self();
     if (fields->m_creatingClone) {
         fields->m_createdClone = modify_cast<CosmicClonesTrigger*>(ret);
         fields->m_creatingClone = false;

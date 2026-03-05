@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Geode/modify/EditorUI.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/SequenceTriggerGameObject.hpp>
 
 struct Style;
@@ -72,9 +73,12 @@ class $modify(CosmicClonesEditorUI, EditorUI) {
 
     bool init(LevelEditorLayer* editorLayer);
     void onCreateObject(int id);
-    GameObject* createObject(int id, cocos2d::CCPoint pos);
     void editObject(CCObject* sender);
     void onCreateButton(CCObject* sender);
 
     CCMenuItemSpriteExtra* createButton(cocos2d::CCSprite* icon, geode::Function<void(CCMenuItemSpriteExtra*)> callback);
+};
+
+class $modify(CosmicClonesEditorLayer, LevelEditorLayer) {
+    GameObject* createObject(int id, cocos2d::CCPoint pos, bool noUndo);
 };

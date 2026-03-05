@@ -1,10 +1,9 @@
 #include "ShaderManager.hpp"
 
-#include "Geode/loader/SettingV3.hpp"
-#include "../Utils.hpp"
-#include "../hooks/GJBaseGameLayer.hpp"
+#include <Geode/loader/SettingV3.hpp>
+
+#include "../hooks/Gameplay.hpp"
 #include "Shaders.hpp"
-#include "../ui/CloneStyleSetting.hpp"
 
 using namespace geode::prelude;
 

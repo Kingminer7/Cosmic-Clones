@@ -1,7 +1,8 @@
 #include "CosmicClone.hpp"
 
+#include <Geode/cocos/shaders/CCShaderCache.h>
+
 #include "ShaderManager.hpp"
-#include "Geode/cocos/shaders/CCShaderCache.h"
 
 using namespace geode::prelude;
 

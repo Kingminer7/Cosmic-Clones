@@ -1,11 +1,14 @@
-#include "EditorUI.hpp"
+#include "Editor.hpp"
+
+#include <Geode/Geode.hpp>
+
 #include <alphalaneous.editortab_api/include/EditorTabAPI.hpp>
 
-#include "GJBaseGameLayer.hpp"
-#include "../ui/ClonesTriggerPopup.hpp"
-#include "../internal/ShaderManager.hpp"
+#include "Gameplay.hpp"
 #include "../Utils.hpp"
 #include "../internal/CosmicClonesController.hpp"
+#include "../internal/ShaderManager.hpp"
+#include "../ui/ClonesTriggerPopup.hpp"
 
 // sequence trigger
 #define TRIGGER_ID 3607

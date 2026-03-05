@@ -3,7 +3,7 @@
 #include <arc/time/Sleep.hpp>
 
 #include "../Utils.hpp"
-#include "../hooks/GJBaseGameLayer.hpp"
+#include "../hooks/Gameplay.hpp"
 
 using namespace geode::prelude;
 

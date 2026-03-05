@@ -1,9 +1,65 @@
-#include "PlayLayer.hpp"
-#include "GJBaseGameLayer.hpp"
-#include "../internal/CosmicClonesController.hpp"
-#include "../Utils.hpp"
-#include <ninxout.options_api/include/API.hpp>
+#include "Gameplay.hpp"
+
+#include <Geode/Geode.hpp>
+
 #include <cvolton.level-id-api/include/EditorIDs.hpp>
+#include <ninxout.options_api/include/API.hpp>
+
+#include "../Utils.hpp"
+#include "../internal/CosmicClonesController.hpp"
+
+using namespace geode::prelude;
+
+// Base Gameplay
+
+void CosmicClonesGJBGL::tickHook() {
+    auto fields = m_fields.self();
+
+    fields->m_controller->tick(m_gameState.m_currentProgress);
+    for (auto [id, cont] : fields->m_triggerControllers) {
+        cont->tick(m_gameState.m_currentProgress);
+    }
+
+    GJBaseGameLayer::tickOrig();
+}
+
+void CosmicClonesPlayerObject::incrementJumps() {
+    PlayerObject::incrementJumps();
+    if (!m_gameLayer) return;
+    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(m_gameLayer)->m_fields.self();
+    if (this == m_gameLayer->m_player1) {
+        fields->m_p1Jump = true;
+    } else if (this == m_gameLayer->m_player2) {
+        fields->m_p2Jump = true;
+    }
+}
+
+void CosmicClonesPlayerObject::enablePlayerControls() {
+    PlayerObject::enablePlayerControls();
+    if (!m_gameLayer) return;
+    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(m_gameLayer)->m_fields.self();
+    if (this == m_gameLayer->m_player1) {
+        fields->m_p1Frozen = false;
+        fields->m_p1Immunity = 240;
+    } else if (this == m_gameLayer->m_player2) {
+        fields->m_p2Frozen = false;
+        fields->m_p2Immunity = 240;
+    }
+}
+
+void CosmicClonesPlayerObject::disablePlayerControls() {
+    PlayerObject::disablePlayerControls();
+    if (!m_gameLayer) return;
+    auto fields = reinterpret_cast<CosmicClonesGJBGL*>(m_gameLayer)->m_fields.self();
+    if (this == m_gameLayer->m_player1) {
+        fields->m_p1Frozen = true;
+    } else if (this == m_gameLayer->m_player2) {
+        fields->m_p2Frozen = true;
+    }
+}
+
+
+// PlayLayer Gameplay
 
 inline bool isEnabledForLevel(GJGameLevel* level) {
     if (level->m_levelType == GJLevelType::Editor) {
@@ -74,6 +130,42 @@ void CosmicClonesPlayLayer::levelComplete() {
         if (!cont->isStopped()) cont->stop();
     }
 }
+
+// Editor Gameplay
+
+bool CosmicClonesLevelEditorLayer::init(GJGameLevel* level, bool noUI) {
+    if (!LevelEditorLayer::init(level, noUI)) return false;
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
+    fields->m_autoClones = getSettingFast<"enabled", bool>();
+    fields->m_controller = CosmicClonesController::createWithSettings(bgl);
+    return true;
+}
+
+void CosmicClonesLevelEditorLayer::onPlaytest() {
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
+    LevelEditorLayer::onPlaytest();
+    fields->m_autoClones = getSettingFast<"enabled", bool>() && getSettingFast<"editor", bool>();
+    if (!fields->m_autoClones) return;
+    fields->m_controller->loadConfigFromSettings();
+    fields->m_controller->start();
+    for (const auto& [id, cont] : fields->m_triggerControllers){
+        cont->loadConfigFromTrigger();
+    }
+}
+
+void CosmicClonesLevelEditorLayer::onStopPlaytest() {
+    auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(this);
+    auto fields = bgl->m_fields.self();
+    LevelEditorLayer::onStopPlaytest();
+    if (!fields->m_controller->isStopped()) fields->m_controller->stop(true);
+    for (const auto& [id, cont] : fields->m_triggerControllers){
+        if (!cont->isStopped()) cont->stop(true);
+    }
+}
+
+// Misc
 
 $on_mod(Loaded) {
     OptionsAPI::addPreLevelSetting<bool>(

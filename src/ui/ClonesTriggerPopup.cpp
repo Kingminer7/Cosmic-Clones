@@ -1,7 +1,6 @@
 #include "ClonesTriggerPopup.hpp"
 
 #include "../internal/ShaderManager.hpp"
-#include <Geode/ui/Button.hpp>
 
 using namespace geode::prelude;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CosmicClone.hpp"
-#include "../hooks/EditorUI.hpp"
+#include "../hooks/Editor.hpp"
 
 struct CosmicClonesGJBGL;
 

@@ -4,7 +4,7 @@
 #include <Geode/ui/Popup.hpp>
 
 #include "CloneStyleSetting.hpp"
-#include "../hooks/EditorUI.hpp"
+#include "../hooks/Editor.hpp"
 
 class ClonesTriggerPopup : public geode::Popup {
 protected:

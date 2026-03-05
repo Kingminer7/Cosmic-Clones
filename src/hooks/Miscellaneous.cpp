@@ -1,12 +1,40 @@
 #include <Geode/modify/MenuGameLayer.hpp>
-#include <Geode/utils/random.hpp>
+#include <Geode/modify/PauseLayer.hpp>
+#include <Geode/Geode.hpp>
+#include <Geode/ui/GeodeUI.hpp>
 
 #include <undefined0.icon_ninja/include/events.hpp>
 
-#include "../internal/ShaderManager.hpp"
 #include "../internal/CosmicClone.hpp"
+#include "../internal/ShaderManager.hpp"
 
 using namespace geode::prelude;
+
+// Pause Layer Button
+
+class $modify(ClonesPauseLayer, PauseLayer) {
+    void customSetup() {
+        PauseLayer::customSetup();
+
+        auto spr = CCSprite::createWithSpriteFrameName("cube_1.png"_spr);
+        spr->setRotation(55);
+        spr->setShaderProgram(ShaderManager::get().getCosmicShader());
+
+        auto btnSpr = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::MediumAlt);
+        btnSpr->setScale(.6f);
+        auto btn = CCMenuItemExt::createSpriteExtra(btnSpr, [](auto) {
+           openSettingsPopup(Mod::get(), true);
+        });
+        spr->setScale(.75);
+        btn->setID("clones-settings-btn"_spr);
+
+        auto menu = getChildByID("left-button-menu");
+        menu->addChild(btn);
+        menu->updateLayout();
+    }
+};
+
+// Easter Egg
 
 class $modify(ClonesMenuGameLayer, MenuGameLayer) {
     struct Fields {
@@ -25,6 +53,7 @@ class $modify(ClonesMenuGameLayer, MenuGameLayer) {
         }
     }
 };
+
 
 $on_mod(Loaded) {
     ninja::NewPlayerEvent().listen([](PlayerObject* player){

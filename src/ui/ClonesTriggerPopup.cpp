@@ -59,9 +59,17 @@ bool ClonesTriggerPopup::init(CosmicClonesTrigger* trigger) {
     m_buttonMenu->addChildAtPosition(right, Anchor::Right, {15, 0});
 
     auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.f, [this](auto){
-        // // TODO: Type this
-        // FLAlertLayer::create("Help", "TODO", "ok")->show();
-        SetupSequenceTriggerPopup::create(m_trigger)->show();
+        MDPopup::create("Clones Trigger Help",
+            "Spawns <cg>cosmic clones</c> that chase the player.\n\n"
+            "<cy>Clone count</c> changes how many clones are spawned.\n\n"
+            "<cb>Controller ID</c> manages what clone controller the trigger manages. A clone controller can only have one set of clones at a time.\n\n"
+            "<cr>Stop</c> makes the controller kill the clones when triggered.\n\n"
+            "<cd>Start delay</c> changes how far behind the player the first clone is.\n\n"
+            "<co>Delay</c> changes the distance between clones.\n\n"
+            "<cf>Damage</c> controls if the clones can kill you.\n\n"
+            "<cs>Styles</c> change how the clones look.\n\n"
+            "<cj>Disable</c> disables the trigger.",
+            "ok")->show();
     });
     infoBtn->setID("info-button");
     m_buttonMenu->addChildAtPosition(infoBtn, Anchor::TopLeft, {18, -18});

@@ -1,3 +1,9 @@
+# 1.3.0
+
+- <cy>Change how clones work internally</c>
+- <cg>Add a trigger for creators to spawn clones</c>
+- theres probably stuff i forgot ngl
+
 # 1.2.2
 
 - <cy>Reset a value that I forgot to change back from testing</c>

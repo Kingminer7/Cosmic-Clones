@@ -1,4 +1,4 @@
-# 1.3.0
+# 1.3.0-beta.1
 
 - <cy>Change how clones work internally</c>
 - <cg>Add a trigger for creators to spawn clones</c>

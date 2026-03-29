@@ -65,6 +65,7 @@ protected:
     IconType m_p2type = IconType::Cube;
     Animation m_p1anim = Animation::None;
     Animation m_p2anim = Animation::None;
+    float m_sillyScale = 1.f;
 
     void init(int delay, bool plat, GJBaseGameLayer* gjbgl);
 public:
@@ -79,6 +80,11 @@ public:
     Animation getAnimation(int player) const;
     void animate(Animation animation, int player);
     void updateAnimation(int player) const;
+
+    void setScale1(float scale);
+    void setScale2(float scale);
+    void setPos1(cocos2d::CCPoint pos);
+    void setPos2(cocos2d::CCPoint pos);
 
     int playSFX(CosmicCloneSFXType type);
 

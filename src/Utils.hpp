@@ -19,3 +19,5 @@ namespace geode::log {
         if (getSettingFast<"dev-logging", bool>()) log::debug(str, std::forward<Args>(args)...);
     }
 }
+
+bool isAprilFools();

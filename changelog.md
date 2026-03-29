@@ -1,3 +1,8 @@
+# 1.3.0-beta.2
+
+- <cy>Fix a bug which broke no damage</c>
+    - technical explanation: i checked a bool setting as a float
+
 # 1.3.0-beta.1
 
 - <cy>Change how clones work internally</c>

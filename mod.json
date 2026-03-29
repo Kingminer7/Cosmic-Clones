@@ -8,7 +8,7 @@
     },
     "id": "km7dev.cosmic_clones",
     "name": "Cosmic Clones",
-    "version": "v1.3.0-beta.1",
+    "version": "v1.3.0-beta.2",
     "developer": "km7dev",
     "description": "Adds chasers to levels.",
     "dependencies": {

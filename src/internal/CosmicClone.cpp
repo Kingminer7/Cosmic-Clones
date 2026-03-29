@@ -3,6 +3,7 @@
 #include <Geode/cocos/shaders/CCShaderCache.h>
 
 #include "ShaderManager.hpp"
+#include "../Utils.hpp"
 
 using namespace geode::prelude;
 
@@ -29,6 +30,9 @@ CosmicPlayerObject* CosmicPlayerObject::createCosmic(int player, int ship, GJBas
 
 void CosmicClone::init(const int delay, bool plat, GJBaseGameLayer* gjbgl) {
     m_delay = delay;
+    if (isAprilFools()) {
+        m_sillyScale = random::generate(.5, 2);
+    }
 
     auto gm = GameManager::sharedState();
     m_p1 = CosmicPlayerObject::createCosmic(gm->getPlayerFrame(), 1, gjbgl, gjbgl, PlayLayer::get());
@@ -79,6 +83,22 @@ void CosmicClone::checkCollision(PlayerObject* player) const {
 void CosmicClone::setDual(const bool dual) {
     m_p2->setVisible(dual);
     m_dual = dual;
+}
+
+void CosmicClone::setScale1(const float scale) {
+    m_p1->setScale(scale * m_sillyScale);
+}
+
+void CosmicClone::setScale2(const float scale) {
+    m_p2->setScale(scale * m_sillyScale);
+}
+
+void CosmicClone::setPos1(const cocos2d::CCPoint pos) {
+    m_p1->setPosition({pos.x, pos.y + (15 * m_sillyScale - 15)});
+}
+
+void CosmicClone::setPos2(const cocos2d::CCPoint pos) {
+    m_p2->setPosition({pos.x, pos.y + (15 * m_sillyScale - 15)});
 }
 
 IconType CosmicClone::getType(const int player) const {

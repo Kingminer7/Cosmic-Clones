@@ -48,7 +48,7 @@ void CosmicClonesController::stop(bool immediate) {
 void CosmicClonesController::loadConfigFromSettings() {
     m_initialDelay = getSettingFast<"spawn-delay", float>();
     m_delay = getSettingFast<"delay", float>();
-    m_damage = !getSettingFast<"friendly", float>();
+    m_damage = !getSettingFast<"friendly", bool>();
     m_count = getSettingFast<"clones", int>();
     m_styles = getSettingFast<"styles", std::vector<Style>>();
     m_sfx = getSettingFast<"sfx", bool>();
@@ -102,8 +102,8 @@ void CosmicClonesController::tick(int prog) {
             auto snap = m_snapshots.at(del);
             clone->setDual(snap.dualEnabled);
             auto p1 = clone->getP1();
-            p1->setPosition(snap.pos);
-            p1->setScale(snap.scale);
+            clone->setPos1(snap.pos);
+            clone->setScale1(snap.scale);
             p1->setRotation(snap.rotation);
             p1->setVisible(snap.visible);
             p1->m_isGoingLeft = snap.left;
@@ -114,8 +114,8 @@ void CosmicClonesController::tick(int prog) {
             clone->animate(snap.anim, 1);
             if (snap.dualEnabled) {
                 auto p2 = clone->getP2();
-                p2->setPosition(snap.pos2);
-                p2->setScale(snap.scale2);
+                clone->setPos2(snap.pos2);
+                clone->setScale2(snap.scale2);
                 p2->setRotation(snap.rotation2);
                 p2->setVisible(snap.visible2);
                 p2->m_isGoingLeft = snap.left2;

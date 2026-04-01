@@ -1,4 +1,4 @@
-# Last updated 2/15/26
+# Last updated 4/1/26
 
 name: Build Geode Mod
 
@@ -66,7 +66,7 @@ jobs:
           bindings-ref: main
           # sdk: nightly
           combine: true
-          build-config: ${{ !(github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]'))) && (matrix.config.target == 'Win64' && 'RelWithDebInfo' || 'Debug') || 'Release' }}
+          build-config: ${{ matrix.config.target == 'Win64' && 'RelWithDebInfo' || ( !(github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]'))) && 'Debug' || 'Release' ) }}
           export-pdb: true
           export-symbols: true
           target: ${{ matrix.config.target }}

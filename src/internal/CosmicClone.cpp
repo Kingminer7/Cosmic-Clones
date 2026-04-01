@@ -316,6 +316,7 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) {
             }
             return -1;
         case CosmicCloneSFXType::FirstSpawn:
+            return FMODAudioEngine::get()->playEffect("in.mp3"_spr);
             if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)") {
                 return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
             }
@@ -324,6 +325,7 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) {
             }
             return -1;
         case CosmicCloneSFXType::Die:
+            return FMODAudioEngine::get()->playEffect("out.mp3"_spr);
             if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)") {
                 return FMODAudioEngine::get()->playEffect("defeat.wav"_spr);
             }
@@ -415,13 +417,22 @@ void CosmicClone::removePlayer(PlayerObject* player) {
 }
 
 void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader, bool applyToRobotSprites) {
-    if (!player) return log::error("Cannot set  shader for a nullptr PlayerObject.");
+    if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
     if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
+    auto spr = player->getChildByID("luma"_spr);
+    if (!spr) {
+        auto s = CCSprite::create("HungryLuma.png"_spr);
+        s->setID("luma"_spr);
+        s->setScaleX(30 / s->getContentWidth());
+        s->setScaleY(30 / s->getContentHeight());
 
-#define $apply(sprite, shader) if(sprite) sprite->setShaderProgram(shader); else log::error("Could not find {}.", #sprite)
+        player->addChildAtPosition(s, Anchor::Center, {0, 0}, false);
+    }
+
+#define $apply(sprite, shader) if(sprite) sprite->setVisible(false); else log::error("Could not find {}.", #sprite)
     
     // Only doing this so the gjrobotsprite logic later on knows what shader to apply, has no visual effect afaik
-    $apply(player, shader);
+    // $apply(player, shader);
 
     $apply(player->m_iconSprite, shader);
     $apply(player->m_iconSpriteSecondary, shader);

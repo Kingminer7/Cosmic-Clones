@@ -7,10 +7,10 @@
         "ios": "2.2081"
     },
     "id": "km7dev.cosmic_clones",
-    "name": "Cosmic Clones",
-    "version": "v1.3.0-beta.2",
+    "name": "Hungry Luma",
+    "version": "v1.3.0-beta.3",
     "developer": "km7dev",
-    "description": "Adds chasers to levels.",
+    "description": "Hungry Luma",
     "dependencies": {
         "geode.node-ids": ">=v1.22.0",
         "alphalaneous.editortab_api": ">=2.0.7",
@@ -148,7 +148,8 @@
         "sprites": [
             "resources/sprites/cosmic.png",
             "resources/sprites/normal.png",
-            "resources/sprites/star.png"
+            "resources/sprites/star.png",
+            "resources/sprites/HungryLuma.png"
         ],
         "spritesheets": {
             "CloneSheet01": [

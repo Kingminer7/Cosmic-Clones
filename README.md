@@ -19,3 +19,4 @@ This mod comes with a few styles!
 
 - [Undefined](https://github.com/undefined06855/) - Big help with shaders
 - [Zilko](https://github.com/zilko/) - Help with some parts of clone movement and some other minor help
+- [Uproxide](https://github.com/uproxide) - The Yellow One.

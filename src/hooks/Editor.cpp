@@ -29,12 +29,13 @@ bool CosmicClonesEditorUI::init(LevelEditorLayer* editorLayer)
             std::vector<Ref<CCNode>> nodes;
             auto spr = CCSprite::createWithSpriteFrameName("triggerMain.png"_spr);
             CosmicClonesTrigger::updateCloneTriggerSprite(spr);
-            auto btn = createButton(spr, [this](auto btn) {
-                if (m_fields->m_selected) {
-                    m_fields->m_selected->setColor({255, 255, 255});
-                    if (m_fields->m_selected == btn) {
+            auto fields = static_cast<CosmicClonesEditorLayer*>(m_editorLayer)->m_fields.self();
+            auto btn = createButton(spr, [this, fields](auto btn) {
+                if (fields->m_selected) {
+                    fields->m_selected->setColor({255, 255, 255});
+                    if (fields->m_selected == btn) {
                         m_selectedObjectIndex = 0;
-                        m_fields->m_selected = nullptr;
+                        fields->m_selected = nullptr;
                         return;
                     }
                 }
@@ -42,7 +43,7 @@ bool CosmicClonesEditorUI::init(LevelEditorLayer* editorLayer)
                 updateCreateMenu(false);
                 updateGridNodeSize();
                 btn->setColor({127, 127, 127});
-                m_fields->m_selected = btn;
+                fields->m_selected = btn;
             });
             nodes.emplace_back(btn);
             return alpha::editor_tabs::createEditButtonBar(nodes);
@@ -62,7 +63,7 @@ bool CosmicClonesEditorUI::init(LevelEditorLayer* editorLayer)
 }
 
 void CosmicClonesEditorUI::onCreateObject(int id) {
-    auto fields = m_fields.self();
+    auto fields = static_cast<CosmicClonesEditorLayer*>(m_editorLayer)->m_fields.self();
     if (id != CLONE_ID) return EditorUI::onCreateObject(id);
 
     id = TRIGGER_ID;
@@ -79,7 +80,7 @@ void CosmicClonesEditorUI::onCreateObject(int id) {
 GameObject* CosmicClonesEditorLayer::createObject(const int id, CCPoint pos, bool noUndo) {
     auto ret = LevelEditorLayer::createObject(id, std::move(pos), noUndo);
     auto eui = static_cast<CosmicClonesEditorUI*>(m_editorUI);
-    auto fields = eui->m_fields.self();
+    auto fields = m_fields.self();
     if (fields->m_creatingClone) {
         fields->m_createdClone = modify_cast<CosmicClonesTrigger*>(ret);
         fields->m_creatingClone = false;
@@ -128,9 +129,10 @@ CCMenuItemSpriteExtra* CosmicClonesEditorUI::createButton(CCSprite* icon, Functi
 }
 
 void CosmicClonesEditorUI::onCreateButton(CCObject* sender) {
-    if (m_fields->m_selected) {
-        m_fields->m_selected->setColor({255, 255, 255});
-        m_fields->m_selected = nullptr;
+    auto fields = static_cast<CosmicClonesEditorLayer*>(m_editorLayer)->m_fields.self();
+    if (fields->m_selected) {
+        fields->m_selected->setColor({255, 255, 255});
+        fields->m_selected = nullptr;
     }
     EditorUI::onCreateButton(sender);
 }

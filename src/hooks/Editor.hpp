@@ -65,12 +65,6 @@ class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
 };
 
 class $modify(CosmicClonesEditorUI, EditorUI) {
-    struct Fields {
-        bool m_creatingClone = false;
-        CosmicClonesTrigger* m_createdClone = nullptr;
-        CCMenuItemSpriteExtra* m_selected = nullptr;
-    };
-
     bool init(LevelEditorLayer* editorLayer);
     void onCreateObject(int id);
     void editObject(CCObject* sender);
@@ -80,5 +74,11 @@ class $modify(CosmicClonesEditorUI, EditorUI) {
 };
 
 class $modify(CosmicClonesEditorLayer, LevelEditorLayer) {
+    struct Fields {
+        bool m_creatingClone = false;
+        CosmicClonesTrigger* m_createdClone = nullptr;
+        CCMenuItemSpriteExtra* m_selected = nullptr;
+    };
+    
     GameObject* createObject(int id, cocos2d::CCPoint pos, bool noUndo);
 };

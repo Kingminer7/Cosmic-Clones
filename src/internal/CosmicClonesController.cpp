@@ -93,7 +93,7 @@ void CosmicClonesController::cleanup() {
 }
 
 void CosmicClonesController::tick(int prog) {
-    if (m_stopped) return;
+    if (m_stopped || m_bgl->m_playerDied) return;
     auto bglFields = m_bgl->m_fields.self();
     int tick = prog - m_startOffset;
     for (const auto& clone : m_clones) {

@@ -313,6 +313,8 @@ std::vector<Style> CosmicClonesTrigger::getStyles() const {
             ret.push_back(chanceObjectsToCustomStyle(co, i + 1 == m_chanceObjects.size() ? ChanceObject{} : m_chanceObjects[i  + 1]));
             i++;
         }
+        else if (co.m_groupID == -5) ret.push_back({"Hungry Luma"});
+        else if (co.m_groupID == -6) ret.push_back({"The Yellow One"});
         i++;
     }
     if (ret.empty()) return getSettingFast<"styles", std::vector<Style>>();
@@ -333,6 +335,8 @@ void CosmicClonesTrigger::setStyles(const std::vector<Style>& styles) {
             m_chanceObjects.emplace_back(first);
             m_chanceObjects.emplace_back(second);
         }
+        else if (styles[i].type == "Hungry Luma") m_chanceObjects.emplace_back(ChanceObject{-5, -1});
+        else if (styles[i].type == "The Yellow One") m_chanceObjects.emplace_back(ChanceObject{-6, -1});
     }
 }
 

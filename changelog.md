@@ -1,3 +1,10 @@
+# 1.3.1-beta.1
+
+## I remembered I have free will.
+
+- <cg>Add Hungry Luma as a customization option</c>
+- <cy>**The Yellow One.**</c>
+
 # 1.3.0-beta.5
 
 - <cr>Reverted april fools stuff</c>

@@ -8,7 +8,7 @@
     },
     "id": "km7dev.cosmic_clones",
     "name": "Cosmic Clones",
-    "version": "v1.3.0-beta.5",
+    "version": "v1.3.1-beta.1",
     "developer": "km7dev",
     "description": "Adds chasers to levels.",
     "dependencies": {
@@ -149,7 +149,8 @@
             "resources/sprites/cosmic.png",
             "resources/sprites/normal.png",
             "resources/sprites/star.png",
-            "resources/sprites/HungryLuma.png"
+            "resources/sprites/HungryLuma.png",
+            "resources/sprites/MD_DifficultyYOSmall.png"
         ],
         "spritesheets": {
             "CloneSheet01": [

@@ -50,6 +50,7 @@ class $modify(CosmicPlayerObject, PlayerObject) {
 enum class CosmicCloneSFXType {
     FirstSpawn,
     Spawn,
+    KillPlayer,
     Die,
 };
 
@@ -86,10 +87,13 @@ public:
     void setPos1(cocos2d::CCPoint pos);
     void setPos2(cocos2d::CCPoint pos);
 
-    int playSFX(CosmicCloneSFXType type);
+    int playSFX(CosmicCloneSFXType type) const;
 
     void updateStyle(Style style);
     void remove();
     static void removePlayer(PlayerObject* player);
     static void updateShaderForPlayer(PlayerObject* player, cocos2d::CCGLProgram* shader, bool applyToRobotSprites = false);
+    static void updateSpriteForPlayer(PlayerObject* player, cocos2d::CCSprite* shader, bool applyToRobotSprites = false);
+    static void updateShaderForPlayer(SimplePlayer* player, cocos2d::CCGLProgram* shader, bool applyToRobotSprites = false);
+    static void updateSpriteForPlayer(SimplePlayer* player, cocos2d::CCSprite* shader, bool applyToRobotSprites = false);
 };

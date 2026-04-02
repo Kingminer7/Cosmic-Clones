@@ -1,6 +1,7 @@
 #include "ClonesTriggerPopup.hpp"
 
 #include "../internal/ShaderManager.hpp"
+#include "../internal/CosmicClone.hpp"
 
 using namespace geode::prelude;
 
@@ -477,7 +478,9 @@ std::vector<Style> StyleNode::m_styles = {
     {"Cosmic Mario\n(SMG 1)"},
     {"Cosmic Clone\n(SMG 2)"},
     {"Badeline Chaser\n(Celeste)"},
-    {"Custom"}
+    {"Hungry Luma"},
+    {"The Yellow One"},
+    {"Custom"},
 };
 
 ClonesTriggerPopup* StyleNode::getPopup() const {
@@ -636,15 +639,24 @@ void StyleNode::updateState(const Style& style) {
     m_preview->setColors(style.getColor1(), style.getColor2());
     if (style.isGlowEnabled()) m_preview->setGlowOutline(style.getGlowColor());
     else m_preview->disableGlowOutline();
-    if (style.type == "Cosmic Mario\n(SMG 1)") {
-        const auto shader = ShaderManager::get().getCosmicShader();
-        m_preview->getChildByIndex(0)->setShaderProgram(shader);
-        for (const auto child : m_preview->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
-    }
-    else {
-        const auto shader = CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor);
-        m_preview->getChildByIndex(0)->setShaderProgram(shader);
-        for (const auto child : m_preview->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
+    if (m_style.type == "Cosmic Mario\n(SMG 1)") {
+        CosmicClone::updateShaderForPlayer(m_preview, ShaderManager::get().getCosmicShader());
+        CosmicClone::updateSpriteForPlayer(m_preview, nullptr);
+    } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, nullptr);
+    } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, nullptr);
+    } else if (m_style.type == "Hungry Luma") {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, CCSprite::create("HungryLuma.png"_spr));
+    } else if (m_style.type == "The Yellow One") {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, CCSprite::create("MD_DifficultyYOSmall.png"_spr));
+    } else {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, nullptr);
     }
     auto scroll = m_popup->getScroll();
     float height = scroll->m_contentLayer->getContentHeight();

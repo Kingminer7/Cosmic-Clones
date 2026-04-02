@@ -70,11 +70,13 @@ void CosmicClone::checkCollision(PlayerObject* player) const {
     auto rect1 = m_p1->getObjectRect();
     if (rect1.intersectsRect(player->getObjectRect())) {
         player->m_gameLayer->destroyPlayer(player, nullptr);
+        playSFX(CosmicCloneSFXType::KillPlayer);
         player->m_maybeIsColliding = true; // for editor
     } else if (m_dual) {
         auto rect2 = m_p2->getObjectRect();
         if (rect2.intersectsRect(player->getObjectRect())) {
             player->m_gameLayer->destroyPlayer(player, nullptr);
+            playSFX(CosmicCloneSFXType::KillPlayer);
             player->m_maybeIsColliding = true; // for editor
         }
     }
@@ -308,30 +310,37 @@ void CosmicClone::updateAnimation(const int player) const {
     }
 }
 
-int CosmicClone::playSFX(CosmicCloneSFXType type) {
+int CosmicClone::playSFX(CosmicCloneSFXType type) const {
     switch (type) {
-        case CosmicCloneSFXType::Spawn:
-            if (m_style.type == "Badeline Chaser\n(Celeste)") {
-                return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
-            }
-            return -1;
         case CosmicCloneSFXType::FirstSpawn:
-            if (isAprilFools()) return FMODAudioEngine::get()->playEffect("in.mp3"_spr);
-            if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)") {
+            if (m_style.type == "The Yellow One")
+                return FMODAudioEngine::get()->playEffect("FordChimeSound.mp3"_spr);
+            if (m_style.type == "Hungry Luma")
+                return FMODAudioEngine::get()->playEffect("in.mp3"_spr);
+            if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)")
                 return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
-            }
-            if (m_style.type == "Badeline Chaser\n(Celeste)") {
+            if (m_style.type == "Badeline Chaser\n(Celeste)")
                 return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
-            }
+            return -1;
+        case CosmicCloneSFXType::KillPlayer:
+            if (m_style.type == "The Yellow One")
+                return FMODAudioEngine::get()->playEffect("FordChimeSound.mp3"_spr);
+        case CosmicCloneSFXType::Spawn:
+            if (m_style.type == "The Yellow One")
+                return FMODAudioEngine::get()->playEffect("FordChimeSound.mp3"_spr);
+            if (m_style.type == "Badeline Chaser\n(Celeste)")
+                return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
+    
             return -1;
         case CosmicCloneSFXType::Die:
-            if (isAprilFools()) return FMODAudioEngine::get()->playEffect("out.mp3"_spr);
-            if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)") {
+            if (m_style.type == "The Yellow One")
+                return FMODAudioEngine::get()->playEffect("FordChimeSound.mp3"_spr);
+            if (m_style.type == "Hungry Luma")
+                return FMODAudioEngine::get()->playEffect("out.mp3"_spr);
+            if (m_style.type == "Cosmic Clone\n(SMG 2)" || m_style.type == "Cosmic Mario\n(SMG 1)")
                 return FMODAudioEngine::get()->playEffect("defeat.wav"_spr);
-            }
-            if (m_style.type == "Badeline Chaser\n(Celeste)") {
+            if (m_style.type == "Badeline Chaser\n(Celeste)")
                 return FMODAudioEngine::get()->playEffect("disappear.wav"_spr);
-            }
             return -1;
     }
     return -1;
@@ -351,12 +360,13 @@ void CosmicClone::updateStyle(Style style) {
         }
         plr->updateGlowColor();
         if (m_style.type == "Cosmic Mario\n(SMG 1)") {
-            // This won't really be seen normally but just in case
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, ShaderManager::get().getCosmicShader());
+            updateSpriteForPlayer(plr, nullptr);
         } else if (m_style.type == "Cosmic Clone\n(SMG 2)") {
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, nullptr);
         } else if (m_style.type == "Badeline Chaser\n(Celeste)") {
             if (!plr->m_gameLayer->m_isEditor) {
                 plr->toggleGhostEffect(GhostType::Enabled);
@@ -366,9 +376,19 @@ void CosmicClone::updateStyle(Style style) {
                 }
             }
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, nullptr);
+        } else if (m_style.type == "Hungry Luma") {
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, CCSprite::create("HungryLuma.png"_spr));
+        } else if (m_style.type == "The Yellow One") {
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, CCSprite::create("MD_DifficultyYOSmall.png"_spr));
         } else {
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, nullptr);
         }
     }
 }
@@ -419,29 +439,15 @@ void CosmicClone::removePlayer(PlayerObject* player) {
 void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader, bool applyToRobotSprites) {
     if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
     if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
-    if (isAprilFools()) {
-        auto spr = player->getChildByID("luma"_spr);
-        if (!spr) {
-            auto s = CCSprite::create("HungryLuma.png"_spr);
-            s->setID("luma"_spr);
-            s->setScaleX(30 / s->getContentWidth());
-            s->setScaleY(30 / s->getContentHeight());
-
-            player->addChildAtPosition(s, Anchor::Center, {0, 0}, false);
-        }
-    }
-
+    
 #define $apply(sprite, shader) if(sprite) { \
-    if (isAprilFools()) sprite->setVisible(false); \
-    else sprite->setShaderProgram(shader); \
+    sprite->setShaderProgram(shader); \
 } else { \
     log::error("Could not find {}.", #sprite); \
 }
     
     // Only doing this so the gjrobotsprite logic later on knows what shader to apply, has no visual effect afaik
-    if (!isAprilFools()) {
-        $apply(player, shader);
-    }
+    $apply(player, shader);
 
     $apply(player->m_iconSprite, shader);
     $apply(player->m_iconSpriteSecondary, shader);
@@ -464,4 +470,51 @@ void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shade
 
 #undef $apply
 
+}
+
+void CosmicClone::updateSpriteForPlayer(PlayerObject* player, CCSprite* sprite, bool applyToRobotSprites) {
+    if (!player) return log::error("Cannot set a sprite for a nullptr PlayerObject.");
+
+    if (auto c = player->getChildByID("display"_spr)) c->removeFromParent();
+
+    if (sprite) {
+        sprite->setID("display"_spr);
+        sprite->setScaleX(30 / sprite->getContentWidth());
+        sprite->setScaleY(30 / sprite->getContentHeight());
+        player->addChildAtPosition(sprite, Anchor::Center, {0, 0}, false);
+    }
+
+    player->m_mainLayer->setVisible(sprite == nullptr);
+}
+
+
+void CosmicClone::updateShaderForPlayer(SimplePlayer* player, CCGLProgram* shader, bool applyToRobotSprites) {
+    if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
+    if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
+    
+#define $apply(sprite, shader) if(sprite) { \
+    sprite->setShaderProgram(shader); \
+} else { \
+    log::error("Could not find {}.", #sprite); \
+}
+    
+    player->getChildByIndex(0)->setShaderProgram(shader);
+    for (const auto child : player->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
+
+
+}
+
+void CosmicClone::updateSpriteForPlayer(SimplePlayer* player, CCSprite* sprite, bool applyToRobotSprites) {
+    if (!player) return log::error("Cannot set a sprite for a nullptr PlayerObject.");
+
+    if (auto c = player->getChildByID("display"_spr)) c->removeFromParent();
+
+    if (sprite) {
+        sprite->setID("display"_spr);
+        sprite->setScaleX(30 / sprite->getContentWidth());
+        sprite->setScaleY(30 / sprite->getContentHeight());
+        player->addChildAtPosition(sprite, Anchor::Center, {0, 0}, false);
+    }
+
+    player->getChildByIndex(0)->setVisible(sprite == nullptr);
 }

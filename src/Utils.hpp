@@ -15,7 +15,7 @@ T const& getSettingFast() {
 
 namespace geode::log {
     template <typename... Args>
-    void dev(impl::FmtStr<Args...> str, Args&&... args) {
+    void dev(format::FmtStr<Args...> str, Args&&... args) {
         if (getSettingFast<"dev-logging", bool>()) log::debug(str, std::forward<Args>(args)...);
     }
 }

@@ -124,8 +124,7 @@ void CosmicClonesPlayLayer::setupHasCompleted() {
 void CosmicClonesPlayLayer::levelComplete() {
     PlayLayer::levelComplete();
     auto fields = reinterpret_cast<CosmicClonesGJBGL*>(this)->m_fields.self();
-    if (fields->m_controller->isStopped()) return;
-    fields->m_controller->stop();
+    if (!fields->m_controller->isStopped()) fields->m_controller->stop();
     for (const auto& [id, cont] : fields->m_triggerControllers){
         if (!cont->isStopped()) cont->stop();
     }

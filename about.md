@@ -1,10 +1,5 @@
 # Cosmic Clones
 
-![Mod Version](https://api.geode-sdk.org/v1/mods/km7dev.cosmic_clones/status_badge?stat=version)
-![Downloads](https://api.geode-sdk.org/v1/mods/km7dev.cosmic_clones/status_badge?stat=downloads)
-![GD Version](https://api.geode-sdk.org/v1/mods/km7dev.cosmic_clones/status_badge?stat=gd_version)
-![Geode Version](https://api.geode-sdk.org/v1/mods/km7dev.cosmic_clones/status_badge?stat=geode_version)
-
 Ever played a platformer and thought it was too easy? Well not anymore! \
 This mod adds clones of the player that kill you if you touch it. These clones follow with a delay, changeable in settings.
 

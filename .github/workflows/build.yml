@@ -1,6 +1,6 @@
-# Last updated 4/1/26
+# Last updated 5/2/26
 
-name: Build Geode Mod
+name: Build and Create Release
 
 on:
   workflow_dispatch:
@@ -52,21 +52,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: hiimjasmine00/download-geode-dependency@main
-        with:
-          repository: undefined06855/Icon-Ninja
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          workflow: multi-platform.yml
-
       - name: Build the mod
         uses: hiimjasmine00/build-geode-mod@xwin
         with:
           bindings: geode-sdk/bindings
           bindings-ref: main
-          # sdk: nightly
           combine: true
-          build-config: ${{ matrix.config.target == 'Win64' && 'RelWithDebInfo' || ( !(github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]'))) && 'Debug' || 'Release' ) }}
+          build-config: ${{ !(github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]'))) && (matrix.config.target == 'Win64' && 'RelWithDebInfo' || 'Debug') || 'Release' }}
           export-pdb: true
           export-symbols: true
           target: ${{ matrix.config.target }}
@@ -106,11 +98,27 @@ jobs:
           tag_name: nightly
           name: 'Development Release'
           body: |
-            Development release for commit ${{ github.sha }}. Built in RelWithDebInfo.
+            Development release for commit ${{ github.sha }}.
           files: |
             ./artifacts/build-output/*.geode
             ./artifacts/build-output/*.pdb
             ./artifacts/build-output/*.sym
+            
+      - name: Create Nightly Release (Codeberg)
+        uses: kingminer7/forgejo-release@main
+        with:
+          direction: upload
+          url: https://codeberg.org
+          token: ${{ secrets.CODEBERG_TOKEN }}
+          repo: km7dev/cosmic-clones
+
+          title: Nightly Release
+          release-notes: Development release for commit ${{ github.sha }}.
+          sha: ${{ github.sha }}
+          tag: nightly
+          prerelease: true
+          override: true
+          release-dir: ./artifacts/build-output/
 
   release:
     name: Create Draft Release
@@ -156,8 +164,24 @@ jobs:
           name: ${{ env.MOD_VERSION }}
           body: |
             ${{ env.CHANGELOG }}
-          draft: true
+          draft: false
           files: |
             ./artifacts/build-output/*.geode
             ./artifacts/build-output/*.pdb
             ./artifacts/build-output/*.sym
+
+      - name: Create Release (Codeberg)
+        uses: kingminer7/forgejo-release@main
+        with:
+          direction: upload
+          url: https://codeberg.org
+          token: ${{ secrets.CODEBERG_TOKEN }}
+          repo: km7dev/cosmic-clones
+
+          title: ${{ env.MOD_VERSION }}
+          release-notes: ${{ env.CHANGELOG }}
+          sha: ${{ github.sha }}
+          tag: ${{ env.MOD_VERSION }}
+          prerelease: false
+          override: false
+          release-dir: ./artifacts/build-output/

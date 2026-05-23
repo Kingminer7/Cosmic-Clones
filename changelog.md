@@ -1,3 +1,8 @@
+# 1.3.2-beta
+
+- <cy>Fix some bugs when Fine Outline is installed</c>
+- <cy>Move source to codeberg</c>
+
 # 1.3.1-beta.1
 
 ## I remembered I have free will.

@@ -160,6 +160,7 @@ void CosmicClone::setType(const IconType type, const int player) {
             default: break;
         }
         m_p1->updateGlowColor();
+        updateShaderForPlayer(m_p1, m_p1->getShaderProgram(), true);
     } else if (player == 2) {
         if (type == m_p2type) return;
         m_p2type = type;
@@ -212,6 +213,7 @@ void CosmicClone::setType(const IconType type, const int player) {
             default: break;
         }
         m_p1->updateGlowColor();
+        updateShaderForPlayer(m_p2, m_p2->getShaderProgram(), true);
     }
     updateAnimation(player);
 }
@@ -435,42 +437,34 @@ void CosmicClone::removePlayer(PlayerObject* player) {
 
 #undef $clear
 }
-
-void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader, bool applyToRobotSprites) {
-    if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
-    if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
     
 #define $apply(sprite, shader) if(sprite) { \
     sprite->setShaderProgram(shader); \
 } else { \
     log::error("Could not find {}.", #sprite); \
 }
-    
-    // Only doing this so the gjrobotsprite logic later on knows what shader to apply, has no visual effect afaik
-    $apply(player, shader);
 
-    $apply(player->m_iconSprite, shader);
-    $apply(player->m_iconSpriteSecondary, shader);
-    $apply(player->m_iconSpriteWhitener, shader);
-    $apply(player->m_iconGlow, shader);
-    $apply(player->m_vehicleSprite, shader);
-    $apply(player->m_vehicleSpriteSecondary, shader);
-    $apply(player->m_birdVehicle, shader);
-    $apply(player->m_vehicleSprite, shader);
-    $apply(player->m_vehicleGlow, shader);
-    $apply(player->m_swingFireBottom, shader);
-    $apply(player->m_swingFireMiddle, shader);
-    $apply(player->m_swingFireTop, shader);
-
-    if (applyToRobotSprites) {
-        $apply(player->m_robotBatchNode, shader);
-        $apply(player->m_spiderBatchNode, shader);
+inline void recurseApply(CCNode* node, CCGLProgram* shader) {
+    $apply(node, shader);
+    for (auto child : node->getChildrenExt()) {
+        recurseApply(child, shader);
     }
-    // Robot and spider sprites will be handled with gamemode changes if false
+}
 
 #undef $apply
 
+void CosmicClone::updateShaderForPlayer(PlayerObject* player, CCGLProgram* shader, bool applyToRobotSprites) {
+    if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
+    if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
+    recurseApply(player, shader);
 }
+
+void CosmicClone::updateShaderForPlayer(SimplePlayer* player, CCGLProgram* shader, bool applyToRobotSprites) {
+    if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
+    if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
+    recurseApply(player, shader);
+}
+
 
 void CosmicClone::updateSpriteForPlayer(PlayerObject* player, CCSprite* sprite, bool applyToRobotSprites) {
     if (!player) return log::error("Cannot set a sprite for a nullptr PlayerObject.");
@@ -485,23 +479,6 @@ void CosmicClone::updateSpriteForPlayer(PlayerObject* player, CCSprite* sprite, 
     }
 
     player->m_mainLayer->setVisible(sprite == nullptr);
-}
-
-
-void CosmicClone::updateShaderForPlayer(SimplePlayer* player, CCGLProgram* shader, bool applyToRobotSprites) {
-    if (!player) return log::error("Cannot set a shader for a nullptr PlayerObject.");
-    if (!shader) return log::error("Cannot set a nullptr shader for a PlayerObject.");
-    
-#define $apply(sprite, shader) if(sprite) { \
-    sprite->setShaderProgram(shader); \
-} else { \
-    log::error("Could not find {}.", #sprite); \
-}
-    
-    player->getChildByIndex(0)->setShaderProgram(shader);
-    for (const auto child : player->getChildByIndex(0)->getChildrenExt()) child->setShaderProgram(shader);
-
-
 }
 
 void CosmicClone::updateSpriteForPlayer(SimplePlayer* player, CCSprite* sprite, bool applyToRobotSprites) {

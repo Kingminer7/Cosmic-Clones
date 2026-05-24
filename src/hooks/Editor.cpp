@@ -20,46 +20,49 @@
 
 using namespace geode::prelude;
 
-bool CosmicClonesEditorUI::init(LevelEditorLayer* editorLayer)
-{
-    if (!EditorUI::init(editorLayer)) return false;
+void CosmicClonesEditorUI::setupCreateMenu() {
+    EditorUI::setupCreateMenu();
 
-    alpha::editor_tabs::addTab("clones-tab"_spr, alpha::editor_tabs::BUILD,
-        [this] {
-            std::vector<Ref<CCNode>> nodes;
-            auto spr = CCSprite::createWithSpriteFrameName("triggerMain.png"_spr);
-            CosmicClonesTrigger::updateCloneTriggerSprite(spr);
-            auto fields = static_cast<CosmicClonesEditorLayer*>(m_editorLayer)->m_fields.self();
-            auto btn = createButton(spr, [this, fields](auto btn) {
-                if (fields->m_selected) {
-                    fields->m_selected->setColor({255, 255, 255});
-                    if (fields->m_selected == btn) {
-                        m_selectedObjectIndex = 0;
-                        fields->m_selected = nullptr;
-                        return;
-                    }
-                }
-                m_selectedObjectIndex = CLONE_ID;
-                updateCreateMenu(false);
-                updateGridNodeSize();
-                btn->setColor({127, 127, 127});
-                fields->m_selected = btn;
-            });
-            nodes.emplace_back(btn);
-            return alpha::editor_tabs::createEditButtonBar(nodes);
-        }, [] {
-            auto spr = CCSprite::createWithSpriteFrameName("cube_1.png"_spr);
-            spr->setShaderProgram(ShaderManager::get().getCosmicShader());
-            return spr;
-        },
-        [] (bool state, auto tab) { // do something when the tab is entered and exited
+    auto bar = CCArrayExt<EditButtonBar*>(m_createButtonBars)[12];
 
-        },
-        [] (int rows, int cols, auto tab) { // do something when the tab is reloaded
+    auto btn = getCreateBtn(CLONE_ID, 1);
 
-        });
+    m_createButtonArray->addObject(btn);
 
-    return true;
+    int idx = 0;
+    for (auto btn : CCArrayExt<CreateMenuItem*>(bar->m_buttonArray)) {
+        idx++;
+        if (btn->m_objectID == 3661) {
+            break;
+        }
+    }
+
+    bar->m_buttonArray->insertObject(btn, idx);
+
+    bar->reloadItems(GameManager::get()->getIntGameVariable("0049"), GameManager::get()->getIntGameVariable("0050"));
+}
+
+CreateMenuItem* CosmicClonesEditorUI::getCreateBtn(int id, int bg) {
+    if (id == CLONE_ID) {
+        auto btn = getCreateBtn(1, 4);
+
+        auto arr = CCArray::create();
+        auto spr = CosmicClonesTrigger::updateCloneTriggerSprite(CCSprite::createWithSpriteFrameName("triggerMain.png"_spr));
+
+        spr->setScale(std::min(32.f / spr->getContentHeight(), 32.f / spr->getContentWidth()));
+
+        auto buttonSpr = static_cast<ButtonSprite*>(btn->getNormalImage());
+        if (auto obj = buttonSpr->m_subSprite) {
+            obj->setVisible(false);
+        }
+        buttonSpr->addChild(spr);
+        spr->setPosition({20, 21});
+
+        btn->m_objectID = CLONE_ID;
+        btn->setTag(CLONE_ID);
+        return btn;
+    }
+    return EditorUI::getCreateBtn(id, bg);
 }
 
 void CosmicClonesEditorUI::onCreateObject(int id) {
@@ -69,12 +72,28 @@ void CosmicClonesEditorUI::onCreateObject(int id) {
     id = TRIGGER_ID;
     fields->m_creatingClone = true;
     EditorUI::onCreateObject(id);
-    if (fields->m_creatingClone) {
+    if (fields->m_creatingClone || !fields->m_createdClone) {
         log::error("Failed to create clone trigger for some reason! Something has gone horribly wrong.");
         fields->m_creatingClone = false;
         return;
     }
     fields->m_createdClone->setupCloneTrigger(true);
+}
+
+void CosmicClonesEditorUI::clickOnPosition(cocos2d::CCPoint position) {
+    EditorUI::clickOnPosition(position);
+    if (m_selectedObjectIndex != TRIGGER_ID)
+        return;
+    if (m_selectedMode != 2)
+        return;
+
+    auto nodePos = m_editorLayer->m_objectLayer->convertToNodeSpace(position);
+
+    auto obj = m_editorLayer->objectAtPosition(nodePos);
+    if (!obj || !obj->getUserFlag("clones-trigger"_spr)) return;
+    
+    m_selectedObjectIndex = CLONE_ID;
+    updateCreateMenu(true);
 }
 
 GameObject* CosmicClonesEditorLayer::createObject(const int id, CCPoint pos, bool noUndo) {
@@ -100,7 +119,7 @@ void CosmicClonesEditorUI::editObject(CCObject* sender) {
     EditorUI::editObject(sender);
 }
 
-void CosmicClonesTrigger::updateCloneTriggerSprite(CCSprite* sprite, bool setFrame) {
+CCSprite* CosmicClonesTrigger::updateCloneTriggerSprite(CCSprite* sprite, bool setFrame) {
     if (setFrame) sprite->setDisplayFrame(CCSpriteFrameCache::get()->spriteFrameByName("triggerMain.png"_spr));
     if (!sprite->getChildByID("outline"_spr)) {
         auto spr = CCSprite::createWithSpriteFrameName("triggerOutline.png"_spr);
@@ -114,6 +133,7 @@ void CosmicClonesTrigger::updateCloneTriggerSprite(CCSprite* sprite, bool setFra
         spr->setShaderProgram(ShaderManager::get().getCosmicShader());
         sprite->addChildAtPosition(spr, Anchor::Center, {0, 0}, false);
     }
+    return sprite;
 }
 
 CCMenuItemSpriteExtra* CosmicClonesEditorUI::createButton(CCSprite* icon, Function<void(CCMenuItemSpriteExtra*)> callback) {

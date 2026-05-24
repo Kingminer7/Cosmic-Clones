@@ -61,14 +61,16 @@ class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
     static Style chanceObjectsToCustomStyle(const ChanceObject& first, const ChanceObject& second);
     static std::pair<ChanceObject, ChanceObject> customStyleToChanceObjects(const Style& s);
 
-    static void updateCloneTriggerSprite(CCSprite* sprite, bool setFrame = true);
+    static CCSprite* updateCloneTriggerSprite(CCSprite* sprite, bool setFrame = true);
 };
 
 class $modify(CosmicClonesEditorUI, EditorUI) {
-    bool init(LevelEditorLayer* editorLayer);
     void onCreateObject(int id);
     void editObject(CCObject* sender);
     void onCreateButton(CCObject* sender);
+    void setupCreateMenu();
+    void clickOnPosition(cocos2d::CCPoint position);
+    CreateMenuItem* getCreateBtn(int id, int bg);
 
     CCMenuItemSpriteExtra* createButton(cocos2d::CCSprite* icon, geode::Function<void(CCMenuItemSpriteExtra*)> callback);
 };

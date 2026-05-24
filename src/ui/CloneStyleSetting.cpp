@@ -8,6 +8,7 @@ std::vector<Style> StyleSettingNode::m_styles = {
     {"Badeline Chaser\n(Celeste)"},
     {"Hungry Luma"},
     {"The Yellow One"},
+    {"eri"},
     {"Custom"},
 };
 
@@ -15,7 +16,7 @@ ccColor3B Style::getColor1() const {
     if (type == "Cosmic Clone\n(SMG 2)") return {60, 20, 21};
     if (type == "Badeline Chaser\n(Celeste)") return {155, 63, 181};
     if (type == "Custom") return col1;
-    if (type == "Hungry Luma" || type == "The Yellow One") return {255, 255, 255};
+    if (type == "Hungry Luma" || type == "The Yellow One" || type == "eri") return {255, 255, 255};
     return {12, 11, 56};
 }
 
@@ -23,14 +24,14 @@ ccColor3B Style::getColor2() const {
     if (type == "Cosmic Clone\n(SMG 2)") return {243, 235, 87};
     if (type == "Badeline Chaser\n(Celeste)") return {191, 29, 51};
     if (type == "Custom") return col2;
-    if (type == "Hungry Luma" || type == "The Yellow One") return {255, 255, 255};
+    if (type == "Hungry Luma" || type == "The Yellow One" || type == "eri") return {255, 255, 255};
     return {11, 27, 56};
 }
 
 bool Style::isGlowEnabled() const {
     if (type == "Badeline Chaser\n(Celeste)") return false;
     if (type == "Custom") return useGlow;
-    if (type == "Hungry Luma" || type == "The Yellow One") return false;
+    if (type == "Hungry Luma" || type == "The Yellow One" || type == "eri") return false;
     return true;
 }
 

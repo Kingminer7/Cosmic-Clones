@@ -387,6 +387,10 @@ void CosmicClone::updateStyle(Style style) {
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
             updateSpriteForPlayer(plr, CCSprite::create("MD_DifficultyYOSmall.png"_spr));
+        } else if (m_style.type == "eri") {
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, CCSprite::create("eri.png"_spr), {1.27f, 1.f});
         } else {
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
@@ -466,30 +470,30 @@ void CosmicClone::updateShaderForPlayer(SimplePlayer* player, CCGLProgram* shade
 }
 
 
-void CosmicClone::updateSpriteForPlayer(PlayerObject* player, CCSprite* sprite, bool applyToRobotSprites) {
+void CosmicClone::updateSpriteForPlayer(PlayerObject* player, CCSprite* sprite, const CCPoint& scaleMult) {
     if (!player) return log::error("Cannot set a sprite for a nullptr PlayerObject.");
 
     if (auto c = player->getChildByID("display"_spr)) c->removeFromParent();
 
     if (sprite) {
         sprite->setID("display"_spr);
-        sprite->setScaleX(30 / sprite->getContentWidth());
-        sprite->setScaleY(30 / sprite->getContentHeight());
+        sprite->setScaleX(30 / sprite->getContentWidth() * scaleMult.x);
+        sprite->setScaleY(30 / sprite->getContentHeight() * scaleMult.y);
         player->addChildAtPosition(sprite, Anchor::Center, {0, 0}, false);
     }
 
     player->m_mainLayer->setVisible(sprite == nullptr);
 }
 
-void CosmicClone::updateSpriteForPlayer(SimplePlayer* player, CCSprite* sprite, bool applyToRobotSprites) {
+void CosmicClone::updateSpriteForPlayer(SimplePlayer* player, CCSprite* sprite, const CCPoint& scaleMult) {
     if (!player) return log::error("Cannot set a sprite for a nullptr PlayerObject.");
 
     if (auto c = player->getChildByID("display"_spr)) c->removeFromParent();
 
     if (sprite) {
         sprite->setID("display"_spr);
-        sprite->setScaleX(30 / sprite->getContentWidth());
-        sprite->setScaleY(30 / sprite->getContentHeight());
+        sprite->setScaleX(30 / sprite->getContentWidth() * scaleMult.x);
+        sprite->setScaleY(30 / sprite->getContentHeight() * scaleMult.y);
         player->addChildAtPosition(sprite, Anchor::Center, {0, 0}, false);
     }
 

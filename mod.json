@@ -150,7 +150,8 @@
             "resources/sprites/normal.png",
             "resources/sprites/star.png",
             "resources/sprites/HungryLuma.png",
-            "resources/sprites/MD_DifficultyYOSmall.png"
+            "resources/sprites/MD_DifficultyYOSmall.png",
+            "resources/sprites/eri.png"
         ],
         "spritesheets": {
             "CloneSheet01": [

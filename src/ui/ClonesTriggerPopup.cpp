@@ -480,6 +480,7 @@ std::vector<Style> StyleNode::m_styles = {
     {"Badeline Chaser\n(Celeste)"},
     {"Hungry Luma"},
     {"The Yellow One"},
+    {"eri"},
     {"Custom"},
 };
 
@@ -654,6 +655,9 @@ void StyleNode::updateState(const Style& style) {
     } else if (m_style.type == "The Yellow One") {
         CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         CosmicClone::updateSpriteForPlayer(m_preview, CCSprite::create("MD_DifficultyYOSmall.png"_spr));
+    } else if (m_style.type == "eri") {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, CCSprite::create("eri.png"_spr), {1.27f, 1.f});
     } else {
         CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         CosmicClone::updateSpriteForPlayer(m_preview, nullptr);

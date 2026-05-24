@@ -1,3 +1,7 @@
+# 1.3.3-beta
+
+- <cg>Add eri (with permission from Erymanthus)</c>
+
 # 1.3.2-beta
 
 - <cy>Fix some bugs when Fine Outline is installed</c>

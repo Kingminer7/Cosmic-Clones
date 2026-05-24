@@ -93,7 +93,7 @@ public:
     void remove();
     static void removePlayer(PlayerObject* player);
     static void updateShaderForPlayer(PlayerObject* player, cocos2d::CCGLProgram* shader, bool applyToRobotSprites = false);
-    static void updateSpriteForPlayer(PlayerObject* player, cocos2d::CCSprite* shader, bool applyToRobotSprites = false);
+    static void updateSpriteForPlayer(PlayerObject* player, cocos2d::CCSprite* sprite, const cocos2d::CCPoint& scaleMult = {1.f, 1.f});
     static void updateShaderForPlayer(SimplePlayer* player, cocos2d::CCGLProgram* shader, bool applyToRobotSprites = false);
-    static void updateSpriteForPlayer(SimplePlayer* player, cocos2d::CCSprite* shader, bool applyToRobotSprites = false);
+    static void updateSpriteForPlayer(SimplePlayer* player, cocos2d::CCSprite* sprite, const cocos2d::CCPoint& scaleMult = {1.f, 1.f});
 };

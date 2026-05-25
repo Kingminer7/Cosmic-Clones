@@ -25,3 +25,4 @@ Custom sound effects and sprite clones are *planned*.
 - [Zilko](https://github.com/zilko/) - Help with some parts of clone movement and some other minor help
 - [Uproxide](https://github.com/uproxide) - The Yellow One.
 - [Erymanthus](https://codeberg.org/raydeeux) - Allowing me to add him as a style (it initially started as a joke lol)
+    - [CinnamoonPi](https://reddit.com/u/CinnamoonPi) - Artist for ery's pfp

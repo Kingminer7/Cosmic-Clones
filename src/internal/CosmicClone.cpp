@@ -328,6 +328,8 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) const {
             if (m_style.type == "The Yellow One")
                 return FMODAudioEngine::get()->playEffect("FordChimeSound.mp3"_spr);
         case CosmicCloneSFXType::Spawn:
+            if (m_style.type == "Hungry Luma")
+                return FMODAudioEngine::get()->playEffect("in.mp3"_spr);
             if (m_style.type == "The Yellow One")
                 return FMODAudioEngine::get()->playEffect("FordChimeSound.mp3"_spr);
             if (m_style.type == "Badeline Chaser\n(Celeste)")

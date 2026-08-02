@@ -22,7 +22,7 @@
             "version": ">=1.0.3-beta.1",
             "required": false
         },
-        "smjs.object-collab": ">=v0.1.0-alpha.2"
+        "smjs.object-collab": ">=v0.1.0-alpha.4"
     },
     "tags": [
         "gameplay",

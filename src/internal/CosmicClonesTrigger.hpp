@@ -7,18 +7,8 @@ class StyleNode;
 class CosmicClonesController;
 
 class CosmicClonesTrigger : public object_collab::CustomObject<EffectGameObject> {
-    static constexpr uint32_t COUNT = 109;
-    static constexpr uint32_t START_DELAY = 119;
-    static constexpr uint32_t DELAY = 124;
-    static constexpr uint32_t DISABLED = 208;
-    static constexpr uint32_t CONTROLLER_ID = 51;
-    static constexpr uint32_t DAMAGING = 130;
-    static constexpr uint32_t STOPS = 140;
-    static constexpr uint32_t SFX = 158;
-    static constexpr uint32_t STYLE = 168;
-
 public:
-    static CosmicClonesTrigger* create();
+    static CosmicClonesTrigger* create(object_collab::ObjectInfo* info);
     static object_collab::PopupOptions getEditObjectConfig(const object_collab::Selected& selected);
 
     std::shared_ptr<CosmicClonesController> m_controller = nullptr;
@@ -33,7 +23,7 @@ public:
     bool m_sfx = true;
     std::vector<Style> m_styles = {{"Cosmic Mario\n(SMG 1)"}};
 
-    CosmicClonesTrigger();
+    CosmicClonesTrigger(object_collab::ObjectInfo* info);
     void postInit() override;
     void postEditorInit() override;
     void triggerObject(GJBaseGameLayer* layer, const int uniqueID, const gd::vector<int>* remapKeys) override;

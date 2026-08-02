@@ -28,3 +28,7 @@ Custom sound effects and sprite clones are *planned*.
 - [Uproxide](https://github.com/uproxide) - The Yellow One.
 - [Erymanthus](https://codeberg.org/raydeeux) - Allowing me to add him as a style (it initially started as a joke lol)
     - [CinnamoonPi](https://reddit.com/u/CinnamoonPi) - Artist for ery's pfp
+
+## Support me!
+
+Supporting me on [my Patreon](https://www.patreon.com/cw/km7dev) is much appreciated, though I don't really have any benefits to provide for supporting me.

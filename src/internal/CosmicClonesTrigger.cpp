@@ -10,8 +10,8 @@
 using namespace object_collab::prelude;
 using namespace geode::prelude;
 
-CosmicClonesTrigger* CosmicClonesTrigger::create() {
-    auto ret = new CosmicClonesTrigger();
+CosmicClonesTrigger* CosmicClonesTrigger::create(ObjectInfo* info) {
+    auto ret = new CosmicClonesTrigger(info);
     queueInMainThread([ret] {
         auto inner = CCSprite::createWithSpriteFrameName("triggerInner.png"_spr);
         inner->setID("inner"_spr);
@@ -31,7 +31,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                     applyValueToSelected(selected, &CosmicClonesTrigger::m_sfx, value);
                 })
                 .currentValue([](const Selected& selected, Popup* popup) {
-                    return getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_sfx, false);
+                    return getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_sfx);
                 })
                 .build());
     toggles.push_back(ToggleMenu::builder()
@@ -50,7 +50,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                 hideAll();
             })
             .currentValue([](const Selected& selected, Popup* popup) {
-                auto value = getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_stopper, false);
+                auto value = getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_stopper);
                 popup->runAction(CallFuncExt::create([popup, value  ] {
                     hideAll();
                 }));
@@ -65,7 +65,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                 applyValueToSelected(selected, &CosmicClonesTrigger::m_damage, value);
             })
             .currentValue([](const Selected& selected, Popup* popup) {
-                return getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_damage, false);
+                return getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_damage);
             })
             .build());
     toggles.push_back(ToggleMenu::builder()
@@ -75,7 +75,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                 applyValueToSelected(selected, &CosmicClonesTrigger::m_disabled, value);
             })
             .currentValue([](const Selected& selected, Popup* popup) {
-                return getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_disabled, false);
+                return getCommonValueOrDefault(selected, &CosmicClonesTrigger::m_disabled);
             })
             .build());
 
@@ -117,7 +117,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                         applyValueToSelected(selected, &CosmicClonesTrigger::m_count, std::clamp(value, 1, 20));
                     })
                     .currentValue([](const Selected& selected, Popup* popup) {
-                        return getCommonValueOrDefault<int>(selected, &CosmicClonesTrigger::m_count, 1);
+                        return getCommonValueOrDefault<int>(selected, &CosmicClonesTrigger::m_count);
                     })
                     .build())
                 .menu(NumericMenu::builder()
@@ -131,7 +131,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                         applyValueToSelected(selected, &CosmicClonesTrigger::m_controllerId, std::clamp(value, 1, 100));
                     })
                     .currentValue([](const Selected& selected, Popup* popup) {
-                        return getCommonValueOrDefault<int>(selected, &CosmicClonesTrigger::m_controllerId, 1);
+                        return getCommonValueOrDefault<int>(selected, &CosmicClonesTrigger::m_controllerId);
                     })
                     .build())
                 .menu(NumericMenu::builder()
@@ -145,7 +145,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                         applyValueToSelected(selected, &CosmicClonesTrigger::m_delay, value);
                     })
                     .currentValue([](const Selected& selected, Popup* popup) {
-                        return getCommonValueOrDefault<float>(selected, &CosmicClonesTrigger::m_delay, 1.75);
+                        return getCommonValueOrDefault<float>(selected, &CosmicClonesTrigger::m_delay);
                     })
                     .build())
                 .menu(NumericMenu::builder()
@@ -159,7 +159,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
                         applyValueToSelected(selected, &CosmicClonesTrigger::m_initialDelay, value);
                     })
                     .currentValue([](const Selected& selected, Popup* popup) {
-                        return getCommonValueOrDefault<float>(selected, &CosmicClonesTrigger::m_initialDelay, 1);
+                        return getCommonValueOrDefault<float>(selected, &CosmicClonesTrigger::m_initialDelay);
                     })
                     .build())
                 .build())
@@ -182,17 +182,7 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
         .build();
 }
 
-CosmicClonesTrigger::CosmicClonesTrigger(): CustomObject({
-    propertyFrom(COUNT, m_count, 3),
-    propertyFrom(START_DELAY, m_initialDelay, 1.75),
-    propertyFrom(DELAY, m_delay, 1),
-    propertyFrom(DISABLED, m_disabled, false),
-    propertyFrom(CONTROLLER_ID, m_controllerId, 1),
-    propertyFrom(DAMAGING, m_damage, true),
-    propertyFrom(STOPS, m_stopper, false),
-    propertyFrom(SFX, m_sfx, true),
-    propertyFrom<>(STYLE, m_styles, std::vector<Style>{{"Cosmic Mario\n(SMG 1)"}}),
-}, GameObjectType::Modifier) { }
+CosmicClonesTrigger::CosmicClonesTrigger(ObjectInfo* info): CustomObject(info, GameObjectType::Modifier) { }
 
 void CosmicClonesTrigger::postInit() {
     this->setHitbox({ 1, 1 });
@@ -554,14 +544,25 @@ StyleNode* StyleNode::create(StylePickMenu* menu, const Style& value) {
     return nullptr;
 }
 
-
 $on_mod(Loaded) {
     ObjectAPI::registerObject(ObjectInfo::builder()
         .id("cosmic-clones-trigger"_spr)
         .sprite("triggerMain.png"_spr)
-        .factory(CosmicClonesTrigger::create)
+        .construction(ComplexObject::builder()
+            .factory(CosmicClonesTrigger::create)
+            .customProperties({
+                PropertyInterface::from(109, &CosmicClonesTrigger::m_count, 3),
+                PropertyInterface::from(119, &CosmicClonesTrigger::m_initialDelay, 1.75),
+                PropertyInterface::from(124, &CosmicClonesTrigger::m_delay, 1),
+                PropertyInterface::from(208, &CosmicClonesTrigger::m_disabled, false),
+                PropertyInterface::from(51,  &CosmicClonesTrigger::m_controllerId, 1),
+                PropertyInterface::from(130, &CosmicClonesTrigger::m_damage, true),
+                PropertyInterface::from(140, &CosmicClonesTrigger::m_stopper, false),
+                PropertyInterface::from(158, &CosmicClonesTrigger::m_sfx, true),
+                PropertyInterface::from(168, &CosmicClonesTrigger::m_styles, std::vector<Style>{{"Cosmic Mario\n(SMG 1)"}}),
+            })
+            .build())
         .editObject(CosmicClonesTrigger::getEditObjectConfig)
         .editorTab(EditorTab::Triggers)
-        .objectType(GameObjectType::Modifier)
         .build());
 }

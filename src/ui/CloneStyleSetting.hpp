@@ -18,15 +18,9 @@ struct Style {
     cocos2d::ccColor3B getGlowColor() const;
     bool isGlowEnabled() const;
 
-    bool operator==(const Style &other) const {
-        if (type != other.type) return false;
-        if (type != "Custom") return true;
-        return col1 == other.col1 && col2 == other.col2 && useGlow == other.useGlow && (!useGlow || glow == other.glow);
-    }
+    bool operator==(const Style &other) const;
 
-    bool operator!=(const Style &other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const Style &other) const;
 };
 
 template<>
@@ -54,6 +48,16 @@ struct matjson::Serialize<Style> {
             });
         return makeObject({{"type", style.type}});
     }
+};
+
+static std::vector<Style> g_allStyles {
+    {"Cosmic Mario\n(SMG 1)"},
+    {"Cosmic Clone\n(SMG 2)"},
+    {"Badeline Chaser\n(Celeste)"},
+    {"Hungry Luma"},
+    {"The Yellow One"},
+    {"eri"},
+    {"Custom"},
 };
 
 class CloneStyleSetting : public geode::SettingBaseValueV3<std::vector<Style> > {
@@ -96,7 +100,6 @@ class StyleSettingNode : public cocos2d::CCMenu {
 protected:
     bool init(CloneStyleSettingNode *setting, Style value);
 
-    static std::vector<Style> m_styles;
     Style m_style;
     cocos2d::CCLabelBMFont *m_label = nullptr;
     CloneStyleSettingNode *m_setting = nullptr;

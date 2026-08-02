@@ -3,6 +3,8 @@
 Ever played a platformer and thought it was too easy? Well not anymore! \
 This mod adds clones of the player that kill you if you touch it. These clones follow with a delay, changeable in settings.
 
+**Support <cr>will only</c> be provided on GitHub or Codeberg. <co>I don't check comments in the Mod Comments mod!</c>**
+
 <cy>Click Between Steps/Frames may cause unexpected issues, beware!</c>
 
 ## Styles

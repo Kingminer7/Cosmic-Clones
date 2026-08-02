@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CosmicClone.hpp"
-#include "../hooks/Editor.hpp"
+#include "CosmicClonesTrigger.hpp"
 
 struct CosmicClonesGJBGL;
 
@@ -26,7 +26,7 @@ public:
     ~CosmicClonesController();
 
     // i don't really wanna make getters/setters for the config options
-    unsigned int m_count = 3;
+    int m_count = 3;
     float m_initialDelay = 1.75;
     float m_delay = 1;
     bool m_damage = true;

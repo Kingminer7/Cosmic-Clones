@@ -1,6 +1,17 @@
-# 1.3.3-beta
+# 1.4.0-beta
 
-- <cg>Add eri (with permission from Erymanthus)</c>
+- <cg>Add eri (with permission from Erymanthus) ![(insert eri sprite here)](km7dev.cosmic_clones/eri.png?scale=0.075)</c>
+- <cj>Rewrite the clones trigger to use Object Collab instead of the janky way I had it before.</c>
+  - **Some other changes were made as a result of this:** 
+  - <cg>You can now edit multiple clones triggers at once.</c>
+  - <cy>Redid the Edit Object popup for the clones trigger</c>
+  - <cy>Vanilla features and other mods no longer treat this as a sequence trigger.</c>
+  - <cy>Fixed a visual bug when Trigger Visualizer was enabled</c>
+  - <cr>The Cosmic Clones tab in the editor is now removed. (A whole tab for one trigger was a waste of space anyways.)</c>
+- <cy>Very slightly edited the appearance of the clones trigger (you will probably not notice the difference).</c>
+- <cy>Fixed a crash with some editor mods installed</c>
+- <ca>Removed dependency on EditorTab API</c>
+- <ca>Updated to Geode v5.8.2</c>
 
 # 1.3.2-beta
 

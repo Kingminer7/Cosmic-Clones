@@ -1,5 +1,7 @@
 #include "Utils.hpp"
 
+using namespace geode::prelude;
+
 bool isAprilFools() {
     auto now = std::chrono::system_clock::now();
     auto timeNow = std::chrono::system_clock::to_time_t(now);

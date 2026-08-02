@@ -1,11 +1,11 @@
 #pragma once
 
 #include <Geode/modify/EditorUI.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/SequenceTriggerGameObject.hpp>
 
+#include "../internal/CosmicClonesTrigger.hpp"
+
 struct Style;
-class CosmicClonesController;
 
 // Property mappings
 // int   count:        int   m_resetMode
@@ -18,69 +18,34 @@ class CosmicClonesController;
 // bool  stopper:      int   m_chanceObjects[0].m_groupID (bit 1)
 // bool  sfx:          int   m_chanceObjects[0].m_groupID (bit 2)
 
-class $modify(CosmicClonesTrigger, SequenceTriggerGameObject)
-{
+// Styles are all chance objects after index 10.
+// Chance object mapping for styles
+// m_groupID: type
+// m_chance: (custom) style color 1
+// Second object (when type == "Custom")
+// m_groupID: (custom) style color 2
+// m_chance: (custom) glow
+
+class $modify(OldClonesTrigger, SequenceTriggerGameObject) {
+
     struct Fields {
-        std::shared_ptr<CosmicClonesController> controller = nullptr;
+        geode::Ref<CosmicClonesTrigger> realTrigger = nullptr;
     };
 
     void customObjectSetup(gd::vector<gd::string>& values, gd::vector<void*>& exists);
     void triggerObject(GJBaseGameLayer* layer, int uniqueID, gd::vector<int> const* remapKeys);
 
-    void setupCloneTrigger(bool initial = false);
-
     int getCount() const;
-    void setCount(int count);
-
     float getStartDelay() const;
-    void setStartDelay(float startDelay);
-
     float getDelay() const;
-    void setDelay(float delay);
-
     bool isDamaging() const;
-    void setDamaging(bool damaging);
-
     bool isDisabled() const;
-    void setDisabled(bool disabled);
-
     int getControllerID() const;
-    void setControllerID(int id);
-
     bool isStopper() const;
-    void setStopper(bool stopper);
-
     bool isSfx() const;
-    void setSfx(bool sfx);
-
     std::vector<Style> getStyles() const;
-    void setStyles(const std::vector<Style>& styles);
 
     void fill10IfNeeded();
 
     static Style chanceObjectsToCustomStyle(const ChanceObject& first, const ChanceObject& second);
-    static std::pair<ChanceObject, ChanceObject> customStyleToChanceObjects(const Style& s);
-
-    static CCSprite* updateCloneTriggerSprite(CCSprite* sprite, bool setFrame = true);
-};
-
-class $modify(CosmicClonesEditorUI, EditorUI) {
-    void onCreateObject(int id);
-    void editObject(CCObject* sender);
-    void onCreateButton(CCObject* sender);
-    void setupCreateMenu();
-    void clickOnPosition(cocos2d::CCPoint position);
-    CreateMenuItem* getCreateBtn(int id, int bg);
-
-    CCMenuItemSpriteExtra* createButton(cocos2d::CCSprite* icon, geode::Function<void(CCMenuItemSpriteExtra*)> callback);
-};
-
-class $modify(CosmicClonesEditorLayer, LevelEditorLayer) {
-    struct Fields {
-        bool m_creatingClone = false;
-        CosmicClonesTrigger* m_createdClone = nullptr;
-        CCMenuItemSpriteExtra* m_selected = nullptr;
-    };
-    
-    GameObject* createObject(int id, cocos2d::CCPoint pos, bool noUndo);
 };

@@ -2,16 +2,6 @@
 
 using namespace geode::prelude;
 
-std::vector<Style> StyleSettingNode::m_styles = {
-    {"Cosmic Mario\n(SMG 1)"},
-    {"Cosmic Clone\n(SMG 2)"},
-    {"Badeline Chaser\n(Celeste)"},
-    {"Hungry Luma"},
-    {"The Yellow One"},
-    {"eri"},
-    {"Custom"},
-};
-
 ccColor3B Style::getColor1() const {
     if (type == "Cosmic Clone\n(SMG 2)") return {60, 20, 21};
     if (type == "Badeline Chaser\n(Celeste)") return {155, 63, 181};
@@ -41,6 +31,17 @@ ccColor3B Style::getGlowColor() const {
     if (type == "Custom") return glow;
     return {13, 23, 64};
 }
+
+bool Style::operator==(const Style& other) const {
+    if (type != other.type) return false;
+    if (type != "Custom") return true;
+    return col1 == other.col1 && col2 == other.col2 && useGlow == other.useGlow && (!useGlow || glow == other.glow);
+}
+
+bool Style::operator!=(const Style& other) const {
+    return !(*this == other);
+}
+
 
 Result<std::shared_ptr<SettingV3>> CloneStyleSetting::parse(std::string const &key, std::string const &modID, matjson::Value const &json) {
     auto res = std::make_shared<CloneStyleSetting>();
@@ -171,9 +172,9 @@ bool StyleSettingNode::init(CloneStyleSettingNode* setting, Style value) {
     m_label->setAlignment(kCCTextAlignmentCenter);
     m_label->setID("display-label");
     auto lArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this](auto) {
-        auto it = std::find(m_styles.begin(), m_styles.end(), m_style);
-        if (it == m_styles.begin() || it == m_styles.end())
-            it = m_styles.end() - 1;
+        auto it = std::find(g_allStyles.begin(), g_allStyles.end(), m_style);
+        if (it == g_allStyles.begin() || it == g_allStyles.end())
+            it = g_allStyles.end() - 1;
         else
             --it;
         auto val = *it;
@@ -182,9 +183,9 @@ bool StyleSettingNode::init(CloneStyleSettingNode* setting, Style value) {
     static_cast<CCSprite*>(lArrow->getNormalImage())->setFlipX(true);
     lArrow->setID("left-arrow-button");
     auto rArrow = CCMenuItemExt::createSpriteExtraWithFrameName("navArrowBtn_001.png", .4f, [this, value](auto) {
-        auto it = std::find(m_styles.begin(), m_styles.end(), m_style);
-        if (it == m_styles.end() - 1 || it == m_styles.end())
-            it = m_styles.begin();
+        auto it = std::find(g_allStyles.begin(), g_allStyles.end(), m_style);
+        if (it == g_allStyles.end() - 1 || it == g_allStyles.end())
+            it = g_allStyles.begin();
         else
             ++it;
         auto val = *it;

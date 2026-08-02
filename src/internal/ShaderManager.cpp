@@ -64,32 +64,4 @@ void ShaderManager::update(const float dt) {
 
 $on_mod(Loaded) {
     CCScheduler::get()->scheduleUpdateForTarget(&ShaderManager::get(), 0, false);
-
-    listenForAllSettingChanges([](auto k, auto s) {
-        if (auto bgl = reinterpret_cast<CosmicClonesGJBGL*>(GJBaseGameLayer::get())) {
-            //auto fields = bgl->m_fields.self();
-            //int i = 0;
-            // if (!fields->m_enabled) return;
-            // if (!bgl->updateSettings(fields)) {
-            //     for (const auto& clone : fields->m_clones) {
-            //         clone->remove();
-            //     }
-            //     fields->m_clones.clear();
-            //     fields->m_snapshots.clear();
-            //     std::erase_if(fields->m_sfxIds, [](int channel) {
-            //         return FMODAudioEngine::get()->m_stoppedChannels.find(channel) != FMODAudioEngine::get()->m_stoppedChannels.end();
-            //     });
-            //     for (auto channel : fields->m_sfxIds) {
-            //         FMODAudioEngine::get()->stopChannel(channel);
-            //     }
-            // } else {
-            //     const auto& styles = getSettingFast<"styles", std::vector<Style>>();
-            //     for (const auto& clone : fields->m_clones) {
-            //         if (clone == nullptr) continue;
-            //         clone->updateStyle(styles[i % styles.size()]);
-            //         i++;
-            //     }
-            // }
-        }
-    });
 }

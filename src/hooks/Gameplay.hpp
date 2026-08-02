@@ -13,7 +13,7 @@
 #define tickOrig() processCommands(dt, half, last)
 #endif
 
-struct CosmicClonesTrigger;
+struct OldClonesTrigger;
 class CosmicClonesController;
 
 // Base Gameplay

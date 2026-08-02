@@ -31,7 +31,7 @@ void CosmicClonesController::stop(bool immediate) {
         for (const auto& clone : m_clones) {
             if (!hasSfxed) {
                 hasSfxed = true;
-                if (m_sfx) clone->playSFX(CosmicCloneSFXType::Die);
+                if (m_sfx) (void) clone->playSFX(CosmicCloneSFXType::Die);
             }
             clone->getP1()->playerDestroyed(false);
             clone->getP2()->playerDestroyed(false);
@@ -56,12 +56,12 @@ void CosmicClonesController::loadConfigFromSettings() {
 
 void CosmicClonesController::loadConfigFromTrigger(const CosmicClonesTrigger* trigger) {
     if (!trigger) return log::error("Could not load config from trigger: trigger doesn't exist!");
-    m_initialDelay = trigger->getStartDelay();
-    m_delay = trigger->getDelay();
-    m_damage = trigger->isDamaging();
-    m_count = trigger->getCount();
-    m_styles = trigger->getStyles();
-    m_sfx = trigger->isSfx();
+    m_initialDelay = trigger->m_initialDelay;
+    m_delay = trigger->m_delay;
+    m_damage = trigger->m_damage;
+    m_count = trigger->m_count;
+    m_styles = trigger->m_styles;
+    m_sfx = trigger->m_sfx;
 }
 
 void CosmicClonesController::loadConfigFromTrigger() {

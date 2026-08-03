@@ -57,6 +57,7 @@ static std::vector<Style> g_allStyles {
     {"Hungry Luma"},
     {"The Yellow One"},
     {"eri"},
+    {"Markiplier"},
     {"Custom"},
 };
 

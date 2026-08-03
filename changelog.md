@@ -1,6 +1,7 @@
 # 1.4.0-beta
 
 - <cg>Add eri (with permission from Erymanthus) ![(insert eri sprite here)](km7dev.cosmic_clones/eri.png?scale=0.075)</c>
+- <cg>Add Markiplier.</c>
 - <cj>Rewrite the clones trigger to use Object Collab instead of the janky way I had it before.</c>
   - **Some other changes were made as a result of this:** 
   - <cg>You can now edit multiple clones triggers at once.</c>

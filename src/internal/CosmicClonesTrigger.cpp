@@ -188,10 +188,6 @@ void CosmicClonesTrigger::postInit() {
     this->setHitbox({ 1, 1 });
 }
 
-void CosmicClonesTrigger::postEditorInit() {
-    // this->setTriggerTextProperty(CosmicClonesTrigger::TARGET_GROUP_ID, { 0, -3 });
-}
-
 void CosmicClonesTrigger::triggerObject(GJBaseGameLayer* layer, const int uniqueID, const gd::vector<int>* remapKeys) {
     log::dev("Clone Trigger:\n"
               "Controller ID: {}\n"
@@ -528,6 +524,9 @@ void StyleNode::updateState(const Style& style) {
     } else if (m_style.type == "eri") {
         CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         CosmicClone::updateSpriteForPlayer(m_preview, CCSprite::create("eri.png"_spr), {1.27f, 1.f});
+    } else if (m_style.type == "Markiplier") {
+        CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+        CosmicClone::updateSpriteForPlayer(m_preview, CCSprite::create("markiplier.png"_spr));
     } else {
         CosmicClone::updateShaderForPlayer(m_preview, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
         CosmicClone::updateSpriteForPlayer(m_preview, nullptr);

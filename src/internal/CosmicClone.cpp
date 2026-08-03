@@ -323,6 +323,8 @@ int CosmicClone::playSFX(CosmicCloneSFXType type) const {
                 return FMODAudioEngine::get()->playEffect("spawn.wav"_spr);
             if (m_style.type == "Badeline Chaser\n(Celeste)")
                 return FMODAudioEngine::get()->playEffect("appear.wav"_spr, 1, 0, .35);
+            if (m_style.type == "Markiplier")
+                return FMODAudioEngine::get()->playEffect("hello everybody.mp3"_spr);
             return -1;
         case CosmicCloneSFXType::KillPlayer:
             if (m_style.type == "The Yellow One")
@@ -393,6 +395,10 @@ void CosmicClone::updateStyle(Style style) {
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
             updateSpriteForPlayer(plr, CCSprite::create("eri.png"_spr), {1.27f, 1.f});
+        } else if (m_style.type == "Markiplier") {
+            if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
+            updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
+            updateSpriteForPlayer(plr, CCSprite::create("markiplier.png"_spr));
         } else {
             if (!plr->m_gameLayer->m_isEditor) plr->toggleGhostEffect(GhostType::Disabled);
             updateShaderForPlayer(plr, CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));

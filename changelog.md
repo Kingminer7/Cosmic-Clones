@@ -8,7 +8,7 @@
   - <cy>Redid the Edit Object popup for the clones trigger.</c>
   - <cy>Vanilla features and other mods no longer treat this as a sequence trigger.</c>
   - <cy>Fixed a visual bug when Trigger Visualizer was enabled.</c>
-  - <cr>The Cosmic Clones tab in the editor is now removed. (A whole tab for one trigger was a waste of space anyways.)</c>
+  - <cr>The Cosmic Clones tab in the editor is now removed. (A whole tab for one trigger was a waste of space anyway.)</c>
 - <cy>Very slightly edited the appearance of the clones trigger (you will probably not notice the difference).</c>
 - <cy>Fixed a crash with some editor mods installed.</c>
 - <ca>Removed dependency on EditorTab API.</c>

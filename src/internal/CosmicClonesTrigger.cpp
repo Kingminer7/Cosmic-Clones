@@ -182,7 +182,10 @@ PopupOptions CosmicClonesTrigger::getEditObjectConfig(const Selected& selected) 
         .build();
 }
 
-CosmicClonesTrigger::CosmicClonesTrigger(ObjectInfo* info): CustomObject(info, GameObjectType::Modifier) { }
+CosmicClonesTrigger::CosmicClonesTrigger(ObjectInfo* info): CustomObject(info, ObjectTraits::builder()
+    .gameObjectType(GameObjectType::Modifier)
+    .ignoreEditorDuration(true)
+    .build()) { }
 
 void CosmicClonesTrigger::postInit() {
     this->setHitbox({ 1, 1 });
@@ -241,10 +244,6 @@ std::vector<std::string> CosmicClonesTrigger::getObjectDetails() {
         .field("Styles: {}", matjson::Value(m_styles).dump())
         .field("Stop: {}", m_stopper)
         .build();
-}
-
-bool CosmicClonesTrigger::ignoreEditorDuration() {
-    return true;
 }
 
 void StylePickMenu::updateState() {

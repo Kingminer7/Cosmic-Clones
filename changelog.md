@@ -14,6 +14,7 @@
 - <ca>Removed dependency on EditorTab API.</c>
 - <ca>Updated to Geode v5.8.2.</c>
 - <cg>Added a [patreon link](https://www.patreon.com/cw/km7dev) for the support button in the mod popup.</c>
+- <co>Removed code that prevented Herobrine from existing.</c>
 
 # 1.3.2-beta
 

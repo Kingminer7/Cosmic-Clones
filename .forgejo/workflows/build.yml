@@ -13,9 +13,9 @@ on:
         options:
           - release
           - debug
-  # push:
-  #   branches:
-  #     - "**"
+  push:
+    branches:
+      - "**"
 
 jobs:
   build:
@@ -68,7 +68,7 @@ jobs:
     if: >
       github.event_name != 'push' ||
       startsWith(github.event.head_commit.message, '[build]') ||
-      startsWith(github.event.head_commit.message, '[rel]')
+      startsWith(github.event.head_commit.message, '[rel]') 
     name: Package builds and create release
     # '-lazy' means you don't care if it takes a while for the job to start (ref: https://codeberg.org/actions/meta)
     runs-on: codeberg-tiny-lazy

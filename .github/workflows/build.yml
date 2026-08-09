@@ -73,7 +73,7 @@ jobs:
         id: build
 
       - uses: https://code.forgejo.org/forgejo/upload-artifact@v3
-        if: ${{ !( github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]')) ) }}
+        if: ${{ !( github.event.inputs.build_type == 'release' ) }}
         with:
           name: build-output
           path: ${{ steps.build.outputs.build-output }}
@@ -91,11 +91,13 @@ jobs:
           release-dir: ${{ steps.build.outputs.build-output }}
 
       - name: Read mod version & mod id
+        if: ${{ github.event.inputs.build_type == 'release' }}
         id: read_version
         run: |
           echo "MOD_VERSION=$(jq -r '.version' mod.json)" >> $GITHUB_ENV
 
       - name: Extract changelog section
+        if: ${{ github.event.inputs.build_type == 'release' }}
         id: changelog
         run: |
           CHANGELOG_CONTENT=$(awk '
@@ -111,6 +113,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Release (Codeberg)
+        if: ${{ github.event.inputs.build_type == 'release' }}
         uses: actions/forgejo-release@v2.13.4
         with:
           direction: upload

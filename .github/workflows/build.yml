@@ -1,4 +1,4 @@
-# Last updated 5/2/26
+# Last updated 8/9/26
 
 name: Build and Create Release
 
@@ -13,126 +13,82 @@ on:
         options:
           - release
           - debug
-  push:
-    branches:
-      - "**"
+  # push:
+  #   branches:
+  #     - "**"
 
 jobs:
   build:
     strategy:
       fail-fast: false
-
       matrix:
         config:
           - name: Windows
-            # this does linux to windows cross comp
-            os: ubuntu-latest
+            image: windows
             target: Win64
-            # if you don't want cross comp replace it with this
-            # os: windows-latest
-            # target isnt necessary if os is windows
 
           - name: macOS
-            os: macos-latest
+            image: macos
+            target: MacOS
 
           - name: Android32
-            os: ubuntu-latest
+            image: android
             target: Android32
 
           - name: Android64
-            os: ubuntu-latest
+            image: android
             target: Android64
 
           - name: iOS
-            os: macos-latest
+            image: ios
             target: iOS
 
     name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
+    runs-on: codeberg-medium
+    container:
+      image: prevter/geode-sdk:${{ matrix.config.image }}-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Build the mod
-        uses: hiimjasmine00/build-geode-mod@xwin
+        uses: https://codeberg.org/geode-sdk/build-geode-mod@main
         with:
-          bindings: geode-sdk/bindings
-          bindings-ref: main
-          combine: true
-          build-config: ${{ matrix.config.target == 'Win64' && 'RelWithDebInfo' || 'Debug' }}
+          build-config: RelWithDebInfo
           export-pdb: true
+          combine: true
           target: ${{ matrix.config.target }}
 
   package:
-    name: Package builds
-    runs-on: ubuntu-latest
-    needs: [ 'build' ]
+    name: Package builds and create release
+    # '-lazy' means you don't care if it takes a while for the job to start (ref: https://codeberg.org/actions/meta)
+    runs-on: codeberg-tiny-lazy
+    needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/combine@main
+      - uses: actions/checkout@v4
+
+      - uses: https://codeberg.org/geode-sdk/build-geode-mod/combine@main
         id: build
 
-      - uses: actions/upload-artifact@v4
+      - uses: https://code.forgejo.org/forgejo/upload-artifact@v3
+        if: ${{ !( github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]')) ) }}
         with:
           name: build-output
           path: ${{ steps.build.outputs.build-output }}
-
-  nightly:
-    name: Create Nightly Release
-    runs-on: ubuntu-latest
-    if: ${{ !( github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]')) ) }}
-    needs: [ 'package' ]
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: './artifacts/'
-
+      
       - name: Create Nightly Release
-        uses: andelf/nightly-release@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: nightly
-          name: 'Development Release'
-          body: |
-            Development release for commit ${{ github.sha }}.
-          files: |
-            ./artifacts/build-output/*.geode
-            ./artifacts/build-output/*.pdb
-            ./artifacts/build-output/*.sym
-            
-      - name: Create Nightly Release (Codeberg)
-        uses: kingminer7/forgejo-release@main
+        uses: actions/forgejo-release@v2.13.4
         with:
           direction: upload
-          url: https://codeberg.org
-          token: ${{ secrets.CODEBERG_TOKEN }}
-          repo: km7dev/cosmic-clones
-
           title: Nightly Release
           release-notes: Development release for commit ${{ github.sha }}.
           sha: ${{ github.sha }}
           tag: nightly
           prerelease: true
           override: true
-          release-dir: ./artifacts/build-output/
-
-  release:
-    name: Create Draft Release
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.build_type == 'release' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[rel]')) }}
-    needs: [ 'package' ]
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          path: './artifacts/'
+          release-dir: ${{ steps.build.outputs.build-output }}
 
       - name: Read mod version & mod id
         id: read_version
@@ -154,33 +110,14 @@ jobs:
           echo "$CHANGELOG_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Create Draft Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.MOD_VERSION }}
-          name: ${{ env.MOD_VERSION }}
-          body: |
-            ${{ env.CHANGELOG }}
-          draft: false
-          files: |
-            ./artifacts/build-output/*.geode
-            ./artifacts/build-output/*.pdb
-            ./artifacts/build-output/*.sym
-
       - name: Create Release (Codeberg)
-        uses: kingminer7/forgejo-release@main
+        uses: actions/forgejo-release@v2.13.4
         with:
           direction: upload
-          url: https://codeberg.org
-          token: ${{ secrets.CODEBERG_TOKEN }}
-          repo: km7dev/cosmic-clones
-
           title: ${{ env.MOD_VERSION }}
           release-notes: ${{ env.CHANGELOG }}
           sha: ${{ github.sha }}
           tag: ${{ env.MOD_VERSION }}
           prerelease: false
           override: false
-          release-dir: ./artifacts/build-output/
+          release-dir: ${{ steps.build.outputs.build-output }}

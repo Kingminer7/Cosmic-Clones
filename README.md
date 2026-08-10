@@ -1,3 +1,6 @@
+# [Moved to Codeberg](https://codeberg.org/km7dev/Cosmic-Clones)
+
+
 # Cosmic Clones
 
 ![Mod Version](https://api.geode-sdk.org/v1/mods/km7dev.cosmic_clones/status_badge?stat=version)
